@@ -45,9 +45,5 @@ fun EventsOverviewScreen(
                 .padding(top = 24.dp),
             contentScale = ContentScale.Crop
         )
-        Text("Das ist ein Text")
-        Text("Das ist ein Text")
-        Text("Das ist ein Text")
-        Text("Das ist ein Text")
     }
 }
