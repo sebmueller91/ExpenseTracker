@@ -35,4 +35,7 @@ sealed class Transaction(
         date: Date,
         currency: Currency
     ) : Transaction(purpose, splitBetween, moneyAmout, date, currency)
+
+
+
 }

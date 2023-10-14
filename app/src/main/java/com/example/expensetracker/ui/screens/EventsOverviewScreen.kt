@@ -3,6 +3,7 @@ package com.example.expensetracker.ui.screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -15,13 +16,24 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.expensetracker.R
+import com.example.expensetracker.ui.screens.destinations.EventDetailScreenDestination
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootNavGraph
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
+@RootNavGraph(start = true)
+@Destination
 @Composable
 fun EventsOverviewScreen(
-    navController: NavController,
-    modifier: Modifier = Modifier
+    navigator: DestinationsNavigator
 ) {
+    Button(onClick = {
+        navigator.navigate(EventDetailScreenDestination())
+    }) {
+        Text("Go to details")
+    }
+
     val systemUiController = rememberSystemUiController()
     val useDarkIcons = MaterialTheme.colors.isLight
     val backgroundColor = MaterialTheme.colors.background
@@ -34,7 +46,7 @@ fun EventsOverviewScreen(
     }
 
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
