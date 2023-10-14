@@ -11,8 +11,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.expensetracker.ui.screens.EventsOverviewScreen
+import com.example.expensetracker.ui.screens.NavGraphs
 import com.example.expensetracker.ui.theme.ExpenseTrackerTheme
 import com.example.expensetracker.util.Screen
+import com.ramcosta.composedestinations.DestinationsNavHost
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,15 +26,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    val navController = rememberNavController()
-                    NavHost(
-                        navController = navController,
-                        startDestination = Screen.EventsOverviewScreen.route
-                    ) {
-                        composable(route = Screen.EventsOverviewScreen.route) {
-                            EventsOverviewScreen(navController = navController)
-                        }
-                    }
+                    DestinationsNavHost(navGraph = NavGraphs.root)
                 }
             }
         }
