@@ -1,6 +1,9 @@
 package com.example.expensetracker.model
 
+import java.util.UUID
+
 data class Participant(
-    val id: Int,
     val name: String
-)
+) {
+    val id: UUID = UUID.randomUUID()
+}
