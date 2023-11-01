@@ -67,10 +67,7 @@ dependencies {
     implementation("io.github.raamcosta.compose-destinations:core:1.9.54")
     ksp("io.github.raamcosta.compose-destinations:ksp:1.9.54")
 
-    // Accompanist
-    def accompanist_version = '0.28.0'
-    // see for compose compatibility: https://github.com/google/accompanist
-    implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanist_version"
+    implementation "androidx.compose.material:material-icons-extended:$compose_ui_version"
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
