@@ -5,6 +5,7 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -67,13 +69,11 @@ fun EventsOverviewScreen(
             contentDescription = "App Logo",
             modifier = Modifier
                 .size(300.dp)
-                .padding(top = 24.dp),
+                .padding(top = 24.dp, bottom = 16.dp),
             contentScale = ContentScale.Crop
         )
         LazyColumn(
             modifier = Modifier
-                .background(MaterialTheme.colors.background)
-                .padding(horizontal = 24.dp)
         ) {
             items(items = events) {
                 EventCard(event = it)
@@ -89,7 +89,9 @@ private fun EventCard(
 ) {
     Card(
         elevation = 4.dp,
-        modifier = modifier.padding(8.dp)
+        shape = RoundedCornerShape(16.dp),
+        modifier = modifier
+            .padding(vertical = 8.dp, horizontal = 12.dp)
     ) {
         var expanded by remember { mutableStateOf(false) }
         Column(
@@ -100,14 +102,41 @@ private fun EventCard(
                 )
             )
         ) {
-            Row() {
-                Text(event.name)
+            Row(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(event.name, style = MaterialTheme.typography.h6)
+                Text("Costs: 1252.32€", style = MaterialTheme.typography.body2)
                 ExpandCollapseButton(expanded = expanded, onClick = { expanded = !expanded })
             }
             if (expanded) {
-                for (participant in event.participants) {
-                    Text(participant.name)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column {
+                        Text("Participants", style = MaterialTheme.typography.body1)
+                        for (participant in event.participants) {
+                            Text(
+                                participant.name,
+                                style = MaterialTheme.typography.subtitle2,
+                                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp)
+                            )
+                        }
+                    }
+                    Text(
+                        "Transactions: ${event.transactions.size}",
+                        style = MaterialTheme.typography.body1
+                    )
                 }
+
             }
         }
     }
