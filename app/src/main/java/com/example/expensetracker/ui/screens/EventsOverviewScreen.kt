@@ -4,7 +4,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,11 +16,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.runtime.Composable
@@ -37,6 +40,8 @@ import com.example.expensetracker.R
 import com.example.expensetracker.model.CURRENCIES
 import com.example.expensetracker.model.Event
 import com.example.expensetracker.model.Participant
+import com.example.expensetracker.ui.screens.destinations.AddEventScreenDestination
+import com.example.expensetracker.ui.screens.destinations.EventDetailScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -60,23 +65,35 @@ fun EventsOverviewScreen(
         )
     )
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.expense_tracker_main_logo),
-            contentDescription = "App Logo",
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(onClick = {
+                navigator.navigate(AddEventScreenDestination)
+            }) {
+                Icon(Icons.Filled.Add, contentDescription = "Add Event")
+            }
+        }
+    ) { innerPadding ->
+        Column(
             modifier = Modifier
-                .size(300.dp)
-                .padding(top = 24.dp, bottom = 16.dp),
-            contentScale = ContentScale.Crop
-        )
-        LazyColumn(
-            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            items(items = events) {
-                EventCard(event = it)
+            Image(
+                painter = painterResource(id = R.drawable.expense_tracker_main_logo),
+                contentDescription = "App Logo",
+                modifier = Modifier
+                    .size(300.dp)
+                    .padding(top = 24.dp, bottom = 16.dp),
+                contentScale = ContentScale.Crop
+            )
+            LazyColumn(
+                modifier = Modifier
+            ) {
+                items(items = events) {
+                    EventCard(event = it, navigator = navigator)
+                }
             }
         }
     }
@@ -85,6 +102,7 @@ fun EventsOverviewScreen(
 @Composable
 private fun EventCard(
     event: Event,
+    navigator: DestinationsNavigator,
     modifier: Modifier = Modifier.fillMaxWidth()
 ) {
     Card(
@@ -95,12 +113,14 @@ private fun EventCard(
     ) {
         var expanded by remember { mutableStateOf(false) }
         Column(
-            modifier = Modifier.animateContentSize(
-                animationSpec = spring(
-                    Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessMedium
+            modifier = Modifier
+                .animateContentSize(
+                    animationSpec = spring(
+                        Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessMedium
+                    )
                 )
-            )
+                .clickable(onClick = { navigator.navigate(EventDetailScreenDestination) })
         ) {
             Row(
                 modifier = Modifier
