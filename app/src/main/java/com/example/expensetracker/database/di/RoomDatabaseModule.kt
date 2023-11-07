@@ -3,6 +3,7 @@ package com.example.expensetracker.database.di
 import android.content.Context
 import androidx.room.Room
 import com.example.expensetracker.database.room.AppDatabase
+import com.example.expensetracker.database.room.dao.EventDao
 import com.example.expensetracker.database.room.dao.ParticipantDao
 import dagger.Module
 import dagger.Provides
@@ -27,5 +28,10 @@ object RoomDatabaseModule {
     @Provides
     fun provideParticipantDao(appDatabase: AppDatabase): ParticipantDao {
         return appDatabase.participantDao()
+    }
+
+    @Provides
+    fun provideEventDao(appDatabase: AppDatabase): EventDao {
+        return appDatabase.eventDao()
     }
 }
