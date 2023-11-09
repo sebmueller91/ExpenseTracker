@@ -52,19 +52,6 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 fun EventsOverviewScreen(
     navigator: DestinationsNavigator
 ) {
-    val events = listOf(
-        Event(
-            currency = CURRENCIES.get(0), name = "Summer Breeze",
-            participants = listOf(Participant("Dennis"), Participant("Johnny")),
-            transactions = listOf()
-        ),
-        Event(
-            currency = CURRENCIES.get(0), name = "Rock im Park",
-            participants = listOf(Participant("Dennis"), Participant("Johnny")),
-            transactions = listOf()
-        )
-    )
-
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = {
