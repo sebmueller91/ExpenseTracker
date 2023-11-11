@@ -1,9 +1,11 @@
 package com.example.expensetracker.repositories
 
-import com.example.expensetracker.model.Event
+import com.example.expensetracker.model.Group
 import kotlinx.coroutines.flow.StateFlow
+import java.util.UUID
 
 interface DatabaseRepository {
-    val events: StateFlow<List<Event>>
-    fun addEvent(event: Event)
+    val groups: StateFlow<List<Group>>
+    fun addEvent(group: Group)
+    fun deleteEvent(groupId: UUID)
 }

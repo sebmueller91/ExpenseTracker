@@ -2,4 +2,7 @@
     <string name="app_name">Expense Tracker</string>
     <string name="add_new_event">Add New Event</string>
     <string name="save_event">Save Event</string>
+    <string name="add_group">Add Group</string>
+    <string name="group_name">Group name</string>
+    <string name="next">Next</string>
 </resources>

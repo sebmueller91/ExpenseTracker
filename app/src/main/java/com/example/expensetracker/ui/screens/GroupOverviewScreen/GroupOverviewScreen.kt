@@ -1,4 +1,4 @@
-package com.example.expensetracker.ui.screens
+package com.example.expensetracker.ui.screens.GroupOverviewScreen
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,29 +36,32 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.expensetracker.R
-import com.example.expensetracker.model.CURRENCIES
-import com.example.expensetracker.model.Event
-import com.example.expensetracker.model.Participant
-import com.example.expensetracker.ui.screens.destinations.AddEventScreenDestination
-import com.example.expensetracker.ui.screens.destinations.EventDetailScreenDestination
+import com.example.expensetracker.model.Group
+import com.example.expensetracker.ui.screens.destinations.AddGroupScreenDestination
+import com.example.expensetracker.ui.screens.destinations.GroupDetailScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import org.koin.androidx.compose.getViewModel
 
 @RootNavGraph(start = true)
 @Destination
 @Composable
-fun EventsOverviewScreen(
+fun GroupOverviewScreen(
     navigator: DestinationsNavigator
 ) {
+    val viewModel: GroupOverviewViewModel = getViewModel()
+    val uiState = viewModel.uiStateFlow.collectAsState()
+
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = {
-                navigator.navigate(AddEventScreenDestination)
+                navigator.navigate(AddGroupScreenDestination)
             }) {
-                Icon(Icons.Filled.Add, contentDescription = "Add Event")
+                Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add_group))
             }
         }
     ) { innerPadding ->
@@ -78,8 +82,8 @@ fun EventsOverviewScreen(
             LazyColumn(
                 modifier = Modifier
             ) {
-                items(items = events) {
-                    EventCard(event = it, navigator = navigator)
+                items(items = uiState.value.groups ) {
+                    GroupCard(group = it, navigator = navigator)
                 }
             }
         }
@@ -87,8 +91,8 @@ fun EventsOverviewScreen(
 }
 
 @Composable
-private fun EventCard(
-    event: Event,
+private fun GroupCard(
+    group: Group,
     navigator: DestinationsNavigator,
     modifier: Modifier = Modifier.fillMaxWidth()
 ) {
@@ -107,7 +111,7 @@ private fun EventCard(
                         stiffness = Spring.StiffnessMedium
                     )
                 )
-                .clickable(onClick = { navigator.navigate(EventDetailScreenDestination) })
+                .clickable(onClick = { navigator.navigate(GroupDetailScreenDestination) })
         ) {
             Row(
                 modifier = Modifier
@@ -116,7 +120,7 @@ private fun EventCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(event.name, style = MaterialTheme.typography.h6)
+                Text(group.name, style = MaterialTheme.typography.h6)
                 Text("Costs: 1252.32€", style = MaterialTheme.typography.body2)
                 ExpandCollapseButton(expanded = expanded, onClick = { expanded = !expanded })
             }
@@ -130,7 +134,7 @@ private fun EventCard(
                 ) {
                     Column {
                         Text("Participants", style = MaterialTheme.typography.body1)
-                        for (participant in event.participants) {
+                        for (participant in group.participants) {
                             Text(
                                 participant.name,
                                 style = MaterialTheme.typography.subtitle2,
@@ -139,7 +143,7 @@ private fun EventCard(
                         }
                     }
                     Text(
-                        "Transactions: ${event.transactions.size}",
+                        "Transactions: ${group.transactions.size}",
                         style = MaterialTheme.typography.body1
                     )
                 }

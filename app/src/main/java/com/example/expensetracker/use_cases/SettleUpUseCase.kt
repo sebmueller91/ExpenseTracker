@@ -1,17 +1,14 @@
 package com.example.expensetracker.use_cases
 
-import android.util.Log
-import com.example.expensetracker.model.Event
+import com.example.expensetracker.model.Group
 import com.example.expensetracker.model.MoneyAmout
 import com.example.expensetracker.model.Participant
 import com.example.expensetracker.model.Transaction
-import java.security.InvalidAlgorithmParameterException
-import java.util.Date
 
 
 class SettleUpUseCase {
     class CalculateEventCost(
-        val event: Event
+        val group: Group
     ) {
         fun execute(): List<Transaction.Payment> {
 //            val transactions = mutableListOf<Transaction.Payment>()
@@ -42,9 +39,9 @@ class SettleUpUseCase {
 
         private fun calculateParticipantBalances(): Array<MoneyAmout> {
             val participantsBalances =
-                Array(event.participants.size) { MoneyAmout(0.0, event.currency) }
+                Array(group.participants.size) { MoneyAmout(0.0, group.currency) }
 
-            for (transaction in event.transactions) {
+            for (transaction in group.transactions) {
                 when (transaction) {
                     is Transaction.Payment -> {
                         participantsBalances.addToBalance(
@@ -89,14 +86,14 @@ class SettleUpUseCase {
         }
 
         private fun Array<MoneyAmout>.addToBalance(participant: Participant, amount: MoneyAmout) {
-            this[event.participants.indexOf(participant)] += amount
+            this[group.participants.indexOf(participant)] += amount
         }
 
         private fun Array<MoneyAmout>.subtractFromBalance(
             participant: Participant,
             amount: MoneyAmout
         ) {
-            this[event.participants.indexOf(participant)] += amount
+            this[group.participants.indexOf(participant)] += amount
         }
     }
 }
