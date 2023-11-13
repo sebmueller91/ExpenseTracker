@@ -6,6 +6,6 @@ import java.util.UUID
 
 interface DatabaseRepository {
     val groups: StateFlow<List<Group>>
-    fun addEvent(group: Group)
-    fun deleteEvent(groupId: UUID)
+    fun addGroup(group: Group)
+    fun Group(groupId: UUID)
 }

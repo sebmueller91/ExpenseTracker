@@ -1,9 +1,11 @@
 package com.example.expensetracker.model
 
-val CURRENCIES = listOf(Currency(name = "Euro", abbreviation = "EUR", symbol = '€'))
-
-data class Currency(
-    val name: String,
+enum class Currency(
+    val currency_name: String,
     val abbreviation: String,
     val symbol: Char
-)
+) {
+    EURO( "Euro", "EUR",'€'),
+    USD("United States Dollar", "USD", '$'),
+    POUND_STERLING("Pound Sterling", "GBP", '£')
+}
