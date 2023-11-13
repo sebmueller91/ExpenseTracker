@@ -1,4 +1,4 @@
-package com.example.expensetracker.ui.screens.GroupOverviewScreen
+package com.example.expensetracker.ui.screens.GroupOverview
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
