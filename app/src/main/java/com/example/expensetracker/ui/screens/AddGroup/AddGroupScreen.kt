@@ -49,9 +49,11 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.expensetracker.R
 import com.example.expensetracker.ui.screens.destinations.GroupDetailScreenDestination
+import com.example.expensetracker.ui.theme.ExpenseTrackerTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.getViewModel
@@ -280,8 +282,49 @@ fun ParticipantsInput(
     }
 }
 
-private fun List<String>.add(element: String): List<String> {
-    val newList = this.toMutableList()
-    newList.add(element)
-    return newList.toList()
+@Composable
+private fun AddGroupScreenPreview(darkTheme: Boolean, showScreen1: Boolean) {
+    ExpenseTrackerTheme(darkTheme = darkTheme) {
+        val uiState = remember {
+            mutableStateOf(
+                AddGroupUiState(
+                    groupName = "Rock im Park 2023",
+                    participantsNames = listOf("Peter", "Michaela", "Gustav"),
+                    showScreen1 = showScreen1
+                )
+            )
+        }
+        AddGroupScreen(
+            uiStateFlow = uiState,
+            updateShowScreen1 = { },
+            updateGroupName = { },
+            updateParticipantsNames = { },
+            onClose = {},
+            onFinish = { },
+            onBack = {})
+    }
+}
+
+@Preview(name = "Add Group Screen 1 - Dark Theme")
+@Composable
+private fun AddGroupScreen1DarkPreview() {
+    AddGroupScreenPreview(darkTheme = true, showScreen1 = true)
+}
+
+@Preview(name = "Add Group Screen 1 - Light Theme")
+@Composable
+private fun AddGroupScreen1LightPreview() {
+    AddGroupScreenPreview(darkTheme = false, showScreen1 = true)
+}
+
+@Preview(name = "Add Group Screen 2 - Dark Theme")
+@Composable
+private fun AddGroupScreen2DarkPreview() {
+    AddGroupScreenPreview(darkTheme = true, showScreen1 = false)
+}
+
+@Preview(name = "Add Group Screen 2 - Light Theme")
+@Composable
+private fun AddGroupScreen2LightPreview() {
+    AddGroupScreenPreview(darkTheme = false, showScreen1 = false)
 }

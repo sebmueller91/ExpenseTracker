@@ -47,6 +47,8 @@ import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.getViewModel
 
+// TODO: Refactor and add preview
+
 @RootNavGraph(start = true)
 @Destination
 @Composable
