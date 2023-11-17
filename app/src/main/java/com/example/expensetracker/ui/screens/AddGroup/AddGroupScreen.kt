@@ -9,6 +9,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -32,10 +33,8 @@ import androidx.compose.material.icons.filled.RemoveCircleOutline
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
@@ -232,7 +231,6 @@ fun ParticipantsInput(
     participantsNames: List<String>,
     onParticipantsChange: (List<String>) -> Unit
 ) {
-    var newParticipant by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
 
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -254,15 +252,24 @@ fun ParticipantsInput(
                         .weight(1f)
                         .padding(horizontal = 8.dp, vertical = 4.dp),
                     keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
-                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done)
+                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+                    colors = TextFieldDefaults.textFieldColors(
+                        focusedIndicatorColor = MaterialTheme.colors.secondary,
+                        unfocusedIndicatorColor = MaterialTheme.colors.secondary,
+                        cursorColor = MaterialTheme.colors.primary,
+                        textColor = MaterialTheme.colors.onBackground,
+                        backgroundColor = Color.Transparent,
+                    )
                 )
                 if (participantsNames.size > 1) {
                     IconButton(onClick = {
                         onParticipantsChange(
                             participantsNames.toMutableList().apply { removeAt(index) })
-                    }) {
+                    }, modifier = Modifier.size(30.dp)) {
                         Icon(Icons.Default.RemoveCircleOutline, contentDescription = null)
                     }
+                } else {
+                    Spacer(Modifier.size(30.dp))
                 }
             }
         }
