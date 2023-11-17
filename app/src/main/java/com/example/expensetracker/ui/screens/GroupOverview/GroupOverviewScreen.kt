@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,11 +38,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.expensetracker.R
+import com.example.expensetracker.model.Currency
 import com.example.expensetracker.model.Group
+import com.example.expensetracker.model.Participant
 import com.example.expensetracker.ui.screens.destinations.AddGroupScreenDestination
 import com.example.expensetracker.ui.screens.destinations.GroupDetailScreenDestination
+import com.example.expensetracker.ui.theme.ExpenseTrackerTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -56,13 +61,23 @@ fun GroupOverviewScreen(
     navigator: DestinationsNavigator
 ) {
     val viewModel: GroupOverviewViewModel = getViewModel()
-    val uiState = viewModel.uiStateFlow.collectAsState()
+    val uiStateFlow = viewModel.uiStateFlow.collectAsState()
 
+    GroupOverviewScreen(
+        uiStateFlow = uiStateFlow,
+        onAddGroup = { navigator.navigate(AddGroupScreenDestination) },
+        onNavigateToDetailScreen = { navigator.navigate(GroupDetailScreenDestination) })
+}
+
+@Composable
+private fun GroupOverviewScreen(
+    uiStateFlow: State<GroupOverviewUiState>,
+    onAddGroup: () -> Unit,
+    onNavigateToDetailScreen: () -> Unit
+) {
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-                navigator.navigate(AddGroupScreenDestination)
-            }) {
+            FloatingActionButton(onClick = onAddGroup) {
                 Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add_group))
             }
         }
@@ -84,8 +99,8 @@ fun GroupOverviewScreen(
             LazyColumn(
                 modifier = Modifier
             ) {
-                items(items = uiState.value.groups ) {
-                    GroupCard(group = it, navigator = navigator)
+                items(items = uiStateFlow.value.groups) {
+                    GroupCard(group = it, onNavigateToDetailScreen = onNavigateToDetailScreen)
                 }
             }
         }
@@ -95,7 +110,7 @@ fun GroupOverviewScreen(
 @Composable
 private fun GroupCard(
     group: Group,
-    navigator: DestinationsNavigator,
+    onNavigateToDetailScreen: () -> Unit,
     modifier: Modifier = Modifier.fillMaxWidth()
 ) {
     Card(
@@ -113,7 +128,7 @@ private fun GroupCard(
                         stiffness = Spring.StiffnessMedium
                     )
                 )
-                .clickable(onClick = { navigator.navigate(GroupDetailScreenDestination) })
+                .clickable(onClick = onNavigateToDetailScreen)
         ) {
             Row(
                 modifier = Modifier
@@ -168,4 +183,48 @@ private fun ExpandCollapseButton(
             contentDescription = null
         )
     }
+}
+
+@Composable
+private fun GroupOverviewScreenPreview(darkMode: Boolean) {
+    val uiState = remember {
+        mutableStateOf(
+            GroupOverviewUiState(
+                groups = listOf(
+                    Group(
+                        name = "Rock im Park",
+                        participants = listOf(
+                            Participant("Participant 1"),
+                            Participant("Participant 2")
+                        ),
+                        currency = Currency.EURO,
+                        transactions = listOf()
+                    ), Group(
+                        name = "Summer Breeze",
+                        participants = listOf(
+                            Participant("Participant 3"),
+                            Participant("Participant 4")
+                        ),
+                        currency = Currency.EURO,
+                        transactions = listOf()
+                    )
+                )
+            )
+        )
+    }
+    ExpenseTrackerTheme(darkTheme = darkMode) {
+        GroupOverviewScreen(uiStateFlow = uiState, onAddGroup = {}, onNavigateToDetailScreen = {})
+    }
+}
+
+@Preview(name = "Group Overview Screen - Light Mode")
+@Composable
+private fun GroupOverviewScreenLightPreview() {
+    GroupOverviewScreenPreview(darkMode = false)
+}
+
+@Preview(name = "Group Overview Screen - Dark Mode")
+@Composable
+private fun GroupOverviewScreenDarkPreview() {
+    GroupOverviewScreenPreview(darkMode = true)
 }
