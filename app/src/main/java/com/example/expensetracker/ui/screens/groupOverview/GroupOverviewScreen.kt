@@ -1,4 +1,4 @@
-package com.example.expensetracker.ui.screens.GroupOverview
+package com.example.expensetracker.ui.screens.groupOverview
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
