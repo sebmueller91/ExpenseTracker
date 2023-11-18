@@ -1,4 +1,4 @@
-package com.example.expensetracker.ui.screens.AddGroup
+package com.example.expensetracker.ui.screens.addGroup
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
+import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -26,11 +27,13 @@ import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.RemoveCircleOutline
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -40,6 +43,8 @@ import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
@@ -72,6 +77,7 @@ fun AddGroupScreen(
         onClose = { navigator.popBackStack() },
         updateGroupName = viewModel::updateGroupName,
         updateParticipantsNames = viewModel::updateParticipantsNames,
+        addParticipant = viewModel::addParticipant,
         onFinish = {
             viewModel.createNewGroup()
             navigator.navigate(GroupDetailScreenDestination)
@@ -93,11 +99,17 @@ private fun AddGroupScreen(
     updateShowScreen1: (Boolean) -> Unit,
     updateGroupName: (String) -> Unit,
     updateParticipantsNames: (List<String>) -> Unit,
+    addParticipant: () -> Unit,
     onClose: () -> Unit,
     onFinish: () -> Unit,
     onBack: () -> Unit
 ) {
     BackHandler(enabled = true, onBack = onBack)
+
+    val groupNameFocusRequester = remember { FocusRequester() }
+    LaunchedEffect(key1 = Unit) {
+        groupNameFocusRequester.requestFocus()
+    }
 
     val screenWidth =
         with(LocalDensity.current) {
@@ -106,7 +118,12 @@ private fun AddGroupScreen(
 
     Scaffold(topBar = {
         TopAppBar(
-            title = { Text("Add new group") },
+            title = {
+                Text(
+                    if (uiStateFlow.value.showScreen1) stringResource(R.string.add_new_group)
+                    else stringResource(R.string.add_group_members)
+                )
+            },
             navigationIcon = {
                 if (uiStateFlow.value.showScreen1) {
                     NavigationIcon(imageVector = Icons.Default.Close, onClick = onClose)
@@ -124,6 +141,12 @@ private fun AddGroupScreen(
             backgroundColor = MaterialTheme.colors.background,
             elevation = 0.dp
         )
+    }, floatingActionButton = {
+        if (!uiStateFlow.value.showScreen1) {
+            FloatingActionButton(onClick = addParticipant) {
+                Icon(Icons.Filled.Add, contentDescription = null)
+            }
+        }
     }) { innerPadding ->
         Box(
             modifier = Modifier
@@ -147,7 +170,9 @@ private fun AddGroupScreen(
                     groupName = uiStateFlow.value.groupName,
                     onValueChange = updateGroupName,
                     onFinished = { updateShowScreen1(false) },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .focusRequester(groupNameFocusRequester)
+                        .fillMaxWidth()
                 )
             }
 
@@ -232,6 +257,9 @@ fun ParticipantsInput(
     onParticipantsChange: (List<String>) -> Unit
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
+    val focusRequesters = remember(participantsNames.size) {
+        List(participantsNames.size) { FocusRequester() }
+    }
 
     Column(modifier = Modifier.fillMaxWidth()) {
         participantsNames.forEachIndexed { index, participant ->
@@ -249,6 +277,7 @@ fun ParticipantsInput(
                     },
                     label = { Text("Participant ${index + 1}") },
                     modifier = Modifier
+                        .focusRequester(focusRequesters[index])
                         .weight(1f)
                         .padding(horizontal = 8.dp, vertical = 4.dp),
                     keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
@@ -274,17 +303,25 @@ fun ParticipantsInput(
             }
         }
 
-        IconButton(
-            modifier = Modifier.align(CenterHorizontally),
-            onClick = {
-                onParticipantsChange(participantsNames.toMutableList().apply { add("") })
-            }) {
-            Icon(
-                modifier = Modifier.size(45.dp),
-                imageVector = Icons.Default.AddCircle,
-                tint = MaterialTheme.colors.secondary,
-                contentDescription = null
-            )
+        LaunchedEffect(key1 = participantsNames.size) {
+            focusRequesters.lastOrNull()?.requestFocus()
+        }
+
+        if (participantsNames.none { it.isBlank() }) {
+            IconButton(
+                modifier = Modifier.align(CenterHorizontally),
+                onClick = {
+                    onParticipantsChange(participantsNames.toMutableList().apply { add("") })
+                },
+                enabled = participantsNames.none { it.isBlank() }
+            ) {
+                Icon(
+                    modifier = Modifier.size(45.dp),
+                    imageVector = Icons.Default.AddCircle,
+                    tint = MaterialTheme.colors.secondary,
+                    contentDescription = null
+                )
+            }
         }
     }
 }
@@ -306,6 +343,7 @@ private fun AddGroupScreenPreview(darkTheme: Boolean, showScreen1: Boolean) {
             updateShowScreen1 = { },
             updateGroupName = { },
             updateParticipantsNames = { },
+            addParticipant = {},
             onClose = {},
             onFinish = { },
             onBack = {})

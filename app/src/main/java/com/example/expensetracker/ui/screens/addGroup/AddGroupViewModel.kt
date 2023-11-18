@@ -1,4 +1,4 @@
-package com.example.expensetracker.ui.screens.AddGroup
+package com.example.expensetracker.ui.screens.addGroup
 
 import androidx.lifecycle.ViewModel
 import com.example.expensetracker.model.Participant
@@ -26,6 +26,12 @@ class AddGroupViewModel(private val databaseRepository: DatabaseRepository) : Vi
     fun updateParticipantsNames(participantsNames: List<String>) {
         _uiState.update {
             it.copy(participantsNames = participantsNames)
+        }
+    }
+
+    fun addParticipant() {
+        _uiState.update {
+            it.copy(participantsNames = it.participantsNames.toMutableList().apply { add("") })
         }
     }
 
