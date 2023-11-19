@@ -6,6 +6,8 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,9 +16,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -28,19 +35,20 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.RemoveCircleOutline
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
-import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -51,11 +59,14 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.expensetracker.R
+import com.example.expensetracker.model.Currency
 import com.example.expensetracker.ui.screens.destinations.GroupDetailScreenDestination
 import com.example.expensetracker.ui.theme.ExpenseTrackerTheme
 import com.ramcosta.composedestinations.annotation.Destination
@@ -76,8 +87,10 @@ fun AddGroupScreen(
         updateShowScreen1 = viewModel::updateShowScreen1,
         onClose = { navigator.popBackStack() },
         updateGroupName = viewModel::updateGroupName,
-        updateParticipantsNames = viewModel::updateParticipantsNames,
         addParticipant = viewModel::addParticipant,
+        updateParticipant = viewModel::updateParticipant,
+        deleteParticipant = viewModel::deleteParticipant,
+        selectCurrency = viewModel::selectCurrency,
         onFinish = {
             viewModel.createNewGroup()
             navigator.navigate(GroupDetailScreenDestination)
@@ -98,17 +111,21 @@ private fun AddGroupScreen(
     uiStateFlow: State<AddGroupUiState>,
     updateShowScreen1: (Boolean) -> Unit,
     updateGroupName: (String) -> Unit,
-    updateParticipantsNames: (List<String>) -> Unit,
     addParticipant: () -> Unit,
+    updateParticipant: (Int, String) -> Unit,
+    deleteParticipant: (Int) -> Unit,
+    selectCurrency: (Currency) -> Unit,
     onClose: () -> Unit,
     onFinish: () -> Unit,
     onBack: () -> Unit
 ) {
     BackHandler(enabled = true, onBack = onBack)
 
-    val groupNameFocusRequester = remember { FocusRequester() }
+    val groupNameFocusRequester by remember { mutableStateOf(FocusRequester()) }
     LaunchedEffect(key1 = Unit) {
-        groupNameFocusRequester.requestFocus()
+        if (uiStateFlow.value.showScreen1) {
+            groupNameFocusRequester.requestFocus()
+        }
     }
 
     val screenWidth =
@@ -134,17 +151,33 @@ private fun AddGroupScreen(
                 }
             },
             actions = {
-                Button(onClick = onFinish) {
-                    Text("Save")
+                if (!uiStateFlow.value.showScreen1) {
+                    Button(onClick = onFinish) {
+                        Text("Save")
+                    }
                 }
             },
             backgroundColor = MaterialTheme.colors.background,
             elevation = 0.dp
         )
     }, floatingActionButton = {
+        val fabEnabled by remember(uiStateFlow.value.participantsNames) {
+            mutableStateOf(uiStateFlow.value.participantsNames.none { it.isBlank() })
+        }
         if (!uiStateFlow.value.showScreen1) {
-            FloatingActionButton(onClick = addParticipant) {
-                Icon(Icons.Filled.Add, contentDescription = null)
+            FloatingActionButton(
+                onClick = {
+                    if (fabEnabled) addParticipant()
+                    else {
+                    }
+                },
+                backgroundColor = if (fabEnabled) MaterialTheme.colors.primary else Color.LightGray // TOOD: Move into theme
+            ) {
+                Icon(
+                    Icons.Filled.Add,
+                    contentDescription = null,
+                    tint = if (fabEnabled) MaterialTheme.colors.onPrimary else Color.White // TOOD: Move into themes
+                )
             }
         }
     }) { innerPadding ->
@@ -166,14 +199,28 @@ private fun AddGroupScreen(
                     animationSpec = tween(durationMillis = 300, easing = LinearEasing)
                 )
             ) {
-                GroupNameTextField(
-                    groupName = uiStateFlow.value.groupName,
-                    onValueChange = updateGroupName,
-                    onFinished = { updateShowScreen1(false) },
-                    modifier = Modifier
-                        .focusRequester(groupNameFocusRequester)
-                        .fillMaxWidth()
-                )
+                Column() {
+                    GroupNameTextField(
+                        groupName = uiStateFlow.value.groupName,
+                        onValueChange = updateGroupName,
+                        onFinished = { updateShowScreen1(false) },
+                        modifier = Modifier
+                            .focusRequester(groupNameFocusRequester)
+                            .fillMaxWidth()
+                    )
+                    CurrencyDropdown(
+                        selectedCurrency = uiStateFlow.value.currency,
+                        selectCurrency = selectCurrency
+                    )
+                    Spacer(Modifier.weight(1f))
+                    Button(
+                        onClick = { updateShowScreen1(false) }, modifier = Modifier
+                            .align(Alignment.CenterHorizontally),
+                        enabled = uiStateFlow.value.groupName.isNotBlank()
+                    ) {
+                        Text(stringResource(id = R.string.next))
+                    }
+                }
             }
 
             AnimatedVisibility(
@@ -189,7 +236,8 @@ private fun AddGroupScreen(
             ) {
                 ParticipantsInput(
                     participantsNames = uiStateFlow.value.participantsNames,
-                    onParticipantsChange = updateParticipantsNames
+                    updateParticipant = updateParticipant,
+                    deleteParticipant = deleteParticipant
                 )
             }
         }
@@ -239,89 +287,149 @@ private fun GroupNameTextField(
                 backgroundColor = Color.Transparent,
             )
         )
-        Button(
-            onClick = onFinished, modifier = Modifier
-                .padding(16.dp)
-                .align(Alignment.End),
-            enabled = groupName.isNotBlank()
-        ) {
-            Text(stringResource(id = R.string.next))
+    }
+}
+
+@Composable
+private fun CurrencyDropdown(
+    selectedCurrency: Currency,
+    selectCurrency: (Currency) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 48.dp, vertical = 32.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
+    ) {
+        Text(stringResource(id = R.string.currency))
+        Spacer(modifier = Modifier.weight(1f))
+
+        Box {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.clickable { expanded = !expanded }
+            ) {
+                Text(
+                    text = "${selectedCurrency.symbol} (${selectedCurrency.currency_name})",
+                    style = MaterialTheme.typography.body1
+                )
+                Icon(
+                    imageVector = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
+                    contentDescription = null
+                )
+            }
+
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.align(Alignment.BottomStart) // Aligns the dropdown to the bottom of the Box
+            ) {
+                Currency.values().forEach { currency ->
+                    DropdownMenuItem(onClick = {
+                        selectCurrency(currency)
+                        expanded = false
+                    }) {
+                        Text(
+                            text = "${currency.symbol} (${currency.currency_name})",
+                            style = MaterialTheme.typography.body2
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ParticipantsInput(
+    participantsNames: List<String>,
+    updateParticipant: (Int, String) -> Unit,
+    deleteParticipant: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val listState = rememberLazyListState()
+    var previousValue by remember { mutableStateOf(participantsNames.size) }
+    LaunchedEffect(key1 = participantsNames.size) {
+        if (previousValue < participantsNames.size) {
+            listState.animateScrollToItem(participantsNames.size - 1)
+            previousValue = participantsNames.size
+        }
+    }
+
+    LazyColumn(modifier = modifier, state = listState) {
+        itemsIndexed(participantsNames) { index, participantName ->
+            ParicipantTextField(
+                participantName = participantName,
+                index = index,
+                numberParticipants = participantsNames.size,
+                updateParticipant = updateParticipant,
+                deleteParticipant = deleteParticipant
+            )
         }
     }
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun ParticipantsInput(
-    participantsNames: List<String>,
-    onParticipantsChange: (List<String>) -> Unit
+private fun ParicipantTextField(
+    participantName: String,
+    index: Int,
+    numberParticipants: Int,
+    updateParticipant: (Int, String) -> Unit,
+    deleteParticipant: (Int) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
-    val focusRequesters = remember(participantsNames.size) {
-        List(participantsNames.size) { FocusRequester() }
+    val focusRequester = remember { FocusRequester() }
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 18.dp, vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        TextField( // TODO: Limit lines
+            value = participantName,
+            textStyle = TextStyle(fontSize = 14.sp, lineHeight = 16.sp),
+            onValueChange = { updateParticipant(index, it) },
+            label = { Text("Participant ${index + 1}") },
+            modifier = Modifier
+                .then(
+                    if (index == numberParticipants - 1) Modifier.focusRequester(
+                        focusRequester
+                    ) else Modifier
+                )
+                .weight(1f)
+                .padding(horizontal = 8.dp, vertical = 1.dp),
+            keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+            colors = TextFieldDefaults.textFieldColors(
+                focusedIndicatorColor = MaterialTheme.colors.secondary,
+                unfocusedIndicatorColor = MaterialTheme.colors.secondary,
+                cursorColor = MaterialTheme.colors.primary,
+                textColor = MaterialTheme.colors.onBackground,
+                backgroundColor = Color.Transparent,
+            )
+        )
+        if (numberParticipants > 1) {
+            IconButton(
+                onClick = { deleteParticipant(index) },
+                modifier = Modifier.size(30.dp)
+            ) {
+                Icon(Icons.Default.RemoveCircleOutline, contentDescription = null)
+            }
+        } else {
+            Spacer(Modifier.size(30.dp))
+        }
     }
 
-    Column(modifier = Modifier.fillMaxWidth()) {
-        participantsNames.forEachIndexed { index, participant ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 4.dp),
-                verticalAlignment = CenterVertically
-            ) {
-                TextField(
-                    value = participant,
-                    onValueChange = {
-                        onParticipantsChange(
-                            participantsNames.toMutableList().apply { set(index, it) })
-                    },
-                    label = { Text("Participant ${index + 1}") },
-                    modifier = Modifier
-                        .focusRequester(focusRequesters[index])
-                        .weight(1f)
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
-                    keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
-                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-                    colors = TextFieldDefaults.textFieldColors(
-                        focusedIndicatorColor = MaterialTheme.colors.secondary,
-                        unfocusedIndicatorColor = MaterialTheme.colors.secondary,
-                        cursorColor = MaterialTheme.colors.primary,
-                        textColor = MaterialTheme.colors.onBackground,
-                        backgroundColor = Color.Transparent,
-                    )
-                )
-                if (participantsNames.size > 1) {
-                    IconButton(onClick = {
-                        onParticipantsChange(
-                            participantsNames.toMutableList().apply { removeAt(index) })
-                    }, modifier = Modifier.size(30.dp)) {
-                        Icon(Icons.Default.RemoveCircleOutline, contentDescription = null)
-                    }
-                } else {
-                    Spacer(Modifier.size(30.dp))
-                }
-            }
-        }
-
-        LaunchedEffect(key1 = participantsNames.size) {
-            focusRequesters.lastOrNull()?.requestFocus()
-        }
-
-        if (participantsNames.none { it.isBlank() }) {
-            IconButton(
-                modifier = Modifier.align(CenterHorizontally),
-                onClick = {
-                    onParticipantsChange(participantsNames.toMutableList().apply { add("") })
-                },
-                enabled = participantsNames.none { it.isBlank() }
-            ) {
-                Icon(
-                    modifier = Modifier.size(45.dp),
-                    imageVector = Icons.Default.AddCircle,
-                    tint = MaterialTheme.colors.secondary,
-                    contentDescription = null
-                )
-            }
+    LaunchedEffect(key1 = numberParticipants) {
+        if (index == numberParticipants - 1) {
+            focusRequester?.requestFocus()
         }
     }
 }
@@ -342,8 +450,10 @@ private fun AddGroupScreenPreview(darkTheme: Boolean, showScreen1: Boolean) {
             uiStateFlow = uiState,
             updateShowScreen1 = { },
             updateGroupName = { },
-            updateParticipantsNames = { },
             addParticipant = {},
+            updateParticipant = { _, _ -> },
+            deleteParticipant = {},
+            selectCurrency = {},
             onClose = {},
             onFinish = { },
             onBack = {})

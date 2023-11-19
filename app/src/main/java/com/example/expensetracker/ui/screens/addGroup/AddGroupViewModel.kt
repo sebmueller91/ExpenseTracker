@@ -1,6 +1,7 @@
 package com.example.expensetracker.ui.screens.addGroup
 
 import androidx.lifecycle.ViewModel
+import com.example.expensetracker.model.Currency
 import com.example.expensetracker.model.Participant
 import com.example.expensetracker.repositories.DatabaseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,15 +24,30 @@ class AddGroupViewModel(private val databaseRepository: DatabaseRepository) : Vi
         }
     }
 
-    fun updateParticipantsNames(participantsNames: List<String>) {
-        _uiState.update {
-            it.copy(participantsNames = participantsNames)
-        }
-    }
-
     fun addParticipant() {
         _uiState.update {
             it.copy(participantsNames = it.participantsNames.toMutableList().apply { add("") })
+        }
+    }
+
+    fun updateParticipant(index: Int, value: String) {
+        _uiState.update {
+            it.copy(
+                participantsNames = it.participantsNames.toMutableList()
+                    .apply { set(index, value) })
+        }
+    }
+
+    fun deleteParticipant(index: Int) {
+        _uiState.update {
+            it.copy(
+                participantsNames = it.participantsNames.toMutableList().apply { removeAt(index) })
+        }
+    }
+
+    fun selectCurrency(currency: Currency) {
+        _uiState.update {
+            it.copy(currency = currency)
         }
     }
 
