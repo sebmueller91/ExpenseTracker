@@ -1,4 +1,4 @@
-package com.example.expensetracker.ui.screens.groupOverview
+package com.example.expensetracker.ui.screens.group_overview
 
 import com.example.expensetracker.model.Group
 

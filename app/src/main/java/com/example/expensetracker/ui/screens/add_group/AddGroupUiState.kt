@@ -1,4 +1,4 @@
-package com.example.expensetracker.ui.screens.addGroup
+package com.example.expensetracker.ui.screens.add_group
 
 import com.example.expensetracker.model.Currency
 

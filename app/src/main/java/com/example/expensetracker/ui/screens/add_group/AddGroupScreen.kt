@@ -1,4 +1,4 @@
-package com.example.expensetracker.ui.screens.addGroup
+package com.example.expensetracker.ui.screens.add_group
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -65,6 +65,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.expensetracker.R
 import com.example.expensetracker.model.Currency
 import com.example.expensetracker.ui.screens.destinations.GroupDetailScreenDestination
@@ -80,7 +81,7 @@ fun AddGroupScreen(
     navigator: DestinationsNavigator
 ) {
     val viewModel: AddGroupViewModel = getViewModel()
-    val uiStateFlow = viewModel.uiStateFlow.collectAsState() // TODO: with lifecycle
+    val uiStateFlow = viewModel.uiStateFlow.collectAsStateWithLifecycle()
 
     AddGroupScreen(
         uiStateFlow = uiStateFlow,
@@ -171,12 +172,12 @@ private fun AddGroupScreen(
                     else {
                     }
                 },
-                backgroundColor = if (fabEnabled) MaterialTheme.colors.primary else Color.LightGray // TOOD: Move into theme
+                backgroundColor = if (fabEnabled) MaterialTheme.colors.primary else Color.LightGray
             ) {
                 Icon(
                     Icons.Filled.Add,
                     contentDescription = null,
-                    tint = if (fabEnabled) MaterialTheme.colors.onPrimary else Color.White // TOOD: Move into themes
+                    tint = if (fabEnabled) MaterialTheme.colors.onPrimary else Color.White
                 )
             }
         }
@@ -326,7 +327,7 @@ private fun CurrencyDropdown(
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-                modifier = Modifier.align(Alignment.BottomStart) // Aligns the dropdown to the bottom of the Box
+                modifier = Modifier.align(Alignment.BottomStart)
             ) {
                 Currency.values().forEach { currency ->
                     DropdownMenuItem(onClick = {
