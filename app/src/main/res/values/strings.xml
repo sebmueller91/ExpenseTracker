@@ -8,4 +8,6 @@
     <string name="add_group_members">Add group members</string>
     <string name="add_new_group">Add new group</string>
     <string name="currency">Currency</string>
+    <string name="finish">Finish</string>
+    <string name="share_the_group">Share the group</string>
 </resources>

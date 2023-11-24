@@ -14,8 +14,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -40,11 +43,12 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.RemoveCircleOutline
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -60,6 +64,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -85,8 +90,8 @@ fun AddGroupScreen(
 
     AddGroupScreen(
         uiStateFlow = uiStateFlow,
-        updateShowScreen1 = viewModel::updateShowScreen1,
         onClose = { navigator.popBackStack() },
+        goToNextSubScreen = viewModel::goToNextSubScreen,
         updateGroupName = viewModel::updateGroupName,
         addParticipant = viewModel::addParticipant,
         updateParticipant = viewModel::updateParticipant,
@@ -97,10 +102,16 @@ fun AddGroupScreen(
             navigator.navigate(GroupDetailScreenDestination)
         },
         onBack = {
-            if (uiStateFlow.value.showScreen1) {
-                navigator.popBackStack()
-            } else {
-                viewModel.updateShowScreen1(true)
+            when (uiStateFlow.value.subScreen) {
+                AddGroupSubScreens.GROUPNAME_CURRENCY -> {
+                    navigator.popBackStack()
+                }
+
+                AddGroupSubScreens.PARTICIPANTS -> {
+                    viewModel.goToPreviousSubScreen()
+                }
+
+                else -> {}
             }
         }
     )
@@ -110,24 +121,17 @@ fun AddGroupScreen(
 @Composable
 private fun AddGroupScreen(
     uiStateFlow: State<AddGroupUiState>,
-    updateShowScreen1: (Boolean) -> Unit,
+    goToNextSubScreen: () -> Unit,
     updateGroupName: (String) -> Unit,
     addParticipant: () -> Unit,
     updateParticipant: (Int, String) -> Unit,
     deleteParticipant: (Int) -> Unit,
     selectCurrency: (Currency) -> Unit,
     onClose: () -> Unit,
-    onFinish: () -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onFinish: () -> Unit
 ) {
     BackHandler(enabled = true, onBack = onBack)
-
-    val groupNameFocusRequester by remember { mutableStateOf(FocusRequester()) }
-    LaunchedEffect(key1 = Unit) {
-        if (uiStateFlow.value.showScreen1) {
-            groupNameFocusRequester.requestFocus()
-        }
-    }
 
     val screenWidth =
         with(LocalDensity.current) {
@@ -138,38 +142,39 @@ private fun AddGroupScreen(
         TopAppBar(
             title = {
                 Text(
-                    if (uiStateFlow.value.showScreen1) stringResource(R.string.add_new_group)
-                    else stringResource(R.string.add_group_members)
+                    when (uiStateFlow.value.subScreen) {
+                        AddGroupSubScreens.GROUPNAME_CURRENCY -> stringResource(R.string.add_new_group)
+                        AddGroupSubScreens.PARTICIPANTS -> stringResource(R.string.add_group_members)
+                        else -> stringResource(R.string.share_the_group)
+                    }
                 )
             },
             navigationIcon = {
-                if (uiStateFlow.value.showScreen1) {
-                    NavigationIcon(imageVector = Icons.Default.Close, onClick = onClose)
-                } else {
-                    NavigationIcon(imageVector = Icons.Default.ArrowBack) {
-                        updateShowScreen1(true)
+                when (uiStateFlow.value.subScreen) {
+                    AddGroupSubScreens.GROUPNAME_CURRENCY -> {
+                        NavigationIcon(imageVector = Icons.Default.Close, onClick = onClose)
+                    }
+
+                    AddGroupSubScreens.PARTICIPANTS -> {
+                        NavigationIcon(imageVector = Icons.Default.ArrowBack, onClick = onBack)
+                    }
+
+                    else -> {
+                        NavigationIcon(imageVector = Icons.Default.Close, onClick = onFinish)
                     }
                 }
             },
-            actions = {
-                if (!uiStateFlow.value.showScreen1) {
-                    Button(onClick = onFinish) {
-                        Text("Save")
-                    }
-                }
-            },
-            backgroundColor = MaterialTheme.colors.background,
             elevation = 0.dp
         )
     }, floatingActionButton = {
         val fabEnabled by remember(uiStateFlow.value.participantsNames) {
             mutableStateOf(uiStateFlow.value.participantsNames.none { it.isBlank() })
         }
-        if (!uiStateFlow.value.showScreen1) {
+        if (uiStateFlow.value.subScreen == AddGroupSubScreens.PARTICIPANTS) {
             FloatingActionButton(
                 onClick = {
-                    if (fabEnabled) addParticipant()
-                    else {
+                    if (fabEnabled) {
+                        addParticipant()
                     }
                 },
                 backgroundColor = if (fabEnabled) MaterialTheme.colors.primary else Color.LightGray
@@ -191,56 +196,93 @@ private fun AddGroupScreen(
         ) {
 
             AnimatedVisibility(
-                visible = uiStateFlow.value.showScreen1,
+                visible = uiStateFlow.value.subScreen == AddGroupSubScreens.GROUPNAME_CURRENCY,
                 enter = slideInHorizontally(
-                    initialOffsetX = { if (uiStateFlow.value.showScreen1) -screenWidth else screenWidth },
+                    initialOffsetX = { if (uiStateFlow.value.subScreen == AddGroupSubScreens.GROUPNAME_CURRENCY) -screenWidth else screenWidth },
                     animationSpec = tween(durationMillis = 300, easing = LinearEasing)
                 ), exit = slideOutHorizontally(
-                    targetOffsetX = { if (uiStateFlow.value.showScreen1) screenWidth else -screenWidth },
+                    targetOffsetX = { if (uiStateFlow.value.subScreen == AddGroupSubScreens.GROUPNAME_CURRENCY) screenWidth else -screenWidth },
                     animationSpec = tween(durationMillis = 300, easing = LinearEasing)
                 )
             ) {
-                Column() {
-                    GroupNameTextField(
-                        groupName = uiStateFlow.value.groupName,
-                        onValueChange = updateGroupName,
-                        onFinished = { updateShowScreen1(false) },
-                        modifier = Modifier
-                            .focusRequester(groupNameFocusRequester)
-                            .fillMaxWidth()
-                    )
-                    CurrencyDropdown(
-                        selectedCurrency = uiStateFlow.value.currency,
-                        selectCurrency = selectCurrency
-                    )
-                    Spacer(Modifier.weight(1f))
-                    Button(
-                        onClick = { updateShowScreen1(false) }, modifier = Modifier
-                            .align(Alignment.CenterHorizontally),
-                        enabled = uiStateFlow.value.groupName.isNotBlank()
-                    ) {
-                        Text(stringResource(id = R.string.next))
-                    }
-                }
+                GroupNameCurrencyScreen(
+                    uiStateFlow = uiStateFlow,
+                    goToNextSubScreen = goToNextSubScreen,
+                    updateGroupName = updateGroupName,
+                    selectCurrency = selectCurrency
+                )
             }
 
             AnimatedVisibility(
-                visible = !uiStateFlow.value.showScreen1,
+                visible = uiStateFlow.value.subScreen == AddGroupSubScreens.PARTICIPANTS,
                 enter = slideInHorizontally(
-                    initialOffsetX = { if (uiStateFlow.value.showScreen1) -screenWidth else screenWidth },
+                    initialOffsetX = { if (uiStateFlow.value.subScreen == AddGroupSubScreens.GROUPNAME_CURRENCY) -screenWidth else screenWidth },
                     animationSpec = tween(durationMillis = 300, easing = LinearEasing)
                 ),
                 exit = slideOutHorizontally(
-                    targetOffsetX = { if (uiStateFlow.value.showScreen1) screenWidth else -screenWidth },
+                    targetOffsetX = { if (uiStateFlow.value.subScreen == AddGroupSubScreens.GROUPNAME_CURRENCY) screenWidth else -screenWidth },
                     animationSpec = tween(durationMillis = 300, easing = LinearEasing)
                 )
             ) {
-                ParticipantsInput(
+                ParticipantsInputScreen(
+                    uiStateFlow = uiStateFlow,
                     participantsNames = uiStateFlow.value.participantsNames,
+                    goToNextSubScreen = goToNextSubScreen,
                     updateParticipant = updateParticipant,
                     deleteParticipant = deleteParticipant
                 )
             }
+
+            AnimatedVisibility(
+                visible = uiStateFlow.value.subScreen == AddGroupSubScreens.SHARE,
+                enter = slideInHorizontally(
+                    initialOffsetX = { if (uiStateFlow.value.subScreen == AddGroupSubScreens.PARTICIPANTS) -screenWidth else screenWidth },
+                    animationSpec = tween(durationMillis = 300, easing = LinearEasing)
+                )
+            ) {
+                ShareGroupScreen(
+                    onFinish = onFinish
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun GroupNameCurrencyScreen(
+    uiStateFlow: State<AddGroupUiState>,
+    goToNextSubScreen: () -> Unit,
+    updateGroupName: (String) -> Unit,
+    selectCurrency: (Currency) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val groupNameFocusRequester by remember { mutableStateOf(FocusRequester()) }
+    LaunchedEffect(key1 = Unit) {
+        if (uiStateFlow.value.subScreen == AddGroupSubScreens.GROUPNAME_CURRENCY) {
+            groupNameFocusRequester.requestFocus()
+        }
+    }
+
+    Column(modifier = modifier) {
+        GroupNameTextField(
+            groupName = uiStateFlow.value.groupName,
+            onValueChange = updateGroupName,
+            onFinished = goToNextSubScreen,
+            modifier = Modifier
+                .focusRequester(groupNameFocusRequester)
+                .fillMaxWidth()
+        )
+        CurrencyDropdown(
+            selectedCurrency = uiStateFlow.value.currency,
+            selectCurrency = selectCurrency
+        )
+        Spacer(Modifier.weight(1f))
+        Button(
+            onClick = goToNextSubScreen, modifier = Modifier
+                .align(Alignment.CenterHorizontally),
+            enabled = uiStateFlow.value.groupName.isNotBlank()
+        ) {
+            Text(stringResource(id = R.string.next))
         }
     }
 }
@@ -250,8 +292,7 @@ private fun NavigationIcon(imageVector: ImageVector, onClick: () -> Unit) {
     IconButton(onClick = onClick) {
         Icon(
             imageVector = imageVector,
-            contentDescription = null,
-            tint = MaterialTheme.colors.onBackground
+            contentDescription = null
         )
     }
 }
@@ -327,9 +368,11 @@ private fun CurrencyDropdown(
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-                modifier = Modifier.align(Alignment.BottomStart)
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .heightIn(max = 300.dp)
             ) {
-                Currency.values().forEach { currency ->
+                Currency.entries.forEach { currency ->
                     DropdownMenuItem(onClick = {
                         selectCurrency(currency)
                         expanded = false
@@ -346,14 +389,16 @@ private fun CurrencyDropdown(
 }
 
 @Composable
-fun ParticipantsInput(
+fun ParticipantsInputScreen(
+    uiStateFlow: State<AddGroupUiState>,
     participantsNames: List<String>,
+    goToNextSubScreen: () -> Unit,
     updateParticipant: (Int, String) -> Unit,
     deleteParticipant: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val listState = rememberLazyListState()
-    var previousValue by remember { mutableStateOf(participantsNames.size) }
+    var previousValue by remember { mutableIntStateOf(participantsNames.size) }
     LaunchedEffect(key1 = participantsNames.size) {
         if (previousValue < participantsNames.size) {
             listState.animateScrollToItem(participantsNames.size - 1)
@@ -361,22 +406,36 @@ fun ParticipantsInput(
         }
     }
 
-    LazyColumn(modifier = modifier, state = listState) {
-        itemsIndexed(participantsNames) { index, participantName ->
-            ParicipantTextField(
-                participantName = participantName,
-                index = index,
-                numberParticipants = participantsNames.size,
-                updateParticipant = updateParticipant,
-                deleteParticipant = deleteParticipant
-            )
+    Scaffold(modifier = modifier.fillMaxSize(),
+        bottomBar = {
+            Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                Button(
+                    onClick = goToNextSubScreen,
+                    modifier = Modifier.padding(top = 16.dp),
+                    enabled = uiStateFlow.value.participantsNames.isNotEmpty() && uiStateFlow.value.participantsNames.none { it.isBlank() }
+                ) {
+                    Text(stringResource(R.string.finish))
+                }
+            }
+        }
+    ) { padding ->
+        LazyColumn(modifier = modifier.padding(padding), state = listState) {
+            itemsIndexed(participantsNames) { index, participantName ->
+                ParicipantTextField(
+                    participantName = participantName,
+                    index = index,
+                    numberParticipants = participantsNames.size,
+                    updateParticipant = updateParticipant,
+                    deleteParticipant = deleteParticipant
+                )
+            }
         }
     }
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun ParicipantTextField(
+private fun ParicipantTextField( // TODO: Fuse this with the group name field?
     participantName: String,
     index: Int,
     numberParticipants: Int,
@@ -430,26 +489,67 @@ private fun ParicipantTextField(
 
     LaunchedEffect(key1 = numberParticipants) {
         if (index == numberParticipants - 1) {
-            focusRequester?.requestFocus()
+            focusRequester.requestFocus()
         }
     }
 }
 
 @Composable
-private fun AddGroupScreenPreview(darkTheme: Boolean, showScreen1: Boolean) {
+private fun ShareGroupScreen(
+    onFinish: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Scaffold(
+        modifier = modifier,
+        bottomBar = {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                Button(onClick = onFinish) {
+                    Text("Go to group")
+                }
+            }
+        }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "Group Created Successfully!",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    onClick = { },
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Icon(Icons.Filled.Share, contentDescription = "Share")
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Share Group")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AddGroupScreenPreview(darkTheme: Boolean, subScreen: AddGroupSubScreens) {
     ExpenseTrackerTheme(darkTheme = darkTheme) {
         val uiState = remember {
             mutableStateOf(
                 AddGroupUiState(
                     groupName = "Rock im Park 2023",
                     participantsNames = listOf("Peter", "Michaela", "Gustav"),
-                    showScreen1 = showScreen1
+                    subScreen = subScreen
                 )
             )
         }
         AddGroupScreen(
             uiStateFlow = uiState,
-            updateShowScreen1 = { },
+            goToNextSubScreen = {},
             updateGroupName = { },
             addParticipant = {},
             updateParticipant = { _, _ -> },
@@ -464,23 +564,23 @@ private fun AddGroupScreenPreview(darkTheme: Boolean, showScreen1: Boolean) {
 @Preview(name = "Add Group Screen 1 - Dark Theme")
 @Composable
 private fun AddGroupScreen1DarkPreview() {
-    AddGroupScreenPreview(darkTheme = true, showScreen1 = true)
+    AddGroupScreenPreview(darkTheme = true, subScreen = AddGroupSubScreens.GROUPNAME_CURRENCY)
 }
 
 @Preview(name = "Add Group Screen 1 - Light Theme")
 @Composable
 private fun AddGroupScreen1LightPreview() {
-    AddGroupScreenPreview(darkTheme = false, showScreen1 = true)
+    AddGroupScreenPreview(darkTheme = false, subScreen = AddGroupSubScreens.GROUPNAME_CURRENCY)
 }
 
 @Preview(name = "Add Group Screen 2 - Dark Theme")
 @Composable
 private fun AddGroupScreen2DarkPreview() {
-    AddGroupScreenPreview(darkTheme = true, showScreen1 = false)
+    AddGroupScreenPreview(darkTheme = true, subScreen = AddGroupSubScreens.PARTICIPANTS)
 }
 
 @Preview(name = "Add Group Screen 2 - Light Theme")
 @Composable
 private fun AddGroupScreen2LightPreview() {
-    AddGroupScreenPreview(darkTheme = false, showScreen1 = false)
+    AddGroupScreenPreview(darkTheme = false, subScreen = AddGroupSubScreens.PARTICIPANTS)
 }
