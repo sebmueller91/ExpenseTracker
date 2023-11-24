@@ -9,5 +9,10 @@
     <string name="add_new_group">Add new group</string>
     <string name="currency">Currency</string>
     <string name="finish">Finish</string>
-    <string name="share_the_group">Share the group</string>
+    <string name="share_the_group">Invite your friends</string>
+    <string name="invitation_text">I am inviting you to join our group %1$s: %2$s\n\nIf you don\'t have the app yet, you can download it from https://github.com/sebmueller91/ExpenseTracker</string>
+    <string name="group_created_successfully">Group Created Successfully!</string>
+    <string name="share">Share</string>
+    <string name="invite_friends">Invite friends</string>
+    <string name="go_to_group">Go to group</string>
 </resources>
