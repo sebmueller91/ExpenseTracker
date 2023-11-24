@@ -7,14 +7,49 @@ import com.example.expensetracker.repositories.DatabaseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import java.lang.IllegalStateException
 
 class AddGroupViewModel(private val databaseRepository: DatabaseRepository) : ViewModel() {
     private var _uiState = MutableStateFlow(AddGroupUiState())
     val uiStateFlow = _uiState.asStateFlow()
 
-    fun updateShowScreen1(showScreen1: Boolean) {
+    fun goToNextSubScreen() {
         _uiState.update {
-            it.copy(showScreen1 = showScreen1)
+            it.copy(
+                subScreen = when (uiStateFlow.value.subScreen) {
+                    AddGroupSubScreens.GROUPNAME_CURRENCY -> {
+                        AddGroupSubScreens.PARTICIPANTS
+                    }
+
+                    AddGroupSubScreens.PARTICIPANTS -> {
+                        AddGroupSubScreens.SHARE
+                    }
+
+                    else -> {
+                        throw IllegalStateException("No next state after participants")
+                    }
+                }
+            )
+        }
+    }
+
+    fun goToPreviousSubScreen() {
+        _uiState.update {
+            it.copy(
+                subScreen = when (uiStateFlow.value.subScreen) {
+                    AddGroupSubScreens.PARTICIPANTS -> {
+                        AddGroupSubScreens.GROUPNAME_CURRENCY
+                    }
+
+                    AddGroupSubScreens.SHARE -> {
+                        AddGroupSubScreens.PARTICIPANTS
+                    }
+
+                    else -> {
+                        throw IllegalStateException("No next state before GroupNameParticipants")
+                    }
+                }
+            )
         }
     }
 
