@@ -1,5 +1,7 @@
 package com.example.expensetracker.ui.screens.add_group
 
+import android.content.Context
+import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
@@ -60,6 +62,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -241,6 +244,7 @@ private fun AddGroupScreen(
                 )
             ) {
                 ShareGroupScreen(
+                    uiStateFlow = uiStateFlow,
                     onFinish = onFinish
                 )
             }
@@ -496,15 +500,20 @@ private fun ParicipantTextField( // TODO: Fuse this with the group name field?
 
 @Composable
 private fun ShareGroupScreen(
+    uiStateFlow: State<AddGroupUiState>,
     onFinish: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    val invitationLink = "fake_url/1234" // TODO: Replace with real link
+    val invitationMessage = stringResource(R.string.invitation_text, uiStateFlow.value.groupName, invitationLink)
+
     Scaffold(
         modifier = modifier,
         bottomBar = {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                 Button(onClick = onFinish) {
-                    Text("Go to group")
+                    Text(stringResource(R.string.go_to_group))
                 }
             }
         }
@@ -517,22 +526,31 @@ private fun ShareGroupScreen(
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = "Group Created Successfully!",
+                    text = stringResource(R.string.group_created_successfully),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
-                    onClick = { },
+                    onClick = { shareMessageIntent(context = context, text = invitationMessage) },
                     modifier = Modifier.padding(16.dp)
                 ) {
-                    Icon(Icons.Filled.Share, contentDescription = "Share")
+                    Icon(Icons.Filled.Share, contentDescription = stringResource(R.string.share))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Share Group")
+                    Text(stringResource(R.string.invite_friends))
                 }
             }
         }
     }
+}
+
+private fun shareMessageIntent(context: Context, text: String) {
+    val intent = Intent(Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(Intent.EXTRA_TEXT, text)
+    }
+    val chooserIntent = Intent.createChooser(intent, "Share via")
+    context.startActivity(chooserIntent)
 }
 
 @Composable
