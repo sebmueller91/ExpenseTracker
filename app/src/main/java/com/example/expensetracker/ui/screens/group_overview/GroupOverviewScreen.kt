@@ -51,6 +51,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.getViewModel
+import java.util.UUID
 
 // TODO: Refactor and add preview
 
@@ -66,14 +67,20 @@ fun GroupOverviewScreen(
     GroupOverviewScreen(
         uiStateFlow = uiStateFlow,
         onAddGroup = { navigator.navigate(AddGroupScreenDestination) },
-        onNavigateToDetailScreen = { navigator.navigate(GroupDetailScreenDestination) })
+        onNavigateToDetailScreen = { uuid ->
+            navigator.navigate(
+                GroupDetailScreenDestination(
+                    GroupDetailScreenDestination.NavArgs(uuid)
+                )
+            )
+        })
 }
 
 @Composable
 private fun GroupOverviewScreen(
     uiStateFlow: State<GroupOverviewUiState>,
     onAddGroup: () -> Unit,
-    onNavigateToDetailScreen: () -> Unit
+    onNavigateToDetailScreen: (UUID) -> Unit
 ) {
     Scaffold(
         floatingActionButton = {
@@ -110,7 +117,7 @@ private fun GroupOverviewScreen(
 @Composable
 private fun GroupCard(
     group: Group,
-    onNavigateToDetailScreen: () -> Unit,
+    onNavigateToDetailScreen: (UUID) -> Unit,
     modifier: Modifier = Modifier.fillMaxWidth()
 ) {
     Card(
@@ -128,7 +135,7 @@ private fun GroupCard(
                         stiffness = Spring.StiffnessMedium
                     )
                 )
-                .clickable(onClick = onNavigateToDetailScreen)
+                .clickable(onClick = {onNavigateToDetailScreen(group.id)})
         ) {
             Row(
                 modifier = Modifier

@@ -2,12 +2,13 @@ package com.example.expensetracker.ui.screens.add_group
 
 import androidx.lifecycle.ViewModel
 import com.example.expensetracker.model.Currency
+import com.example.expensetracker.model.Group
 import com.example.expensetracker.model.Participant
 import com.example.expensetracker.repositories.DatabaseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import java.lang.IllegalStateException
+import java.util.UUID
 
 class AddGroupViewModel(private val databaseRepository: DatabaseRepository) : ViewModel() {
     private var _uiState = MutableStateFlow(AddGroupUiState())
@@ -86,14 +87,17 @@ class AddGroupViewModel(private val databaseRepository: DatabaseRepository) : Vi
         }
     }
 
-    fun createNewGroup() {
+    fun createNewGroup(): UUID {
+        val uuid = UUID.randomUUID()
         databaseRepository.addGroup(
-            com.example.expensetracker.model.Group(
+            Group(
+                id = uuid,
                 name = _uiState.value.groupName,
                 participants = _uiState.value.participantsNames.map { Participant(name = it) },
                 currency = _uiState.value.currency,
                 transactions = listOf()
             )
         )
+        return uuid
     }
 }
