@@ -3,6 +3,7 @@ package com.example.expensetracker.repositories
 import com.example.expensetracker.model.Currency
 import com.example.expensetracker.model.Group
 import com.example.expensetracker.model.Participant
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -37,11 +38,8 @@ class DatabaseRepositoryFakeImpl : DatabaseRepository {
         }
     }
 
-    override fun Group(groupId: UUID) {
-        _groups.update {
-            val newList = it.toMutableList()
-            newList.removeIf { it.id == groupId }
-            newList.toList()
-        }
+    override suspend fun getGroup(groupId: UUID): Group? {
+        delay(3000)
+        return _groups.value.firstOrNull { it.id == groupId }
     }
 }

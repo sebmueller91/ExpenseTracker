@@ -7,5 +7,5 @@ import java.util.UUID
 interface DatabaseRepository {
     val groups: StateFlow<List<Group>>
     fun addGroup(group: Group)
-    fun Group(groupId: UUID)
+    suspend fun getGroup(groupId: UUID): Group?
 }

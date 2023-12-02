@@ -101,8 +101,8 @@ fun AddGroupScreen(
         deleteParticipant = viewModel::deleteParticipant,
         selectCurrency = viewModel::selectCurrency,
         onFinish = {
-            viewModel.createNewGroup()
-            navigator.navigate(GroupDetailScreenDestination)
+            val uuid = viewModel.createNewGroup()
+            navigator.navigate(GroupDetailScreenDestination(GroupDetailScreenDestination.NavArgs(uuid)))
         },
         onBack = {
             when (uiStateFlow.value.subScreen) {
