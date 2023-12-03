@@ -45,7 +45,6 @@ java {
     }
 }
 
-
 android {
     namespace 'com.example.expensetracker'
     compileSdk 34
