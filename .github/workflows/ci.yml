@@ -80,11 +80,11 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ steps.get_version.outputs.VERSION }}
-        release_name: Release ${{ steps.get_version.outputs.VERSION }}
+        tag_name: ${{ env.VERSION }}
+        release_name: Release ${{ env.VERSION }}
         draft: false
         prerelease: false
-
+      
     - name: Upload Release Asset
       if: github.event_name == 'push' && github.ref == 'refs/heads/main' && env.CREATE_RELEASE == 'true'
       uses: actions/upload-release-asset@v1
@@ -93,6 +93,5 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./app/build/outputs/apk/release/expenseTracker.apk
-        asset_name: expenseTracker-${{ steps.get_version.outputs.VERSION }}.apk
-        asset_content_type: application/vnd.android.package-archive
-        
+        asset_name: expenseTracker-${{ env.VERSION }}.apk
+        asset_content_type: application/vnd.android.package-archive    
