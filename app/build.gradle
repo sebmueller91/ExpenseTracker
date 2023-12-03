@@ -5,6 +5,40 @@ plugins {
     id("com.google.devtools.ksp")
 }
 
+def getVersionProperties() {
+    Properties versionProps = new Properties()
+    try {
+        File versionPropsFile = file("../version.properties")
+        if (versionPropsFile.exists()) {
+            versionProps.load(versionPropsFile.newDataInputStream())
+        } else {
+            println "version.properties file not found"
+        }
+    } catch (Exception e) {
+        println "Error reading version.properties file: " + e.getMessage()
+    }
+    return versionProps
+}
+
+def generateVersionCode(String versionName) {
+    if (versionName == null) {
+        versionName = "0.0.1"
+    }
+    def (major, minor, patch) = versionName.tokenize('.').collect { it.toInteger() }
+    return major * 10000 + minor * 100 + patch
+}
+
+def getFullVersionName() {
+    String versionName = "0.0.0"
+    try {
+        Properties versionProps = getVersionProperties()
+        versionName = versionProps.getProperty("version_name", versionName)
+    } catch (Exception e) {
+        println "Error reading version.properties file: " + e.getMessage()
+    }
+    return versionName
+}
+
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(17))
@@ -20,8 +54,8 @@ android {
         applicationId "com.example.expensetracker"
         minSdk 28
         targetSdk 34
-        versionCode 1
-        versionName "1.0"
+        versionCode generateVersionCode(getVersionProperties().getProperty("version_name"))
+        versionName getFullVersionName()
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

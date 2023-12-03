@@ -51,16 +51,6 @@ jobs:
     - name: Test with Gradle
       run: ./gradlew test
 
-    - name: Rename APK
-      run: mv app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/expenseTracker.apk
-
-    - name: Upload APK
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      uses: actions/upload-artifact@v2.2.4
-      with:
-        name: app
-        path: app/build/outputs/apk/release/expenseTracker.apk
-
     - name: Get version
       id: get_version
       run: echo ::set-output name=VERSION::$(cat version.properties | grep 'version_name' | cut -d'=' -f2)
