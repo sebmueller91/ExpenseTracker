@@ -94,4 +94,5 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./app/build/outputs/apk/release/expenseTracker.apk
         asset_name: expenseTracker-${{ env.VERSION }}.apk
-        asset_content_type: application/vnd.android.package-archive    
+        asset_content_type: application/vnd.android.package-archive
+    
