@@ -9,6 +9,7 @@ on:
 
 jobs:
   build:
+    name: Android Continuous Integration
 
     runs-on: ubuntu-latest
 
