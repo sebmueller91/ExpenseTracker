@@ -53,8 +53,6 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.getViewModel
 import java.util.UUID
 
-// TODO: Refactor and add preview
-
 @RootNavGraph(start = true)
 @Destination
 @Composable
