@@ -13,13 +13,19 @@ class GroupDetailViewModel(
     private val groupId: UUID,
     private val databaseRepository: DatabaseRepository
 ) : ViewModel() {
-    private var _uiState = MutableStateFlow(GroupDetailUiState())
+    private var _uiState = MutableStateFlow<GroupDetailUiState>(GroupDetailUiState.Loading)
     val uiStateFlow = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
-            val group = databaseRepository.getGroup(groupId)
-            _uiState.update { GroupDetailUiState(group) }
+            when (val group = databaseRepository.getGroup(groupId)) {
+                null -> {
+                    _uiState.update { GroupDetailUiState.Error }
+                }
+                else -> {
+                    _uiState.update { GroupDetailUiState.Success(group) }
+                }
+            }
         }
     }
 }

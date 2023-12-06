@@ -61,9 +61,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -81,7 +79,6 @@ import com.example.expensetracker.ui.theme.ExpenseTrackerTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.getViewModel
-import kotlin.math.roundToInt
 
 @Destination
 @Composable
@@ -102,11 +99,17 @@ fun AddGroupScreen(
         selectCurrency = viewModel::selectCurrency,
         onFinish = {
             val uuid = viewModel.createNewGroup()
-            navigator.navigate(GroupDetailScreenDestination(GroupDetailScreenDestination.NavArgs(uuid)))
+            navigator.navigate(
+                GroupDetailScreenDestination(
+                    GroupDetailScreenDestination.NavArgs(
+                        uuid
+                    )
+                )
+            )
         },
         onBack = {
             when (uiStateFlow.value.subScreen) {
-                AddGroupSubScreens.GROUPNAME_CURRENCY -> {
+                AddGroupSubScreens.GROUP_NAME_CURRENCY -> {
                     navigator.popBackStack()
                 }
 
@@ -114,7 +117,9 @@ fun AddGroupScreen(
                     viewModel.goToPreviousSubScreen()
                 }
 
-                else -> {}
+                else -> {
+                    // Disabled on purpose
+                }
             }
         }
     )
@@ -136,17 +141,12 @@ private fun AddGroupScreen(
 ) {
     BackHandler(enabled = true, onBack = onBack)
 
-    val screenWidth =
-        with(LocalDensity.current) {
-            LocalConfiguration.current.screenWidthDp.dp.toPx().roundToInt()
-        }
-
     Scaffold(topBar = {
         TopAppBar(
             title = {
                 Text(
                     when (uiStateFlow.value.subScreen) {
-                        AddGroupSubScreens.GROUPNAME_CURRENCY -> stringResource(R.string.add_new_group)
+                        AddGroupSubScreens.GROUP_NAME_CURRENCY -> stringResource(R.string.add_new_group)
                         AddGroupSubScreens.PARTICIPANTS -> stringResource(R.string.add_group_members)
                         else -> stringResource(R.string.share_the_group)
                     }
@@ -154,7 +154,7 @@ private fun AddGroupScreen(
             },
             navigationIcon = {
                 when (uiStateFlow.value.subScreen) {
-                    AddGroupSubScreens.GROUPNAME_CURRENCY -> {
+                    AddGroupSubScreens.GROUP_NAME_CURRENCY -> {
                         NavigationIcon(imageVector = Icons.Default.Close, onClick = onClose)
                     }
 
@@ -199,12 +199,12 @@ private fun AddGroupScreen(
         ) {
 
             AnimatedVisibility(
-                visible = uiStateFlow.value.subScreen == AddGroupSubScreens.GROUPNAME_CURRENCY,
+                visible = uiStateFlow.value.subScreen == AddGroupSubScreens.GROUP_NAME_CURRENCY,
                 enter = slideInHorizontally(
-                    initialOffsetX = { if (uiStateFlow.value.subScreen == AddGroupSubScreens.GROUPNAME_CURRENCY) -screenWidth else screenWidth },
+                    initialOffsetX = { fullWidth -> if (uiStateFlow.value.subScreen == AddGroupSubScreens.GROUP_NAME_CURRENCY) -fullWidth else fullWidth },
                     animationSpec = tween(durationMillis = 300, easing = LinearEasing)
                 ), exit = slideOutHorizontally(
-                    targetOffsetX = { if (uiStateFlow.value.subScreen == AddGroupSubScreens.GROUPNAME_CURRENCY) screenWidth else -screenWidth },
+                    targetOffsetX = { fullWidth -> if (uiStateFlow.value.subScreen == AddGroupSubScreens.GROUP_NAME_CURRENCY) fullWidth else -fullWidth },
                     animationSpec = tween(durationMillis = 300, easing = LinearEasing)
                 )
             ) {
@@ -219,11 +219,11 @@ private fun AddGroupScreen(
             AnimatedVisibility(
                 visible = uiStateFlow.value.subScreen == AddGroupSubScreens.PARTICIPANTS,
                 enter = slideInHorizontally(
-                    initialOffsetX = { if (uiStateFlow.value.subScreen == AddGroupSubScreens.GROUPNAME_CURRENCY) -screenWidth else screenWidth },
+                    initialOffsetX = { fullWidth -> if (uiStateFlow.value.subScreen == AddGroupSubScreens.GROUP_NAME_CURRENCY) -fullWidth else fullWidth },
                     animationSpec = tween(durationMillis = 300, easing = LinearEasing)
                 ),
                 exit = slideOutHorizontally(
-                    targetOffsetX = { if (uiStateFlow.value.subScreen == AddGroupSubScreens.GROUPNAME_CURRENCY) screenWidth else -screenWidth },
+                    targetOffsetX = { fullWidth -> if (uiStateFlow.value.subScreen == AddGroupSubScreens.GROUP_NAME_CURRENCY) fullWidth else -fullWidth },
                     animationSpec = tween(durationMillis = 300, easing = LinearEasing)
                 )
             ) {
@@ -239,7 +239,7 @@ private fun AddGroupScreen(
             AnimatedVisibility(
                 visible = uiStateFlow.value.subScreen == AddGroupSubScreens.SHARE,
                 enter = slideInHorizontally(
-                    initialOffsetX = { if (uiStateFlow.value.subScreen == AddGroupSubScreens.PARTICIPANTS) -screenWidth else screenWidth },
+                    initialOffsetX = { fullWidth -> if (uiStateFlow.value.subScreen == AddGroupSubScreens.PARTICIPANTS) -fullWidth else fullWidth },
                     animationSpec = tween(durationMillis = 300, easing = LinearEasing)
                 )
             ) {
@@ -262,7 +262,7 @@ private fun GroupNameCurrencyScreen(
 ) {
     val groupNameFocusRequester by remember { mutableStateOf(FocusRequester()) }
     LaunchedEffect(key1 = Unit) {
-        if (uiStateFlow.value.subScreen == AddGroupSubScreens.GROUPNAME_CURRENCY) {
+        if (uiStateFlow.value.subScreen == AddGroupSubScreens.GROUP_NAME_CURRENCY) {
             groupNameFocusRequester.requestFocus()
         }
     }
@@ -506,7 +506,8 @@ private fun ShareGroupScreen(
 ) {
     val context = LocalContext.current
     val invitationLink = "fake_url/1234" // TODO: Replace with real link
-    val invitationMessage = stringResource(R.string.invitation_text, uiStateFlow.value.groupName, invitationLink)
+    val invitationMessage =
+        stringResource(R.string.invitation_text, uiStateFlow.value.groupName, invitationLink)
 
     Scaffold(
         modifier = modifier,
@@ -582,13 +583,13 @@ private fun AddGroupScreenPreview(darkTheme: Boolean, subScreen: AddGroupSubScre
 @Preview(name = "Add Group Screen 1 - Dark Theme")
 @Composable
 private fun AddGroupScreen1DarkPreview() {
-    AddGroupScreenPreview(darkTheme = true, subScreen = AddGroupSubScreens.GROUPNAME_CURRENCY)
+    AddGroupScreenPreview(darkTheme = true, subScreen = AddGroupSubScreens.GROUP_NAME_CURRENCY)
 }
 
 @Preview(name = "Add Group Screen 1 - Light Theme")
 @Composable
 private fun AddGroupScreen1LightPreview() {
-    AddGroupScreenPreview(darkTheme = false, subScreen = AddGroupSubScreens.GROUPNAME_CURRENCY)
+    AddGroupScreenPreview(darkTheme = false, subScreen = AddGroupSubScreens.GROUP_NAME_CURRENCY)
 }
 
 @Preview(name = "Add Group Screen 2 - Dark Theme")
