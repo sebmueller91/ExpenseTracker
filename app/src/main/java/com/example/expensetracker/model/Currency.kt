@@ -2,7 +2,7 @@ package com.example.expensetracker.model
 
 enum class Currency(
     val currency_name: String,
-    val abbreviation: String,
+    val abbreviation: String, // TODO: Is this needed?
     val symbol: Char
 ) {
     EURO("Euro", "EUR", '€'),

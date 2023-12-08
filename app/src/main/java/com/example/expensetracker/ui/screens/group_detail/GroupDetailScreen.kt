@@ -3,23 +3,23 @@ package com.example.expensetracker.ui.screens.group_detail
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Sort
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -82,6 +82,7 @@ private fun GroupDetailScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun GroupDetailScreenContent(modifier: Modifier = Modifier) { // TODO: Better name
     val dragThreshold = 20.dp
@@ -101,28 +102,34 @@ private fun GroupDetailScreenContent(modifier: Modifier = Modifier) { // TODO: B
 
     Scaffold(modifier = modifier
         .fillMaxSize()
-        .then(dragModifier), bottomBar = {
-        NavigationBar() {
-            GroupDetailScreenTabs.entries.forEach { tab ->
-                val selected = tab == selectedTab
+        .then(dragModifier),
+        topBar = {
+            TopAppBar(title = { Text("Rock im Park") })
+        },
+        bottomBar = {
+            NavigationBar() {
+                GroupDetailScreenTabs.entries.forEach { tab ->
+                    val selected = tab == selectedTab
 
-                NavigationBarItem(
-                    selected = selected,
-                    onClick = { selectedTab = tab },
-                    icon = {
-                        Icon(
-                            imageVector = tab.imageVector,
-                            contentDescription = tab.label
-                        )
-                    },
-                    label = { Text(text = tab.label) })
+                    NavigationBarItem(
+                        selected = selected,
+                        onClick = { selectedTab = tab },
+                        icon = {
+                            Icon(
+                                imageVector = tab.imageVector,
+                                contentDescription = tab.label
+                            )
+                        },
+                        label = { Text(text = tab.label) })
+                }
             }
-        }
-    })
+        })
     { innerPadding ->
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .padding(innerPadding)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
             AnimatedVisibility(
                 visible = selectedTab == GroupDetailScreenTabs.EXPENSES,
                 enter = slideInHorizontally { fullWidth -> fullWidth },
@@ -145,7 +152,8 @@ private fun GroupDetailScreenContent(modifier: Modifier = Modifier) { // TODO: B
 @Composable
 private fun OverviewTab(modifier: Modifier = Modifier) {
     Column(
-        Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
+        Modifier
+            .fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
