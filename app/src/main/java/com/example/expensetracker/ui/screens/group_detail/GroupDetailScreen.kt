@@ -1,5 +1,6 @@
 package com.example.expensetracker.ui.screens.group_detail
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material3.CircularProgressIndicator
@@ -34,6 +36,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.expensetracker.R
+import com.example.expensetracker.ui.components.NavigationIcon
 import com.example.expensetracker.ui.screens.destinations.GroupOverviewScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -53,30 +56,37 @@ fun GroupDetailScreen(
 
     GroupDetailScreen(
         uiStateFlow = uiStateFlow,
-        navigateBack = { navigator.navigate(GroupOverviewScreenDestination()) })
+        onLeave = { navigator.navigate(GroupOverviewScreenDestination()) })
 }
 
 @Composable
 private fun GroupDetailScreen(
     uiStateFlow: State<GroupDetailUiState>,
-    navigateBack: () -> Unit // TODO: Is this needed?
+    onLeave: () -> Unit
 ) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        when (val uiState = uiStateFlow.value) {
-            is GroupDetailUiState.Error -> {
-                Text(stringResource(R.string.something_went_wrong))
-            }
+    BackHandler(onBack = onLeave)
 
-            is GroupDetailUiState.Loading -> {
-                CircularProgressIndicator()
-            }
+    Scaffold { paddingValues ->
+        Column(
+            modifier = Modifier.padding(paddingValues).fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            when (val uiState = uiStateFlow.value) {
+                is GroupDetailUiState.Error -> {
+                    Text(stringResource(R.string.something_went_wrong))
+                }
 
-            is GroupDetailUiState.Success -> {
-                GroupDetailScreenContent()
+                is GroupDetailUiState.Loading -> {
+                    CircularProgressIndicator()
+                }
+
+                is GroupDetailUiState.Success -> {
+                    GroupDetailScreenContent(
+                        uiState = uiState,
+                        onLeave = onLeave
+                    )
+                }
             }
         }
     }
@@ -84,7 +94,11 @@ private fun GroupDetailScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun GroupDetailScreenContent(modifier: Modifier = Modifier) { // TODO: Better name
+private fun GroupDetailScreenContent(
+    uiState: GroupDetailUiState.Success,
+    onLeave: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val dragThreshold = 20.dp
     var selectedTab by remember { mutableStateOf(GroupDetailScreenTabs.EXPENSES) }
 
@@ -104,7 +118,11 @@ private fun GroupDetailScreenContent(modifier: Modifier = Modifier) { // TODO: B
         .fillMaxSize()
         .then(dragModifier),
         topBar = {
-            TopAppBar(title = { Text("Rock im Park") })
+            TopAppBar(
+                title = { Text(uiState.group.name) },
+                navigationIcon = {
+                    NavigationIcon(imageVector = Icons.Default.ArrowBack, onClick = onLeave)
+                })
         },
         bottomBar = {
             NavigationBar() {

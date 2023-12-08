@@ -1,5 +1,6 @@
 package com.example.expensetracker.ui.screens.group_overview
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -63,7 +64,11 @@ import java.util.UUID
 fun GroupOverviewScreen(
     navigator: DestinationsNavigator
 ) {
-    ExpenseTrackerTheme { // Wrap your screen with ExpenseTrackerTheme
+    BackHandler {
+        // Don't navigate back from  group overview
+    }
+
+    ExpenseTrackerTheme {
         val viewModel: GroupOverviewViewModel = getViewModel()
         val uiStateFlow = viewModel.uiStateFlow.collectAsState()
 
