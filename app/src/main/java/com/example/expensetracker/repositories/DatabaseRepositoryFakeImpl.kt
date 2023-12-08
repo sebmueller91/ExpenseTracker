@@ -78,7 +78,7 @@ class DatabaseRepositoryFakeImpl : DatabaseRepository {
     }
 
     override suspend fun getGroup(groupId: UUID): Group? {
-        delay(3000)
+        delay(1000)
         return _groups.value.firstOrNull { it.id == groupId }
     }
 
