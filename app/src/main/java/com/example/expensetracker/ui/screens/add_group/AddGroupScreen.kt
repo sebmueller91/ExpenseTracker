@@ -26,18 +26,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Button
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
@@ -46,6 +34,18 @@ import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.RemoveCircleOutline
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -126,6 +126,7 @@ fun AddGroupScreen(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AddGroupScreen(
     uiStateFlow: State<AddGroupUiState>,
@@ -166,8 +167,7 @@ private fun AddGroupScreen(
                         NavigationIcon(imageVector = Icons.Default.Close, onClick = onFinish)
                     }
                 }
-            },
-            elevation = 0.dp
+            }
         )
     }, floatingActionButton = {
         val fabEnabled by remember(uiStateFlow.value.participantsNames) {
@@ -179,13 +179,12 @@ private fun AddGroupScreen(
                     if (fabEnabled) {
                         addParticipant()
                     }
-                },
-                backgroundColor = if (fabEnabled) MaterialTheme.colors.primary else Color.LightGray
+                }
             ) {
                 Icon(
                     Icons.Filled.Add,
                     contentDescription = null,
-                    tint = if (fabEnabled) MaterialTheme.colors.onPrimary else Color.White
+                    tint = if (fabEnabled) MaterialTheme.colorScheme.onPrimary else Color.White
                 )
             }
         }
@@ -324,13 +323,6 @@ private fun GroupNameTextField(
                 onGo = {
                     onFinished()
                 }
-            ),
-            colors = TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = MaterialTheme.colors.secondary,
-                unfocusedIndicatorColor = MaterialTheme.colors.secondary,
-                cursorColor = MaterialTheme.colors.primary,
-                textColor = MaterialTheme.colors.onBackground,
-                backgroundColor = Color.Transparent,
             )
         )
     }
@@ -361,7 +353,7 @@ private fun CurrencyDropdown(
             ) {
                 Text(
                     text = "${selectedCurrency.symbol} (${selectedCurrency.currency_name})",
-                    style = MaterialTheme.typography.body1
+                    style = MaterialTheme.typography.bodyMedium
                 )
                 Icon(
                     imageVector = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
@@ -377,15 +369,16 @@ private fun CurrencyDropdown(
                     .heightIn(max = 300.dp)
             ) {
                 Currency.entries.forEach { currency ->
-                    DropdownMenuItem(onClick = {
-                        selectCurrency(currency)
-                        expanded = false
-                    }) {
-                        Text(
-                            text = "${currency.symbol} (${currency.currency_name})",
-                            style = MaterialTheme.typography.body2
-                        )
-                    }
+                    DropdownMenuItem(
+                        onClick = {
+                            selectCurrency(currency)
+                            expanded = false
+                        }, text = {
+                            Text(
+                                text = "${currency.symbol} (${currency.currency_name})",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        })
                 }
             }
         }
@@ -470,14 +463,7 @@ private fun ParicipantTextField( // TODO: Fuse this with the group name field?
                 .weight(1f)
                 .padding(horizontal = 8.dp, vertical = 1.dp),
             keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
-            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-            colors = TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = MaterialTheme.colors.secondary,
-                unfocusedIndicatorColor = MaterialTheme.colors.secondary,
-                cursorColor = MaterialTheme.colors.primary,
-                textColor = MaterialTheme.colors.onBackground,
-                backgroundColor = Color.Transparent,
-            )
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done)
         )
         if (numberParticipants > 1) {
             IconButton(
@@ -556,7 +542,7 @@ private fun shareMessageIntent(context: Context, text: String) {
 
 @Composable
 private fun AddGroupScreenPreview(darkTheme: Boolean, subScreen: AddGroupSubScreens) {
-    ExpenseTrackerTheme(darkTheme = darkTheme) {
+    ExpenseTrackerTheme(darkMode = darkTheme) {
         val uiState = remember {
             mutableStateOf(
                 AddGroupUiState(

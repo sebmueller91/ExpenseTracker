@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,17 +16,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material3.Card
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
@@ -38,8 +39,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.expensetracker.BuildConfig
 import com.example.expensetracker.R
 import com.example.expensetracker.model.Currency
 import com.example.expensetracker.model.Group
@@ -59,19 +63,21 @@ import java.util.UUID
 fun GroupOverviewScreen(
     navigator: DestinationsNavigator
 ) {
-    val viewModel: GroupOverviewViewModel = getViewModel()
-    val uiStateFlow = viewModel.uiStateFlow.collectAsState()
+    ExpenseTrackerTheme { // Wrap your screen with ExpenseTrackerTheme
+        val viewModel: GroupOverviewViewModel = getViewModel()
+        val uiStateFlow = viewModel.uiStateFlow.collectAsState()
 
-    GroupOverviewScreen(
-        uiStateFlow = uiStateFlow,
-        onAddGroup = { navigator.navigate(AddGroupScreenDestination) },
-        onNavigateToDetailScreen = { uuid ->
-            navigator.navigate(
-                GroupDetailScreenDestination(
-                    GroupDetailScreenDestination.NavArgs(uuid)
+        GroupOverviewScreen(
+            uiStateFlow = uiStateFlow,
+            onAddGroup = { navigator.navigate(AddGroupScreenDestination) },
+            onNavigateToDetailScreen = { uuid ->
+                navigator.navigate(
+                    GroupDetailScreenDestination(
+                        GroupDetailScreenDestination.NavArgs(uuid)
+                    )
                 )
-            )
-        })
+            })
+    }
 }
 
 @Composable
@@ -108,6 +114,8 @@ private fun GroupOverviewScreen(
                     GroupCard(group = it, onNavigateToDetailScreen = onNavigateToDetailScreen)
                 }
             }
+            Spacer(Modifier.weight(1f))
+            VersionCopyrightLabel()
         }
     }
 }
@@ -119,7 +127,6 @@ private fun GroupCard(
     modifier: Modifier = Modifier.fillMaxWidth()
 ) {
     Card(
-        elevation = 4.dp,
         shape = RoundedCornerShape(16.dp),
         modifier = modifier
             .padding(vertical = 8.dp, horizontal = 12.dp)
@@ -133,7 +140,7 @@ private fun GroupCard(
                         stiffness = Spring.StiffnessMedium
                     )
                 )
-                .clickable(onClick = {onNavigateToDetailScreen(group.id)})
+                .clickable(onClick = { onNavigateToDetailScreen(group.id) })
         ) {
             Row(
                 modifier = Modifier
@@ -142,8 +149,8 @@ private fun GroupCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(group.name, style = MaterialTheme.typography.h6)
-                Text("Costs: 1252.32€", style = MaterialTheme.typography.body2)
+                Text(group.name, style = MaterialTheme.typography.headlineSmall)
+                Text("Costs: 1252.32€", style = MaterialTheme.typography.bodyMedium)
                 ExpandCollapseButton(expanded = expanded, onClick = { expanded = !expanded })
             }
             if (expanded) {
@@ -155,18 +162,18 @@ private fun GroupCard(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column {
-                        Text("Participants", style = MaterialTheme.typography.body1)
+                        Text("Participants", style = MaterialTheme.typography.bodySmall)
                         for (participant in group.participants) {
                             Text(
                                 participant.name,
-                                style = MaterialTheme.typography.subtitle2,
+                                style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp)
                             )
                         }
                     }
                     Text(
                         "Transactions: ${group.transactions.size}",
-                        style = MaterialTheme.typography.body1
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
 
@@ -184,8 +191,25 @@ private fun ExpandCollapseButton(
     IconButton(onClick = onClick, modifier = modifier) {
         Icon(
             imageVector = if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
-            tint = MaterialTheme.colors.secondary,
             contentDescription = null
+        )
+    }
+}
+
+@Composable
+private fun VersionCopyrightLabel(modifier: Modifier = Modifier) {
+    val infoText = "©2023 DGS Software\nApp version: ${BuildConfig.VERSION_NAME}" // TODO: Move into resources
+    Row(
+        horizontalArrangement = Arrangement.End,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = infoText,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+            fontSize = 12.sp,
+            textAlign = TextAlign.End,
+            modifier = modifier
+                .padding(16.dp)
         )
     }
 }
@@ -217,7 +241,7 @@ private fun GroupOverviewScreenPreview(darkMode: Boolean) {
             )
         )
     }
-    ExpenseTrackerTheme(darkTheme = darkMode) {
+    ExpenseTrackerTheme(darkMode = darkMode) {
         GroupOverviewScreen(uiStateFlow = uiState, onAddGroup = {}, onNavigateToDetailScreen = {})
     }
 }
