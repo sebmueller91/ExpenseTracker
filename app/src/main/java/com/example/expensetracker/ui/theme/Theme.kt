@@ -80,7 +80,7 @@ fun ExpenseTrackerTheme(
     val colors = if (!darkMode) {
         LightColors
     } else {
-        DarkColors
+        LightColors //DarkColors
     }
 
     MaterialTheme(

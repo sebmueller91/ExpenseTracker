@@ -8,12 +8,17 @@ import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Sort
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -36,12 +41,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.expensetracker.R
+import com.example.expensetracker.model.Currency
+import com.example.expensetracker.model.Group
+import com.example.expensetracker.model.Transaction
 import com.example.expensetracker.ui.components.NavigationIcon
 import com.example.expensetracker.ui.screens.destinations.GroupOverviewScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
+import java.text.SimpleDateFormat
 import java.util.UUID
 import kotlin.math.absoluteValue
 
@@ -68,7 +77,9 @@ private fun GroupDetailScreen(
 
     Scaffold { paddingValues ->
         Column(
-            modifier = Modifier.padding(paddingValues).fillMaxSize(),
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -153,7 +164,10 @@ private fun GroupDetailScreenContent(
                 enter = slideInHorizontally { fullWidth -> fullWidth },
                 exit = slideOutHorizontally { fullWidth -> fullWidth }
             ) {
-                ExpensesTab()
+                ExpensesTab(
+                    transactions = uiState.group.transactions,
+                    currency = uiState.group.currency
+                )
             }
 
             AnimatedVisibility(
@@ -161,14 +175,14 @@ private fun GroupDetailScreenContent(
                 enter = slideInHorizontally { fullWidth -> -fullWidth },
                 exit = slideOutHorizontally { fullWidth -> -fullWidth }
             ) {
-                OverviewTab()
+                OverviewTab(group = uiState.group)
             }
         }
     }
 }
 
 @Composable
-private fun OverviewTab(modifier: Modifier = Modifier) {
+private fun OverviewTab(group: Group, modifier: Modifier = Modifier) {
     Column(
         Modifier
             .fillMaxSize(),
@@ -180,13 +194,62 @@ private fun OverviewTab(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun ExpensesTab(modifier: Modifier = Modifier) {
-    Column(
-        Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+private fun ExpensesTab(
+    transactions: List<Transaction>,
+    currency: Currency,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(modifier = modifier.fillMaxSize()) {
+        items(items = transactions) { transaction ->
+            when (transaction) {
+                is Transaction.Expense -> ExpenseEntry(expense = transaction, currency = currency)
+                is Transaction.Income -> IncomeEntry(income = transaction, currency = currency)
+                is Transaction.Payment -> PaymentEntry(payment = transaction, currency = currency)
+            }
+        }
+    }
+}
+
+@Composable
+private fun PaymentEntry(
+    payment: Transaction.Payment,
+    currency: Currency,
+    modifier: Modifier = Modifier
+) {
+    Text(payment.purpose)
+}
+
+@Composable
+private fun IncomeEntry(
+    income: Transaction.Income,
+    currency: Currency,
+    modifier: Modifier = Modifier
+) {
+    Text(income.purpose)
+}
+
+@Composable
+private fun ExpenseEntry(
+    expense: Transaction.Expense,
+    currency: Currency,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .padding(horizontal = 16.dp, vertical = 4.dp)
+            .fillMaxWidth()
     ) {
-        Text("Expenses")
+        Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.SpaceAround) {
+            Text(
+                "${expense.paidBy.name} paid ${
+                    String.format("%.2f", expense.amount).toDouble()
+                }${currency.symbol} for ${expense.purpose}"
+            )
+            Row(horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(SimpleDateFormat("dd.MM.yyyy").format(expense.date))
+                Text("Split between ${expense.splitBetween.joinToString(", ") { it.name }}")
+            }
+        }
     }
 }
 
