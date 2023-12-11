@@ -88,8 +88,7 @@ class DatabaseRepositoryFakeImpl : DatabaseRepository {
             date = createDate(year = 2022, day = 23, month = 8),
             paidBy = participants.random(),
             purpose = createPurpose(),
-            splitBetween = participants.shuffled().subList(0, participants.size - 1)
-        )
+            splitBetween = participants)
     }
 
     private fun createPayment(participants: List<Participant>): Transaction.Payment {
@@ -108,7 +107,7 @@ class DatabaseRepositoryFakeImpl : DatabaseRepository {
             date = createDate(year = 2022, day = 23, month = 8),
             receivedBy = participants.random(),
             purpose = createPurpose(),
-            splitBetween = participants.shuffled().subList(0, participants.size - 1)
+            splitBetween = participants
         )
     }
 
