@@ -19,4 +19,6 @@
     <string name="add_expense">Add expense</string>
     <string name="add_income">Add income</string>
     <string name="add_payment">Add payment</string>
+    <string name="_2023_dgs_software">©2023 DGS Software</string>
+    <string name="app_version">App version: %1$s</string>
 </resources>
