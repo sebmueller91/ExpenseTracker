@@ -203,18 +203,23 @@ private fun ExpandCollapseButton(
 
 @Composable
 private fun VersionCopyrightLabel(modifier: Modifier = Modifier) {
-    val infoText = "©2023 DGS Software\nApp version: ${BuildConfig.VERSION_NAME}" // TODO: Move into resources
-    Row(
-        horizontalArrangement = Arrangement.End,
-        verticalAlignment = Alignment.CenterVertically
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.Bottom,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = infoText,
+            text = stringResource(R.string._2023_dgs_software),
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+            fontSize = 12.sp,
+            textAlign = TextAlign.End
+        )
+        Text(
+            text = stringResource(R.string.app_version, BuildConfig.VERSION_NAME),
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
             fontSize = 12.sp,
             textAlign = TextAlign.End,
-            modifier = modifier
-                .padding(16.dp)
+            modifier = modifier.padding(bottom = 16.dp, top = 4.dp)
         )
     }
 }
