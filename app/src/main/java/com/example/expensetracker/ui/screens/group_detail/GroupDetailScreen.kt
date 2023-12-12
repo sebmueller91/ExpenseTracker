@@ -1,26 +1,39 @@
 package com.example.expensetracker.ui.screens.group_detail
 
 import androidx.activity.compose.BackHandler
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.CurrencyExchange
 import androidx.compose.material.icons.filled.DoneAll
+import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.Payment
+import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -35,6 +48,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
@@ -75,29 +91,21 @@ private fun GroupDetailScreen(
 ) {
     BackHandler(onBack = onLeave)
 
-    Scaffold { paddingValues ->
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            when (val uiState = uiStateFlow.value) {
-                is GroupDetailUiState.Error -> {
-                    Text(stringResource(R.string.something_went_wrong))
-                }
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        when (val uiState = uiStateFlow.value) {
+            is GroupDetailUiState.Error -> {
+                Text(stringResource(R.string.something_went_wrong))
+            }
 
-                is GroupDetailUiState.Loading -> {
-                    CircularProgressIndicator()
-                }
+            is GroupDetailUiState.Loading -> {
+                CircularProgressIndicator()
+            }
 
-                is GroupDetailUiState.Success -> {
-                    GroupDetailScreenContent(
-                        uiState = uiState,
-                        onLeave = onLeave
-                    )
-                }
+            is GroupDetailUiState.Success -> {
+                GroupDetailScreenContent(
+                    uiState = uiState,
+                    onLeave = onLeave
+                )
             }
         }
     }
@@ -181,15 +189,31 @@ private fun GroupDetailScreenContent(
     }
 }
 
+
+// TODO: Move into separate file
 @Composable
 private fun OverviewTab(group: Group, modifier: Modifier = Modifier) {
-    Column(
-        Modifier
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("Overview")
+    var fabExpanded by remember { mutableStateOf(false) }
+
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        floatingActionButton = {
+            ExpandableOverviewFabs(
+                fabExpanded = fabExpanded,
+                expandCollapseFab = { fabExpanded = !fabExpanded })
+        }
+    ) { paddingValues ->
+        ScreenWithAnimatedOverlay(
+            applyOverlay = fabExpanded,
+            modifier = Modifier.padding(paddingValues)
+        ) {
+            Box(
+                modifier = Modifier.padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("Overview")
+            }
+        }
     }
 }
 
@@ -199,12 +223,185 @@ private fun ExpensesTab(
     currency: Currency,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(modifier = modifier.fillMaxSize()) {
-        items(items = transactions) { transaction ->
-            when (transaction) {
-                is Transaction.Expense -> ExpenseEntry(expense = transaction, currency = currency)
-                is Transaction.Income -> IncomeEntry(income = transaction, currency = currency)
-                is Transaction.Payment -> PaymentEntry(payment = transaction, currency = currency)
+    var fabExpanded by remember { mutableStateOf(false) }
+
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        floatingActionButton = {
+            ExpandableExpensesFabs(
+                fabExpanded = fabExpanded,
+                expandCollapseFab = { fabExpanded = !fabExpanded })
+        }
+
+    ) { paddingValues ->
+        ScreenWithAnimatedOverlay(
+            applyOverlay = fabExpanded,
+            modifier = Modifier.padding(paddingValues)
+        ) {
+            LazyColumn {
+                items(items = transactions) { transaction ->
+                    when (transaction) {
+                        is Transaction.Expense -> ExpenseEntry(
+                            expense = transaction,
+                            currency = currency
+                        )
+
+                        is Transaction.Income -> IncomeEntry(
+                            income = transaction,
+                            currency = currency
+                        )
+
+                        is Transaction.Payment -> PaymentEntry(
+                            payment = transaction,
+                            currency = currency
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ExpandableExpensesFabs(
+    fabExpanded: Boolean,
+    expandCollapseFab: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val animationDelay = 60
+
+    Column {
+        AnimatedFloatingActionButton(
+            visible = fabExpanded,
+            icon = Icons.Filled.CurrencyExchange,
+            labelId = R.string.add_payment,
+            animationDelayEnter = animationDelay * 2,
+            animationDelayExit = 0
+        ) {
+            // TODO
+        }
+        Spacer(Modifier.height(20.dp))
+        AnimatedFloatingActionButton(
+            visible = fabExpanded,
+            icon = Icons.Filled.Savings,
+            labelId = R.string.add_income,
+            animationDelayEnter = animationDelay,
+            animationDelayExit = animationDelay
+        ) {
+            // TODO
+        }
+        Spacer(Modifier.height(20.dp))
+        AnimatedFloatingActionButton(
+            visible = fabExpanded,
+            icon = Icons.Filled.Payment,
+            labelId = R.string.add_expense,
+            animationDelayEnter = 0,
+            animationDelayExit = animationDelay * 2
+        ) {
+            // TODO
+        }
+        Spacer(Modifier.height(20.dp))
+        Row {
+            Spacer(Modifier.weight(1f))
+            FloatingActionButton(onClick = expandCollapseFab, shape = CircleShape) {
+                Icon(
+                    Icons.Filled.MoreHoriz,
+                    contentDescription = null
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ExpandableOverviewFabs(
+    fabExpanded: Boolean,
+    expandCollapseFab: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val animationDelay = 60
+
+    Column {
+        AnimatedFloatingActionButton(
+            visible = fabExpanded,
+            icon = Icons.Filled.Payment,
+            labelId = R.string.add_expense,
+            animationDelayEnter = 0,
+            animationDelayExit = 0
+        ) {
+            // TODO
+        }
+        Spacer(Modifier.height(20.dp))
+        Row {
+            Spacer(Modifier.weight(1f))
+            FloatingActionButton(onClick = expandCollapseFab, shape = CircleShape) {
+                Icon(
+                    Icons.Filled.MoreHoriz,
+                    contentDescription = null
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ScreenWithAnimatedOverlay(
+    applyOverlay: Boolean,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    Box(modifier = modifier) {
+        content()
+
+        AnimatedVisibility(
+            visible = applyOverlay,
+            enter = fadeIn(
+                animationSpec = tween(durationMillis = 500)
+            ),
+            exit = fadeOut(animationSpec = tween(durationMillis = 500))
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        brush = Brush.radialGradient(
+                            colors = listOf(
+                                Color.White.copy(alpha = 0.2f),
+                                Color.White.copy(alpha = 0.9f)
+                            ), center = Offset(1f, 1f)
+                        )
+                    )
+            )
+        }
+    }
+}
+
+@Composable
+private fun AnimatedFloatingActionButton(
+    visible: Boolean,
+    icon: ImageVector,
+    @StringRes labelId: Int,
+    animationDelayEnter: Int,
+    animationDelayExit: Int,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    AnimatedVisibility(
+        visible = visible,
+        enter = slideInHorizontally(
+            initialOffsetX = { fullWidth -> fullWidth },
+            animationSpec = tween(durationMillis = 500, delayMillis = animationDelayEnter)
+        ),
+        exit = slideOutHorizontally(
+            targetOffsetX = { fullWidth -> fullWidth },
+            animationSpec = tween(durationMillis = 500, delayMillis = animationDelayExit)
+        )
+    ) {
+        Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+            Spacer(Modifier.weight(1f))
+            Text(stringResource(id = labelId), Modifier.padding(end = 8.dp))
+            FloatingActionButton(onClick = onClick, shape = CircleShape) {
+                Icon(imageVector = icon, contentDescription = stringResource(id = labelId))
             }
         }
     }
@@ -239,7 +436,10 @@ private fun ExpenseEntry(
             .padding(horizontal = 16.dp, vertical = 4.dp)
             .fillMaxWidth()
     ) {
-        Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.SpaceAround) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.SpaceAround
+        ) {
             Text(
                 "${expense.paidBy.name} paid ${
                     String.format("%.2f", expense.amount).toDouble()
@@ -260,3 +460,5 @@ private enum class GroupDetailScreenTabs(
     OVERVIEW("Overview", Icons.Filled.DoneAll),
     EXPENSES("Expenses", Icons.Filled.Sort)
 }
+
+// TODO: Add previews
