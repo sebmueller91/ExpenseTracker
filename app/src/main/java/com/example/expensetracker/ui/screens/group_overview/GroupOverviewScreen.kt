@@ -22,7 +22,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.Card
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -49,6 +48,7 @@ import com.example.expensetracker.R
 import com.example.expensetracker.model.Currency
 import com.example.expensetracker.model.Group
 import com.example.expensetracker.model.Participant
+import com.example.expensetracker.ui.components.RoundFloatingActionButton
 import com.example.expensetracker.ui.screens.destinations.AddGroupScreenDestination
 import com.example.expensetracker.ui.screens.destinations.GroupDetailScreenDestination
 import com.example.expensetracker.ui.theme.ExpenseTrackerTheme
@@ -93,7 +93,7 @@ private fun GroupOverviewScreen(
 ) {
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = onAddGroup) {
+            RoundFloatingActionButton(onClick = onAddGroup) {
                 Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add_group))
             }
         }
