@@ -38,7 +38,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -74,6 +73,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.expensetracker.R
 import com.example.expensetracker.model.Currency
 import com.example.expensetracker.ui.components.NavigationIcon
+import com.example.expensetracker.ui.components.RoundFloatingActionButton
 import com.example.expensetracker.ui.screens.destinations.GroupDetailScreenDestination
 import com.example.expensetracker.ui.theme.ExpenseTrackerTheme
 import com.ramcosta.composedestinations.annotation.Destination
@@ -174,7 +174,7 @@ private fun AddGroupScreen(
             mutableStateOf(uiStateFlow.value.participantsNames.none { it.isBlank() })
         }
         if (uiStateFlow.value.subScreen == AddGroupSubScreens.PARTICIPANTS) {
-            FloatingActionButton(
+            RoundFloatingActionButton(
                 onClick = {
                     if (fabEnabled) {
                         addParticipant()
