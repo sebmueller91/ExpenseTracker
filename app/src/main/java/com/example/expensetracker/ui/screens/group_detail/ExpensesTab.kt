@@ -1,5 +1,8 @@
 package com.example.expensetracker.ui.screens.group_detail
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -32,6 +36,7 @@ import com.example.expensetracker.R
 import com.example.expensetracker.model.Currency
 import com.example.expensetracker.model.Transaction
 import com.example.expensetracker.ui.components.AnimatedFloatingActionButton
+import com.example.expensetracker.ui.components.ExpandCollapseButton
 import com.example.expensetracker.ui.components.RoundFloatingActionButton
 import com.example.expensetracker.ui.components.ScreenWithAnimatedOverlay
 import com.example.expensetracker.ui.theme.ExpenseTrackerTheme
@@ -93,7 +98,7 @@ private fun ExpandableExpensesFabs(
 ) {
     val animationDelay = 60
 
-    Column {
+    Column(modifier = modifier) {
         AnimatedFloatingActionButton(
             visible = fabExpanded,
             icon = Icons.Filled.CurrencyExchange,
@@ -160,25 +165,71 @@ private fun ExpenseEntry(
     currency: Currency,
     modifier: Modifier = Modifier
 ) {
+    Entry(modifier = modifier,
+        mainContent = { mainContentModifier ->
+            Text(
+                modifier = mainContentModifier
+                    .padding(6.dp),
+                style = MaterialTheme.typography.bodyLarge,
+                text = "${expense.paidBy.name} paid ${
+                    String.format("%.2f", expense.amount).toDouble()
+                }${currency.symbol} for ${expense.purpose}",
+
+                )
+        }, expandedContent = {
+            Column(modifier = Modifier.padding(horizontal = 6.dp)) {
+                Text(
+                    text = "Paid on: ${SimpleDateFormat("dd.MM.yyyy").format(expense.date)}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = "Split between ${expense.splitBetween.joinToString(", ") { it.name }}",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+        }
+    )
+}
+
+@Composable
+fun Entry(
+    modifier: Modifier = Modifier,
+    mainContent: @Composable (modifier: Modifier) -> Unit,
+    expandedContent: @Composable () -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
     Card(
         modifier = modifier
             .padding(horizontal = 16.dp, vertical = 4.dp)
             .fillMaxWidth()
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+                .animateContentSize(
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioNoBouncy,
+                        stiffness = Spring.StiffnessLow
+                    )
+                ),
             verticalArrangement = Arrangement.SpaceAround
         ) {
-            Text(
-                modifier = Modifier.padding(6.dp),
-                style = MaterialTheme.typography.bodyLarge,
-                text = "${expense.paidBy.name} paid ${
-                    String.format("%.2f", expense.amount).toDouble()
-                }${currency.symbol} for ${expense.purpose}"
-            )
-            Row(horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(modifier = Modifier.padding(horizontal = 6.dp), text = SimpleDateFormat("dd.MM.yyyy").format(expense.date)) // TODO: Move into viewModel
-                Text("Split between ${expense.splitBetween.joinToString(", ") { it.name }}")
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                mainContent(modifier = Modifier.weight(1f))
+                ExpandCollapseButton(
+                    expanded = expanded,
+                    onClick = { expanded = !expanded }
+                )
+            }
+            if (expanded) {
+                expandedContent()
             }
         }
     }

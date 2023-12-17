@@ -19,11 +19,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -48,6 +45,7 @@ import com.example.expensetracker.R
 import com.example.expensetracker.model.Currency
 import com.example.expensetracker.model.Group
 import com.example.expensetracker.model.Participant
+import com.example.expensetracker.ui.components.ExpandCollapseButton
 import com.example.expensetracker.ui.components.RoundFloatingActionButton
 import com.example.expensetracker.ui.screens.destinations.AddGroupScreenDestination
 import com.example.expensetracker.ui.screens.destinations.GroupDetailScreenDestination
@@ -141,8 +139,8 @@ private fun GroupCard(
             modifier = Modifier
                 .animateContentSize(
                     animationSpec = spring(
-                        Spring.DampingRatioMediumBouncy,
-                        stiffness = Spring.StiffnessMedium
+                        Spring.DampingRatioNoBouncy,
+                        stiffness = Spring.StiffnessLow
                     )
                 )
                 .clickable(onClick = { onNavigateToDetailScreen(group.id) })
@@ -184,20 +182,6 @@ private fun GroupCard(
 
             }
         }
-    }
-}
-
-@Composable
-private fun ExpandCollapseButton(
-    expanded: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    IconButton(onClick = onClick, modifier = modifier) {
-        Icon(
-            imageVector = if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
-            contentDescription = null
-        )
     }
 }
 
