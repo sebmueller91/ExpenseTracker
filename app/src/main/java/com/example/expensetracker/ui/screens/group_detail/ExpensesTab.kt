@@ -40,14 +40,11 @@ import com.example.expensetracker.ui.components.ExpandCollapseButton
 import com.example.expensetracker.ui.components.RoundFloatingActionButton
 import com.example.expensetracker.ui.components.ScreenWithAnimatedOverlay
 import com.example.expensetracker.ui.theme.ExpenseTrackerTheme
-import com.example.expensetracker.util.FakeData.Companion.createFakeExpense
-import com.example.expensetracker.util.FakeData.Companion.fakeParticipantsSmall
-import java.text.SimpleDateFormat
 
 
 @Composable
 fun ExpensesTab(
-    formattedTransactions: List<FormattedTransaction>,
+    transactions: List<Transaction>,
     currency: Currency,
     modifier: Modifier = Modifier
 ) {
@@ -67,8 +64,8 @@ fun ExpensesTab(
             modifier = Modifier.padding(paddingValues)
         ) {
             LazyColumn {
-                items(items = formattedTransactions) { formattedTransaction ->
-                    ExpenseEntry(formattedTransaction = formattedTransaction)
+                items(items = transactions) { transaction ->
+                    ExpenseEntry(formattedTransaction = transaction.format(currency))
                 }
             }
         }
@@ -137,7 +134,8 @@ private fun ExpenseEntry(
                 modifier = mainContentModifier
                     .padding(6.dp),
                 style = MaterialTheme.typography.bodyLarge,
-                text = formattedTransaction.mainText)
+                text = formattedTransaction.mainText
+            )
         }, expandedContent = {
             Column(modifier = Modifier.padding(horizontal = 6.dp)) {
                 Text(
@@ -202,8 +200,11 @@ fun Entry(
 private fun ExpenseEntryPreview() {
     ExpenseTrackerTheme {
         ExpenseEntry(
-            expense = createFakeExpense(fakeParticipantsSmall),
-            currency = Currency.EURO
+            FormattedTransaction(
+                mainText = "Peter paid 10€ for Water",
+                date = "pain on: 10.11.2023",
+                splitBetween = "Peter, Alisa und Michael"
+            )
         )
     }
 }
