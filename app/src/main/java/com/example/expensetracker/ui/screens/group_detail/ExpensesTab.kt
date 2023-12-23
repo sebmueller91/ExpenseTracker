@@ -47,7 +47,7 @@ import java.text.SimpleDateFormat
 
 @Composable
 fun ExpensesTab(
-    transactions: List<Transaction>,
+    formattedTransactions: List<FormattedTransaction>,
     currency: Currency,
     modifier: Modifier = Modifier
 ) {
@@ -67,23 +67,8 @@ fun ExpensesTab(
             modifier = Modifier.padding(paddingValues)
         ) {
             LazyColumn {
-                items(items = transactions) { transaction ->
-                    when (transaction) {
-                        is Transaction.Expense -> ExpenseEntry(
-                            expense = transaction,
-                            currency = currency
-                        )
-
-                        is Transaction.Income -> IncomeEntry(
-                            income = transaction,
-                            currency = currency
-                        )
-
-                        is Transaction.Payment -> PaymentEntry(
-                            payment = transaction,
-                            currency = currency
-                        )
-                    }
+                items(items = formattedTransactions) { formattedTransaction ->
+                    ExpenseEntry(formattedTransaction = formattedTransaction)
                 }
             }
         }
@@ -142,27 +127,8 @@ private fun ExpandableExpensesFabs(
 }
 
 @Composable
-private fun PaymentEntry(
-    payment: Transaction.Payment,
-    currency: Currency,
-    modifier: Modifier = Modifier
-) {
-    Text(payment.purpose)
-}
-
-@Composable
-private fun IncomeEntry(
-    income: Transaction.Income,
-    currency: Currency,
-    modifier: Modifier = Modifier
-) {
-    Text(income.purpose)
-}
-
-@Composable
 private fun ExpenseEntry(
-    expense: Transaction.Expense,
-    currency: Currency,
+    formattedTransaction: FormattedTransaction,
     modifier: Modifier = Modifier
 ) {
     Entry(modifier = modifier,
@@ -171,20 +137,16 @@ private fun ExpenseEntry(
                 modifier = mainContentModifier
                     .padding(6.dp),
                 style = MaterialTheme.typography.bodyLarge,
-                text = "${expense.paidBy.name} paid ${
-                    String.format("%.2f", expense.amount).toDouble()
-                }${currency.symbol} for ${expense.purpose}",
-
-                )
+                text = formattedTransaction.mainText)
         }, expandedContent = {
             Column(modifier = Modifier.padding(horizontal = 6.dp)) {
                 Text(
-                    text = "Paid on: ${SimpleDateFormat("dd.MM.yyyy").format(expense.date)}",
+                    text = formattedTransaction.date,
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    text = "Split between ${expense.splitBetween.joinToString(", ") { it.name }}",
+                    text = formattedTransaction.splitBetween,
                     style = MaterialTheme.typography.bodySmall
                 )
             }

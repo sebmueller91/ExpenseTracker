@@ -60,6 +60,7 @@ fun GroupDetailScreen(
 @Composable
 private fun GroupDetailScreen(
     uiStateFlow: State<GroupDetailUiState>,
+    formattedTransactions: Int,
     onLeave: () -> Unit
 ) {
     BackHandler(onBack = onLeave)
@@ -88,6 +89,7 @@ private fun GroupDetailScreen(
 @Composable
 private fun GroupDetailScreenContent(
     uiState: GroupDetailUiState.Success,
+    formattedTransactions: Flow<FormattedTransaction>
     onLeave: () -> Unit,
     modifier: Modifier = Modifier
 ) {
