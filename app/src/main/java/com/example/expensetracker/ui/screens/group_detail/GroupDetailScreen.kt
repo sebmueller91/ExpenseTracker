@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material3.CircularProgressIndicator
@@ -36,6 +37,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.expensetracker.R
 import com.example.expensetracker.ui.components.NavigationIcon
 import com.example.expensetracker.ui.screens.destinations.GroupOverviewScreenDestination
+import com.example.expensetracker.ui.screens.group_detail.tabs.ExpensesTab
+import com.example.expensetracker.ui.screens.group_detail.tabs.OverviewTab
+import com.example.expensetracker.ui.screens.group_detail.tabs.StatisticsTab
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.getViewModel
@@ -93,13 +97,15 @@ private fun GroupDetailScreenContent(
 ) {
     val dragThreshold = 20.dp
     var selectedTab by remember { mutableStateOf(GroupDetailScreenTabs.EXPENSES) }
+    var previousTab:  GroupDetailScreenTabs? by remember { mutableStateOf(null) }
 
     val dragModifier = Modifier.pointerInput(Unit) {
         detectHorizontalDragGestures { _, dragAmount ->
             if (dragAmount.absoluteValue > dragThreshold.toPx()) {
                 val newTab =
-                    if (dragAmount < 0) GroupDetailScreenTabs.EXPENSES else GroupDetailScreenTabs.OVERVIEW
+                    if (dragAmount < 0) GroupDetailScreenTabs.EXPENSES else GroupDetailScreenTabs.SETTLE_UP
                 if (newTab != selectedTab) {
+                    previousTab = selectedTab
                     selectedTab = newTab
                 }
             }
@@ -117,13 +123,16 @@ private fun GroupDetailScreenContent(
                 })
         },
         bottomBar = {
-            NavigationBar() {
+            NavigationBar {
                 GroupDetailScreenTabs.entries.forEach { tab ->
                     val selected = tab == selectedTab
 
                     NavigationBarItem(
                         selected = selected,
-                        onClick = { selectedTab = tab },
+                        onClick = {
+                            previousTab = selectedTab
+                            selectedTab = tab
+                        },
                         icon = {
                             Icon(
                                 imageVector = tab.imageVector,
@@ -142,8 +151,8 @@ private fun GroupDetailScreenContent(
         ) {
             AnimatedVisibility(
                 visible = selectedTab == GroupDetailScreenTabs.EXPENSES,
-                enter = slideInHorizontally { fullWidth -> fullWidth },
-                exit = slideOutHorizontally { fullWidth -> fullWidth }
+                enter = slideInHorizontally { fullWidth -> -fullWidth },
+                exit = slideOutHorizontally { fullWidth -> -fullWidth }
             ) {
                 ExpensesTab(
                     transactions = uiState.group.transactions,
@@ -152,9 +161,17 @@ private fun GroupDetailScreenContent(
             }
 
             AnimatedVisibility(
-                visible = selectedTab == GroupDetailScreenTabs.OVERVIEW,
-                enter = slideInHorizontally { fullWidth -> -fullWidth },
-                exit = slideOutHorizontally { fullWidth -> -fullWidth }
+                visible = selectedTab == GroupDetailScreenTabs.STATISTICS,
+                enter = slideInHorizontally { fullWidth -> if(previousTab == GroupDetailScreenTabs.EXPENSES) fullWidth else -fullWidth },
+                exit = slideOutHorizontally { fullWidth -> if(selectedTab == GroupDetailScreenTabs.EXPENSES) fullWidth else -fullWidth }
+            ) {
+                StatisticsTab(group = uiState.group)
+            }
+
+            AnimatedVisibility(
+                visible = selectedTab == GroupDetailScreenTabs.SETTLE_UP,
+                enter = slideInHorizontally { fullWidth -> fullWidth },
+                exit = slideOutHorizontally { fullWidth -> fullWidth }
             ) {
                 OverviewTab(group = uiState.group)
             }
@@ -166,8 +183,10 @@ private enum class GroupDetailScreenTabs(
     val label: String,
     val imageVector: ImageVector
 ) {
-    OVERVIEW("Overview", Icons.Filled.DoneAll),
-    EXPENSES("Expenses", Icons.Filled.Sort)
+    // TODO: Move strings into resources
+    EXPENSES("Expenses", Icons.Filled.Sort),
+    STATISTICS("Statistics", Icons.Filled.BarChart),
+    SETTLE_UP("Settle up", Icons.Filled.DoneAll)
 }
 
 // TODO: Add previews

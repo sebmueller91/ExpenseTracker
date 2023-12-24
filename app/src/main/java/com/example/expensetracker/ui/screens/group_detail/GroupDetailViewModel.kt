@@ -35,24 +35,33 @@ class GroupDetailViewModel(
 }
 
 fun Transaction.format(currency: Currency): FormattedTransaction {
+    // TODO: Move strings into resources
+    // TODO: Number formatting has 0 or 2 digits after comma
     val mainText = when (this) {
-        is Transaction.Expense -> {
-            "${paidBy.name} paid ${String.format("%.2f", amount).toDouble()}${currency.symbol} for $purpose"
-        }
-        is Transaction.Income -> "TODO()"
-        is Transaction.Payment -> "TODO()"
+        is Transaction.Expense -> "${paidBy.name} paid ${
+            String.format("%.2f", amount).toDouble()
+        }${currency.symbol} for $purpose"
+
+        is Transaction.Income -> "${receivedBy.name} received ${
+            String.format("%.2f", amount).toDouble()
+        }${currency.symbol} for $purpose"
+
+        is Transaction.Payment -> "${fromParticipant.name} gave ${
+            String.format("%.2f", amount).toDouble()
+        }${currency.symbol} to ${toParticipant.name} for $purpose"
     }
 
+    val formattedDate = "${SimpleDateFormat("dd.MM.yyyy").format(this.date)}"
     val date = when (this) {
-        is Transaction.Expense -> "Paid on: ${SimpleDateFormat("dd.MM.yyyy").format(this.date)}"
-        is Transaction.Income -> "TODO()"
-        is Transaction.Payment -> "TODO()"
+        is Transaction.Expense -> "Paid on: $formattedDate"
+        is Transaction.Income -> "Received on: $formattedDate"
+        is Transaction.Payment -> "Paid on $formattedDate"
     }
 
     val splitBetween = when (this) {
-        is Transaction.Expense -> "Split between ${splitBetween.joinToString(", ") { it.name }}"
-        is Transaction.Income -> "TODO()"
-        is Transaction.Payment -> "TODO()"
+        is Transaction.Expense -> "Split between ${splitBetween.joinToString(", ") { it.name }}" // TODO: Move into function and add "and"
+        is Transaction.Income -> "Split between ${splitBetween.joinToString(", ") { it.name }}"
+        is Transaction.Payment -> "From $fromParticipant to $toParticipant"
     }
 
     return FormattedTransaction(

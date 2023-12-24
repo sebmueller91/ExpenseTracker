@@ -1,4 +1,4 @@
-package com.example.expensetracker.ui.screens.group_detail
+package com.example.expensetracker.ui.screens.group_detail.tabs
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
@@ -39,6 +39,8 @@ import com.example.expensetracker.ui.components.AnimatedFloatingActionButton
 import com.example.expensetracker.ui.components.ExpandCollapseButton
 import com.example.expensetracker.ui.components.RoundFloatingActionButton
 import com.example.expensetracker.ui.components.ScreenWithAnimatedOverlay
+import com.example.expensetracker.ui.screens.group_detail.FormattedTransaction
+import com.example.expensetracker.ui.screens.group_detail.format
 import com.example.expensetracker.ui.theme.ExpenseTrackerTheme
 
 

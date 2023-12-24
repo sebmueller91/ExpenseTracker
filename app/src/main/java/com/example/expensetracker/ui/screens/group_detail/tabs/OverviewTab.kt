@@ -1,4 +1,4 @@
-package com.example.expensetracker.ui.screens.group_detail
+package com.example.expensetracker.ui.screens.group_detail.tabs
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
