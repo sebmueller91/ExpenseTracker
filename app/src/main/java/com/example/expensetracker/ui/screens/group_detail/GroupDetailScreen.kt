@@ -38,7 +38,7 @@ import com.example.expensetracker.R
 import com.example.expensetracker.ui.components.NavigationIcon
 import com.example.expensetracker.ui.screens.destinations.GroupOverviewScreenDestination
 import com.example.expensetracker.ui.screens.group_detail.tabs.ExpensesTab
-import com.example.expensetracker.ui.screens.group_detail.tabs.OverviewTab
+import com.example.expensetracker.ui.screens.group_detail.tabs.SettleUpTab
 import com.example.expensetracker.ui.screens.group_detail.tabs.StatisticsTab
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -173,7 +173,7 @@ private fun GroupDetailScreenContent(
                 enter = slideInHorizontally { fullWidth -> fullWidth },
                 exit = slideOutHorizontally { fullWidth -> fullWidth }
             ) {
-                OverviewTab(group = uiState.group)
+                SettleUpTab(group = uiState.group)
             }
         }
     }
