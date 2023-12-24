@@ -18,7 +18,7 @@ class AddGroupViewModel(private val databaseRepository: DatabaseRepository) : Vi
         _uiState.update {
             it.copy(
                 subScreen = when (uiStateFlow.value.subScreen) {
-                    AddGroupSubScreens.GROUPNAME_CURRENCY -> {
+                    AddGroupSubScreens.GROUP_NAME_CURRENCY -> {
                         AddGroupSubScreens.PARTICIPANTS
                     }
 
@@ -39,7 +39,7 @@ class AddGroupViewModel(private val databaseRepository: DatabaseRepository) : Vi
             it.copy(
                 subScreen = when (uiStateFlow.value.subScreen) {
                     AddGroupSubScreens.PARTICIPANTS -> {
-                        AddGroupSubScreens.GROUPNAME_CURRENCY
+                        AddGroupSubScreens.GROUP_NAME_CURRENCY
                     }
 
                     AddGroupSubScreens.SHARE -> {

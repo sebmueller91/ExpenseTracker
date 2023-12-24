@@ -4,38 +4,29 @@ import java.util.Date
 
 sealed class Transaction(
     val purpose: String,
-    val splitBetween: List<Participant>,
-    val moneyAmout: MoneyAmout,
-    val date: Date,
-    val currency: Currency
+    val amount: Double,
+    val date: Date
 ) {
     class Expense(
         val paidBy: Participant,
+        val splitBetween: List<Participant>,
         purpose: String,
-        splitBetween: List<Participant>,
-        moneyAmout: MoneyAmout,
-        date: Date,
-        currency: Currency
-    ) : Transaction(purpose, splitBetween, moneyAmout, date, currency)
+        amount: Double,
+        date: Date
+    ) : Transaction(purpose, amount, date)
 
     class Payment(
         val fromParticipant: Participant,
         val toParticipant: Participant,
         purpose: String,
-        splitBetween: List<Participant>,
-        moneyAmout: MoneyAmout,
-        date: Date,
-        currency: Currency
-    ) : Transaction(purpose, splitBetween, moneyAmout, date, currency)
+        amount: Double,
+        date: Date
+    ) : Transaction(purpose, amount, date)
     class Income(
         val receivedBy: Participant,
+        val splitBetween: List<Participant>,
         purpose: String,
-        splitBetween: List<Participant>,
-        moneyAmout: MoneyAmout,
-        date: Date,
-        currency: Currency
-    ) : Transaction(purpose, splitBetween, moneyAmout, date, currency)
-
-
-
+        amount: Double,
+        date: Date
+    ) : Transaction(purpose, amount, date)
 }

@@ -1,5 +1,6 @@
 package com.example.expensetracker.ui.screens.group_overview
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -8,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,17 +17,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
@@ -38,12 +36,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.expensetracker.BuildConfig
 import com.example.expensetracker.R
 import com.example.expensetracker.model.Currency
 import com.example.expensetracker.model.Group
 import com.example.expensetracker.model.Participant
+import com.example.expensetracker.ui.components.ExpandCollapseButton
+import com.example.expensetracker.ui.components.RoundFloatingActionButton
 import com.example.expensetracker.ui.screens.destinations.AddGroupScreenDestination
 import com.example.expensetracker.ui.screens.destinations.GroupDetailScreenDestination
 import com.example.expensetracker.ui.theme.ExpenseTrackerTheme
@@ -53,27 +56,31 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.getViewModel
 import java.util.UUID
 
-// TODO: Refactor and add preview
-
 @RootNavGraph(start = true)
 @Destination
 @Composable
 fun GroupOverviewScreen(
     navigator: DestinationsNavigator
 ) {
-    val viewModel: GroupOverviewViewModel = getViewModel()
-    val uiStateFlow = viewModel.uiStateFlow.collectAsState()
+    BackHandler {
+        // Don't navigate back from  group overview
+    }
 
-    GroupOverviewScreen(
-        uiStateFlow = uiStateFlow,
-        onAddGroup = { navigator.navigate(AddGroupScreenDestination) },
-        onNavigateToDetailScreen = { uuid ->
-            navigator.navigate(
-                GroupDetailScreenDestination(
-                    GroupDetailScreenDestination.NavArgs(uuid)
+    ExpenseTrackerTheme {
+        val viewModel: GroupOverviewViewModel = getViewModel()
+        val uiStateFlow = viewModel.uiStateFlow.collectAsState()
+
+        GroupOverviewScreen(
+            uiStateFlow = uiStateFlow,
+            onAddGroup = { navigator.navigate(AddGroupScreenDestination) },
+            onNavigateToDetailScreen = { uuid ->
+                navigator.navigate(
+                    GroupDetailScreenDestination(
+                        GroupDetailScreenDestination.NavArgs(uuid)
+                    )
                 )
-            )
-        })
+            })
+    }
 }
 
 @Composable
@@ -84,7 +91,7 @@ private fun GroupOverviewScreen(
 ) {
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = onAddGroup) {
+            RoundFloatingActionButton(onClick = onAddGroup) {
                 Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add_group))
             }
         }
@@ -110,6 +117,8 @@ private fun GroupOverviewScreen(
                     GroupCard(group = it, onNavigateToDetailScreen = onNavigateToDetailScreen)
                 }
             }
+            Spacer(Modifier.weight(1f))
+            VersionCopyrightLabel()
         }
     }
 }
@@ -121,7 +130,6 @@ private fun GroupCard(
     modifier: Modifier = Modifier.fillMaxWidth()
 ) {
     Card(
-        elevation = 4.dp,
         shape = RoundedCornerShape(16.dp),
         modifier = modifier
             .padding(vertical = 8.dp, horizontal = 12.dp)
@@ -131,11 +139,11 @@ private fun GroupCard(
             modifier = Modifier
                 .animateContentSize(
                     animationSpec = spring(
-                        Spring.DampingRatioMediumBouncy,
-                        stiffness = Spring.StiffnessMedium
+                        Spring.DampingRatioNoBouncy,
+                        stiffness = Spring.StiffnessLow
                     )
                 )
-                .clickable(onClick = {onNavigateToDetailScreen(group.id)})
+                .clickable(onClick = { onNavigateToDetailScreen(group.id) })
         ) {
             Row(
                 modifier = Modifier
@@ -144,8 +152,8 @@ private fun GroupCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(group.name, style = MaterialTheme.typography.h6)
-                Text("Costs: 1252.32€", style = MaterialTheme.typography.body2)
+                Text(group.name, style = MaterialTheme.typography.headlineSmall)
+                Text("Costs: 1252.32€", style = MaterialTheme.typography.bodyMedium)
                 ExpandCollapseButton(expanded = expanded, onClick = { expanded = !expanded })
             }
             if (expanded) {
@@ -157,18 +165,18 @@ private fun GroupCard(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column {
-                        Text("Participants", style = MaterialTheme.typography.body1)
+                        Text("Participants", style = MaterialTheme.typography.bodySmall)
                         for (participant in group.participants) {
                             Text(
                                 participant.name,
-                                style = MaterialTheme.typography.subtitle2,
+                                style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp)
                             )
                         }
                     }
                     Text(
                         "Transactions: ${group.transactions.size}",
-                        style = MaterialTheme.typography.body1
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
 
@@ -178,16 +186,24 @@ private fun GroupCard(
 }
 
 @Composable
-private fun ExpandCollapseButton(
-    expanded: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    IconButton(onClick = onClick, modifier = modifier) {
-        Icon(
-            imageVector = if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
-            tint = MaterialTheme.colors.secondary,
-            contentDescription = null
+private fun VersionCopyrightLabel(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.Bottom,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = stringResource(R.string._2023_dgs_software),
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+            fontSize = 12.sp,
+            textAlign = TextAlign.End
+        )
+        Text(
+            text = stringResource(R.string.app_version, BuildConfig.VERSION_NAME),
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+            fontSize = 12.sp,
+            textAlign = TextAlign.End,
+            modifier = modifier.padding(bottom = 16.dp, top = 4.dp)
         )
     }
 }
@@ -219,7 +235,7 @@ private fun GroupOverviewScreenPreview(darkMode: Boolean) {
             )
         )
     }
-    ExpenseTrackerTheme(darkTheme = darkMode) {
+    ExpenseTrackerTheme(darkMode = darkMode) {
         GroupOverviewScreen(uiStateFlow = uiState, onAddGroup = {}, onNavigateToDetailScreen = {})
     }
 }
