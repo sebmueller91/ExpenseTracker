@@ -2,9 +2,14 @@ package com.example.expensetracker.repositories
 
 import com.example.expensetracker.model.Currency
 import com.example.expensetracker.model.Group
-import com.example.expensetracker.model.Participant
+import com.example.expensetracker.util.FakeData.Companion.createFakeExpense
+import com.example.expensetracker.util.FakeData.Companion.createFakeIncome
+import com.example.expensetracker.util.FakeData.Companion.createFakePayment
+import com.example.expensetracker.util.FakeData.Companion.fakeParticipantsBig
+import com.example.expensetracker.util.FakeData.Companion.fakeParticipantsSmall
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import java.util.UUID
@@ -14,21 +19,42 @@ class DatabaseRepositoryFakeImpl : DatabaseRepository {
         listOf(
             Group(
                 currency = Currency.USD, name = "Summer Breeze",
-                participants = listOf(Participant("Dennis"), Participant("Johnny")),
-                transactions = listOf()
+                participants = (fakeParticipantsSmall),
+                transactions = listOf(
+                    createFakeExpense(fakeParticipantsSmall),
+                    createFakeIncome(fakeParticipantsSmall),
+                    createFakePayment(fakeParticipantsSmall),
+                    createFakeExpense(fakeParticipantsSmall),
+                    createFakeExpense(fakeParticipantsSmall),
+                    createFakeExpense(fakeParticipantsSmall),
+                    createFakeIncome(fakeParticipantsSmall),
+                    createFakePayment(fakeParticipantsSmall),
+                    createFakeIncome(fakeParticipantsSmall),
+                    createFakeIncome(fakeParticipantsSmall),
+                )
             ),
             Group(
                 currency = Currency.EURO, name = "Rock im Park",
-                participants = listOf(
-                    Participant("Dennis"),
-                    Participant("Johnny"),
-                    Participant("Alisa")
-                ),
-                transactions = listOf()
+                participants = fakeParticipantsBig,
+                transactions = listOf(
+                    createFakeExpense(fakeParticipantsBig),
+                    createFakeIncome(fakeParticipantsBig),
+                    createFakeIncome(fakeParticipantsBig),
+                    createFakePayment(fakeParticipantsBig),
+                    createFakePayment(fakeParticipantsBig),
+                    createFakeIncome(fakeParticipantsBig),
+                    createFakeExpense(fakeParticipantsBig),
+                    createFakeExpense(fakeParticipantsBig),
+                    createFakeIncome(fakeParticipantsBig),
+                    createFakeExpense(fakeParticipantsBig),
+                    createFakeExpense(fakeParticipantsBig),
+                    createFakeIncome(fakeParticipantsBig),
+                    createFakePayment(fakeParticipantsBig),
+                )
             )
         )
     )
-    override val groups = _groups.asStateFlow()
+    override val groups: StateFlow<List<Group>> = _groups.asStateFlow()
 
     override fun addGroup(group: Group) {
         _groups.update {
@@ -39,7 +65,7 @@ class DatabaseRepositoryFakeImpl : DatabaseRepository {
     }
 
     override suspend fun getGroup(groupId: UUID): Group? {
-        delay(3000)
+        delay(1000)
         return _groups.value.firstOrNull { it.id == groupId }
     }
 }

@@ -26,18 +26,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Button
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
@@ -46,6 +34,17 @@ import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.RemoveCircleOutline
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -60,10 +59,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -76,12 +72,13 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.expensetracker.R
 import com.example.expensetracker.model.Currency
+import com.example.expensetracker.ui.components.NavigationIcon
+import com.example.expensetracker.ui.components.RoundFloatingActionButton
 import com.example.expensetracker.ui.screens.destinations.GroupDetailScreenDestination
 import com.example.expensetracker.ui.theme.ExpenseTrackerTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.getViewModel
-import kotlin.math.roundToInt
 
 @Destination
 @Composable
@@ -102,11 +99,17 @@ fun AddGroupScreen(
         selectCurrency = viewModel::selectCurrency,
         onFinish = {
             val uuid = viewModel.createNewGroup()
-            navigator.navigate(GroupDetailScreenDestination(GroupDetailScreenDestination.NavArgs(uuid)))
+            navigator.navigate(
+                GroupDetailScreenDestination(
+                    GroupDetailScreenDestination.NavArgs(
+                        uuid
+                    )
+                )
+            )
         },
         onBack = {
             when (uiStateFlow.value.subScreen) {
-                AddGroupSubScreens.GROUPNAME_CURRENCY -> {
+                AddGroupSubScreens.GROUP_NAME_CURRENCY -> {
                     navigator.popBackStack()
                 }
 
@@ -114,13 +117,16 @@ fun AddGroupScreen(
                     viewModel.goToPreviousSubScreen()
                 }
 
-                else -> {}
+                else -> {
+                    // Disabled on purpose
+                }
             }
         }
     )
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AddGroupScreen(
     uiStateFlow: State<AddGroupUiState>,
@@ -136,17 +142,12 @@ private fun AddGroupScreen(
 ) {
     BackHandler(enabled = true, onBack = onBack)
 
-    val screenWidth =
-        with(LocalDensity.current) {
-            LocalConfiguration.current.screenWidthDp.dp.toPx().roundToInt()
-        }
-
     Scaffold(topBar = {
         TopAppBar(
             title = {
                 Text(
                     when (uiStateFlow.value.subScreen) {
-                        AddGroupSubScreens.GROUPNAME_CURRENCY -> stringResource(R.string.add_new_group)
+                        AddGroupSubScreens.GROUP_NAME_CURRENCY -> stringResource(R.string.add_new_group)
                         AddGroupSubScreens.PARTICIPANTS -> stringResource(R.string.add_group_members)
                         else -> stringResource(R.string.share_the_group)
                     }
@@ -154,7 +155,7 @@ private fun AddGroupScreen(
             },
             navigationIcon = {
                 when (uiStateFlow.value.subScreen) {
-                    AddGroupSubScreens.GROUPNAME_CURRENCY -> {
+                    AddGroupSubScreens.GROUP_NAME_CURRENCY -> {
                         NavigationIcon(imageVector = Icons.Default.Close, onClick = onClose)
                     }
 
@@ -166,26 +167,24 @@ private fun AddGroupScreen(
                         NavigationIcon(imageVector = Icons.Default.Close, onClick = onFinish)
                     }
                 }
-            },
-            elevation = 0.dp
+            }
         )
     }, floatingActionButton = {
         val fabEnabled by remember(uiStateFlow.value.participantsNames) {
             mutableStateOf(uiStateFlow.value.participantsNames.none { it.isBlank() })
         }
         if (uiStateFlow.value.subScreen == AddGroupSubScreens.PARTICIPANTS) {
-            FloatingActionButton(
+            RoundFloatingActionButton(
                 onClick = {
                     if (fabEnabled) {
                         addParticipant()
                     }
-                },
-                backgroundColor = if (fabEnabled) MaterialTheme.colors.primary else Color.LightGray
+                }
             ) {
                 Icon(
                     Icons.Filled.Add,
                     contentDescription = null,
-                    tint = if (fabEnabled) MaterialTheme.colors.onPrimary else Color.White
+                    tint = if (fabEnabled) MaterialTheme.colorScheme.onPrimary else Color.White
                 )
             }
         }
@@ -199,12 +198,12 @@ private fun AddGroupScreen(
         ) {
 
             AnimatedVisibility(
-                visible = uiStateFlow.value.subScreen == AddGroupSubScreens.GROUPNAME_CURRENCY,
+                visible = uiStateFlow.value.subScreen == AddGroupSubScreens.GROUP_NAME_CURRENCY,
                 enter = slideInHorizontally(
-                    initialOffsetX = { if (uiStateFlow.value.subScreen == AddGroupSubScreens.GROUPNAME_CURRENCY) -screenWidth else screenWidth },
+                    initialOffsetX = { fullWidth -> if (uiStateFlow.value.subScreen == AddGroupSubScreens.GROUP_NAME_CURRENCY) -fullWidth else fullWidth },
                     animationSpec = tween(durationMillis = 300, easing = LinearEasing)
                 ), exit = slideOutHorizontally(
-                    targetOffsetX = { if (uiStateFlow.value.subScreen == AddGroupSubScreens.GROUPNAME_CURRENCY) screenWidth else -screenWidth },
+                    targetOffsetX = { fullWidth -> if (uiStateFlow.value.subScreen == AddGroupSubScreens.GROUP_NAME_CURRENCY) fullWidth else -fullWidth },
                     animationSpec = tween(durationMillis = 300, easing = LinearEasing)
                 )
             ) {
@@ -219,11 +218,11 @@ private fun AddGroupScreen(
             AnimatedVisibility(
                 visible = uiStateFlow.value.subScreen == AddGroupSubScreens.PARTICIPANTS,
                 enter = slideInHorizontally(
-                    initialOffsetX = { if (uiStateFlow.value.subScreen == AddGroupSubScreens.GROUPNAME_CURRENCY) -screenWidth else screenWidth },
+                    initialOffsetX = { fullWidth -> if (uiStateFlow.value.subScreen == AddGroupSubScreens.GROUP_NAME_CURRENCY) -fullWidth else fullWidth },
                     animationSpec = tween(durationMillis = 300, easing = LinearEasing)
                 ),
                 exit = slideOutHorizontally(
-                    targetOffsetX = { if (uiStateFlow.value.subScreen == AddGroupSubScreens.GROUPNAME_CURRENCY) screenWidth else -screenWidth },
+                    targetOffsetX = { fullWidth -> if (uiStateFlow.value.subScreen == AddGroupSubScreens.GROUP_NAME_CURRENCY) fullWidth else -fullWidth },
                     animationSpec = tween(durationMillis = 300, easing = LinearEasing)
                 )
             ) {
@@ -239,7 +238,7 @@ private fun AddGroupScreen(
             AnimatedVisibility(
                 visible = uiStateFlow.value.subScreen == AddGroupSubScreens.SHARE,
                 enter = slideInHorizontally(
-                    initialOffsetX = { if (uiStateFlow.value.subScreen == AddGroupSubScreens.PARTICIPANTS) -screenWidth else screenWidth },
+                    initialOffsetX = { fullWidth -> if (uiStateFlow.value.subScreen == AddGroupSubScreens.PARTICIPANTS) -fullWidth else fullWidth },
                     animationSpec = tween(durationMillis = 300, easing = LinearEasing)
                 )
             ) {
@@ -262,7 +261,7 @@ private fun GroupNameCurrencyScreen(
 ) {
     val groupNameFocusRequester by remember { mutableStateOf(FocusRequester()) }
     LaunchedEffect(key1 = Unit) {
-        if (uiStateFlow.value.subScreen == AddGroupSubScreens.GROUPNAME_CURRENCY) {
+        if (uiStateFlow.value.subScreen == AddGroupSubScreens.GROUP_NAME_CURRENCY) {
             groupNameFocusRequester.requestFocus()
         }
     }
@@ -292,16 +291,6 @@ private fun GroupNameCurrencyScreen(
 }
 
 @Composable
-private fun NavigationIcon(imageVector: ImageVector, onClick: () -> Unit) {
-    IconButton(onClick = onClick) {
-        Icon(
-            imageVector = imageVector,
-            contentDescription = null
-        )
-    }
-}
-
-@Composable
 private fun GroupNameTextField(
     groupName: String,
     onValueChange: (String) -> Unit,
@@ -324,13 +313,6 @@ private fun GroupNameTextField(
                 onGo = {
                     onFinished()
                 }
-            ),
-            colors = TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = MaterialTheme.colors.secondary,
-                unfocusedIndicatorColor = MaterialTheme.colors.secondary,
-                cursorColor = MaterialTheme.colors.primary,
-                textColor = MaterialTheme.colors.onBackground,
-                backgroundColor = Color.Transparent,
             )
         )
     }
@@ -361,7 +343,7 @@ private fun CurrencyDropdown(
             ) {
                 Text(
                     text = "${selectedCurrency.symbol} (${selectedCurrency.currency_name})",
-                    style = MaterialTheme.typography.body1
+                    style = MaterialTheme.typography.bodyMedium
                 )
                 Icon(
                     imageVector = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
@@ -377,15 +359,16 @@ private fun CurrencyDropdown(
                     .heightIn(max = 300.dp)
             ) {
                 Currency.entries.forEach { currency ->
-                    DropdownMenuItem(onClick = {
-                        selectCurrency(currency)
-                        expanded = false
-                    }) {
-                        Text(
-                            text = "${currency.symbol} (${currency.currency_name})",
-                            style = MaterialTheme.typography.body2
-                        )
-                    }
+                    DropdownMenuItem(
+                        onClick = {
+                            selectCurrency(currency)
+                            expanded = false
+                        }, text = {
+                            Text(
+                                text = "${currency.symbol} (${currency.currency_name})",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        })
                 }
             }
         }
@@ -470,14 +453,7 @@ private fun ParicipantTextField( // TODO: Fuse this with the group name field?
                 .weight(1f)
                 .padding(horizontal = 8.dp, vertical = 1.dp),
             keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
-            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-            colors = TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = MaterialTheme.colors.secondary,
-                unfocusedIndicatorColor = MaterialTheme.colors.secondary,
-                cursorColor = MaterialTheme.colors.primary,
-                textColor = MaterialTheme.colors.onBackground,
-                backgroundColor = Color.Transparent,
-            )
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done)
         )
         if (numberParticipants > 1) {
             IconButton(
@@ -506,7 +482,8 @@ private fun ShareGroupScreen(
 ) {
     val context = LocalContext.current
     val invitationLink = "fake_url/1234" // TODO: Replace with real link
-    val invitationMessage = stringResource(R.string.invitation_text, uiStateFlow.value.groupName, invitationLink)
+    val invitationMessage =
+        stringResource(R.string.invitation_text, uiStateFlow.value.groupName, invitationLink)
 
     Scaffold(
         modifier = modifier,
@@ -555,7 +532,7 @@ private fun shareMessageIntent(context: Context, text: String) {
 
 @Composable
 private fun AddGroupScreenPreview(darkTheme: Boolean, subScreen: AddGroupSubScreens) {
-    ExpenseTrackerTheme(darkTheme = darkTheme) {
+    ExpenseTrackerTheme(darkMode = darkTheme) {
         val uiState = remember {
             mutableStateOf(
                 AddGroupUiState(
@@ -582,13 +559,13 @@ private fun AddGroupScreenPreview(darkTheme: Boolean, subScreen: AddGroupSubScre
 @Preview(name = "Add Group Screen 1 - Dark Theme")
 @Composable
 private fun AddGroupScreen1DarkPreview() {
-    AddGroupScreenPreview(darkTheme = true, subScreen = AddGroupSubScreens.GROUPNAME_CURRENCY)
+    AddGroupScreenPreview(darkTheme = true, subScreen = AddGroupSubScreens.GROUP_NAME_CURRENCY)
 }
 
 @Preview(name = "Add Group Screen 1 - Light Theme")
 @Composable
 private fun AddGroupScreen1LightPreview() {
-    AddGroupScreenPreview(darkTheme = false, subScreen = AddGroupSubScreens.GROUPNAME_CURRENCY)
+    AddGroupScreenPreview(darkTheme = false, subScreen = AddGroupSubScreens.GROUP_NAME_CURRENCY)
 }
 
 @Preview(name = "Add Group Screen 2 - Dark Theme")
