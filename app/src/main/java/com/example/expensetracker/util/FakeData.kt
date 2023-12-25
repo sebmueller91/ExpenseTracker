@@ -23,9 +23,12 @@ class FakeData {
             Participant("Eli")
         )
 
-        fun createFakeExpense(participants: List<Participant>): Transaction.Expense {
+        fun createFakeExpense(
+            participants: List<Participant> = fakeParticipantsSmall,
+            amount: Double = Random.nextDouble(0.1, 1200.0)
+        ): Transaction.Expense {
             return Transaction.Expense(
-                amount = Random.nextDouble(0.1, 1200.0),
+                amount = amount,
                 date = createFakeDate(year = 2022, day = 23, month = 8),
                 paidBy = participants.random(),
                 purpose = createFakePurpose(),
@@ -33,9 +36,9 @@ class FakeData {
             )
         }
 
-        fun createFakePayment(participants: List<Participant>): Transaction.Payment {
+        fun createFakePayment(participants: List<Participant> = fakeParticipantsSmall, amount: Double = Random.nextDouble(0.1, 1200.0)): Transaction.Payment {
             return Transaction.Payment(
-                amount = Random.nextDouble(0.1, 1200.0),
+                amount = amount,
                 date = createFakeDate(year = 2022, day = 23, month = 8),
                 fromParticipant = participants.subList(0, participants.size / 2).random(),
                 purpose = createFakePurpose(),
@@ -44,9 +47,12 @@ class FakeData {
             )
         }
 
-        fun createFakeIncome(participants: List<Participant>): Transaction.Income {
+        fun createFakeIncome(
+            participants: List<Participant> = fakeParticipantsSmall,
+            amount: Double = Random.nextDouble(0.1, 1200.0)
+        ): Transaction.Income {
             return Transaction.Income(
-                amount = Random.nextDouble(0.1, 1200.0),
+                amount = amount,
                 date = createFakeDate(year = 2022, day = 23, month = 8),
                 receivedBy = participants.random(),
                 purpose = createFakePurpose(),
