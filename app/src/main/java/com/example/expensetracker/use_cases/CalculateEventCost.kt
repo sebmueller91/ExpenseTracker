@@ -6,27 +6,20 @@ class CalculateEventCost(
     val transactions: List<Transaction>
 ) {
     fun execute(): Double {
-        return 0.0
+        var sum = 0.0
+        transactions.forEach {transaction ->
+            when (transaction) {
+                is Transaction.Expense -> {
+                    sum += transaction.amount
+                }
+                is Transaction.Income -> {
+                    sum -= transaction.amount
+                }
+                is Transaction.Payment -> {
+                    // Does not influence event cost
+                }
+            }
+        }
+        return sum
     }
 }
-
-//class CalculateEventCost(
-//    val group: Group
-//) {
-//    fun execute(): MoneyAmout {
-//        var eventCosts = MoneyAmout(amount = 0.0, currency = group.currency)
-//        for (transaction in group.transactions) {
-//            when (transaction) {
-//                is Transaction.Payment -> {}
-//                is Transaction.Expense -> {
-//                    eventCosts += transaction.moneyAmout
-//                }
-//
-//                is Transaction.Income -> {
-//                    eventCosts -= transaction.moneyAmout
-//                }
-//            }
-//        }
-//        return eventCosts
-//    }
-//}
