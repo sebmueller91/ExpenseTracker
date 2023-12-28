@@ -2,10 +2,12 @@ package com.example.expensetracker.use_cases
 
 import com.example.expensetracker.model.Transaction
 
-class CalculateEventCost(
-    val transactions: List<Transaction>
-) {
-    fun execute(): Double {
+interface EventCostCalculator {
+    fun execute(transactions: List<Transaction>): Double
+}
+
+class EventCostCalculatorImpl : EventCostCalculator {
+    override fun execute(transactions: List<Transaction>): Double {
         var sum = 0.0
         transactions.forEach {transaction ->
             when (transaction) {
