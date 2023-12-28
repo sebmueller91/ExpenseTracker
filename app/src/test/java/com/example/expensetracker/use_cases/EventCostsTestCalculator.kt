@@ -1,6 +1,5 @@
 package com.example.expensetracker.use_cases
 
-import com.example.expensetracker.use_cases.di.useCasesTestModule
 import com.example.expensetracker.util.FakeData
 import junit.framework.TestCase.assertEquals
 import org.junit.After
@@ -8,11 +7,16 @@ import org.junit.Before
 import org.junit.Test
 import org.koin.core.context.GlobalContext.startKoin
 import org.koin.core.context.stopKoin
+import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.inject
 
 class EventCostsTestCalculator: KoinTest {
     private val DELTA = 0.001
+
+    private val useCasesTestModule = module {
+        single<EventCostCalculator> { EventCostCalculatorImpl() }
+    }
 
     private val sut: EventCostCalculator by inject()
 
