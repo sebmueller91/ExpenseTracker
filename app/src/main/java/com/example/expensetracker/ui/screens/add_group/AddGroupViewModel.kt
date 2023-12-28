@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.example.expensetracker.model.Currency
 import com.example.expensetracker.model.Group
 import com.example.expensetracker.model.Participant
-import com.example.expensetracker.repositories.DatabaseRepository
+import com.example.expensetracker.data.DatabaseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
