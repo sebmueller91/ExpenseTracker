@@ -10,6 +10,6 @@ import org.koin.dsl.module
 
 val useCasesModule = module {
     single<EventCostCalculator> {EventCostCalculatorImpl()}
-    factory<IndividualShareCalculator> { IndividualShareCalculatorImpl(eventCostCalculator = get()) }
+    factory<IndividualShareCalculator> { IndividualShareCalculatorImpl() }
     factory<PercentageShareCalculator> { PercentageShareCalculatorImpl(individualShareCalculator = get()) }
 }

@@ -36,28 +36,39 @@ class FakeData {
             )
         }
 
-        fun createFakePayment(participants: List<Participant> = fakeParticipantsSmall, amount: Double = Random.nextDouble(0.1, 1200.0)): Transaction.Payment {
+        fun createFakePayment(
+            participants: List<Participant> = fakeParticipantsSmall,
+            amount: Double = Random.nextDouble(0.1, 1200.0),
+            fromParticipant: Participant = participants.subList(0, participants.size / 2).random(),
+            toParticipant: Participant = participants.subList(participants.size / 2, participants.size)
+                .random()
+        ): Transaction.Payment {
             return Transaction.Payment(
                 amount = amount,
                 date = createFakeDate(year = 2022, day = 23, month = 8),
-                fromParticipant = participants.subList(0, participants.size / 2).random(),
+                fromParticipant = fromParticipant,
                 purpose = createFakePurpose(),
-                toParticipant = participants.subList(participants.size / 2, participants.size)
-                    .random()
+                toParticipant = toParticipant
             )
         }
 
         fun createFakeIncome(
             participants: List<Participant> = fakeParticipantsSmall,
-            amount: Double = Random.nextDouble(0.1, 1200.0)
+            amount: Double = Random.nextDouble(0.1, 1200.0),
+            receivedBy: Participant = participants.random(),
+            splitBetween: List<Participant> = participants
         ): Transaction.Income {
             return Transaction.Income(
                 amount = amount,
                 date = createFakeDate(year = 2022, day = 23, month = 8),
-                receivedBy = participants.random(),
+                receivedBy = receivedBy,
                 purpose = createFakePurpose(),
-                splitBetween = participants
+                splitBetween = splitBetween
             )
+        }
+
+        fun createFakeParticipant(name: String = "P${Random.nextInt()}"): Participant {
+            return Participant(name)
         }
 
         private fun createFakeDate(year: Int, month: Int, day: Int): Date {
