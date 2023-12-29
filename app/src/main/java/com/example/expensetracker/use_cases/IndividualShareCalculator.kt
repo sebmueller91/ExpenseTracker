@@ -26,17 +26,22 @@ class IndividualShareCalculatorImpl : IndividualShareCalculator {
         transactions.forEach { transaction ->
             when (transaction) {
                 is Transaction.Expense -> {
-                    if (transaction.splitBetween.contains(participant)) {
-                        sum += transaction.amount / transaction.splitBetween.size.toDouble()
+                    if (transaction.paidBy == participant ) {
+                        sum += transaction.amount
                     }
                 }
                 is Transaction.Income -> {
-                    if (transaction.splitBetween.contains(participant)) {
-                        sum -= transaction.amount / transaction.splitBetween.size.toDouble()
+                    if (transaction.receivedBy == participant) {
+                        sum -= transaction.amount
                     }
                 }
                 is Transaction.Payment -> {
-                    // Payments do not influence share
+                    if (transaction.fromParticipant == participant) {
+                        sum += transaction.amount
+                    }
+                    if (transaction.toParticipant == participant) {
+                        sum -= transaction.amount
+                    }
                 }
             }
         }

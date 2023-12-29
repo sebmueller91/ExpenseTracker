@@ -14,7 +14,9 @@ val uiModule = module {
         GroupDetailViewModel(
             groupId = groupId,
             databaseRepository = get(),
-            eventCostCalculator = get()
+            eventCostCalculator = get(),
+            individualShareCalculator = get(),
+            percentageShareCalculator = get()
         )
     }
 }

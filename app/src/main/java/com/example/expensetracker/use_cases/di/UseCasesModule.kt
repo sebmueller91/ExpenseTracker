@@ -9,7 +9,12 @@ import com.example.expensetracker.use_cases.PercentageShareCalculatorImpl
 import org.koin.dsl.module
 
 val useCasesModule = module {
-    single<EventCostCalculator> {EventCostCalculatorImpl()}
+    single<EventCostCalculator> { EventCostCalculatorImpl() }
     factory<IndividualShareCalculator> { IndividualShareCalculatorImpl() }
-    factory<PercentageShareCalculator> { PercentageShareCalculatorImpl(individualShareCalculator = get()) }
+    factory<PercentageShareCalculator> {
+        PercentageShareCalculatorImpl(
+            eventCostCalculator = get(),
+            individualShareCalculator = get()
+        )
+    }
 }
