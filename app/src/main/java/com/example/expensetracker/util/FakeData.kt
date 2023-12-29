@@ -25,12 +25,13 @@ class FakeData {
 
         fun createFakeExpense(
             participants: List<Participant> = fakeParticipantsSmall,
-            amount: Double = Random.nextDouble(0.1, 1200.0)
+            amount: Double = Random.nextDouble(0.1, 1200.0),
+            paidBy: Participant = participants.random()
         ): Transaction.Expense {
             return Transaction.Expense(
                 amount = amount,
                 date = createFakeDate(year = 2022, day = 23, month = 8),
-                paidBy = participants.random(),
+                paidBy = paidBy,
                 purpose = createFakePurpose(),
                 splitBetween = participants
             )
