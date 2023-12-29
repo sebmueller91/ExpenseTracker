@@ -2,7 +2,7 @@ package com.example.expensetracker.ui.screens.group_overview
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.expensetracker.repositories.DatabaseRepository
+import com.example.expensetracker.data.DatabaseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

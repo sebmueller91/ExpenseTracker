@@ -1,4 +1,4 @@
-package com.example.expensetracker.repositories
+package com.example.expensetracker.data
 
 import com.example.expensetracker.model.Currency
 import com.example.expensetracker.model.Group
