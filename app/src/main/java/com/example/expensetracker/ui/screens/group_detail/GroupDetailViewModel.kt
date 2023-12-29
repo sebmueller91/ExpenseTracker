@@ -2,9 +2,12 @@ package com.example.expensetracker.ui.screens.group_detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.expensetracker.data.DatabaseRepository
 import com.example.expensetracker.model.Currency
 import com.example.expensetracker.model.Transaction
-import com.example.expensetracker.repositories.DatabaseRepository
+import com.example.expensetracker.use_cases.EventCostCalculator
+import com.example.expensetracker.use_cases.IndividualShareCalculator
+import com.example.expensetracker.use_cases.PercentageShareCalculator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -14,7 +17,10 @@ import java.util.UUID
 
 class GroupDetailViewModel(
     private val groupId: UUID,
-    private val databaseRepository: DatabaseRepository
+    private val databaseRepository: DatabaseRepository,
+    private val eventCostCalculator: EventCostCalculator,
+    private val individualShareCalculator: IndividualShareCalculator,
+    private val percentageShareCalculator: PercentageShareCalculator
 ) : ViewModel() {
     private var _uiState = MutableStateFlow<GroupDetailUiState>(GroupDetailUiState.Loading)
     val uiStateFlow = _uiState.asStateFlow()
