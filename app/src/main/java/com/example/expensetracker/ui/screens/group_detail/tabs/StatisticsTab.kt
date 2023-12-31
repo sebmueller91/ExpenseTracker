@@ -6,9 +6,12 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,15 +40,25 @@ fun StatisticsTab(
     percentageSharesFlow: State<Map<Participant, Double>>,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text("The event cost ${eventCostFlow.value}", style = MaterialTheme.typography.headlineSmall)
-        PieChart(
-            percentageSharesFlow = percentageSharesFlow
-        )
+    LazyColumn(modifier = modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
+        item {
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Text(
+                    "The event cost ${
+                        String.format("%.2f", eventCostFlow.value).toDouble()
+                    }${group.currency.symbol}",
+                    style = MaterialTheme.typography.headlineSmall
+                )
+            }
+        }
+        item {
+            Spacer(Modifier.height(30.dp))
+        }
+        item {
+            PieChart(
+                percentageSharesFlow = percentageSharesFlow
+            )
+        }
     }
 }
 
@@ -60,7 +73,8 @@ private fun PieChart(
     var animationFinished by remember { mutableStateOf(false) }
     var lastValue = 0f
 
-    val pieChartChunks = percentageSharesFlow.value.values.map { value -> ((value / 100.0)*360.0).toFloat() }
+    val pieChartChunks =
+        percentageSharesFlow.value.values.map { value -> ((value / 100.0) * 360.0).toFloat() }
 
     val animatedSize by animateFloatAsState(
         targetValue = if (animationFinished) outerRadius.value * 2f else 0f,
@@ -84,17 +98,27 @@ private fun PieChart(
         animationFinished = true
     }
 
-    Box(modifier = modifier.size(animatedSize.dp), contentAlignment = Alignment.Center) {
-        Canvas(modifier = Modifier.size(outerRadius * 2f).rotate(animatedRotation)) {
-            pieChartChunks.forEachIndexed { index, value ->
-                drawArc(
-                    getPieChartColor(index),
-                    lastValue,
-                    value,
-                    useCenter = false,
-                    style = Stroke(chartBarWidth.toPx(), cap = StrokeCap.Butt)
-                )
-                lastValue += value
+    Box(modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        Box(
+            modifier = modifier
+                .size(animatedSize.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Canvas(
+                modifier = Modifier
+                    .size(outerRadius * 2f)
+                    .rotate(animatedRotation)
+            ) {
+                pieChartChunks.forEachIndexed { index, value ->
+                    drawArc(
+                        getPieChartColor(index),
+                        lastValue,
+                        value,
+                        useCenter = false,
+                        style = Stroke(chartBarWidth.toPx(), cap = StrokeCap.Butt)
+                    )
+                    lastValue += value
+                }
             }
         }
     }
