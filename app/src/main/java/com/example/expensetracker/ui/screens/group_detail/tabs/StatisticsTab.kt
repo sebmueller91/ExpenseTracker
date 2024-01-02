@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -49,19 +50,23 @@ fun StatisticsTab(
     percentageSharesFlow: State<Map<Participant, Double>>,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(modifier = modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
+    LazyColumn(
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         item {
-            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                Text(
-                    "The event cost ${
-                        String.format("%.2f", eventCostFlow.value).toDouble()
-                    }${group.currency.symbol} so far.",
-                    style = MaterialTheme.typography.headlineSmall
-                )
-            }
+            Text(
+                "Event costs: ${
+                    String.format("%.2f", eventCostFlow.value).toDouble()
+                }${group.currency.symbol}",
+                style = MaterialTheme.typography.headlineSmall
+            )
+            Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f), modifier = Modifier.padding(horizontal = 36.dp, vertical = 24.dp))
         }
         item {
-            Spacer(Modifier.height(30.dp))
+            Text("Expense distribution", style = MaterialTheme.typography.headlineSmall)
+            Spacer(Modifier.height(20.dp))
         }
         item {
             PieChart(
@@ -72,7 +77,8 @@ fun StatisticsTab(
             BarChart(
                 individualSharesFlow = individualSharesFlow,
                 percentageSharesFlow = percentageSharesFlow,
-                currency = group.currency
+                currency = group.currency,
+                modifier = Modifier.padding(top = 10.dp)
             )
         }
     }
@@ -175,12 +181,13 @@ private fun BarChartItem(
     modifier: Modifier = Modifier
 ) {
     Surface(
-        modifier = modifier.padding(vertical = 10.dp, horizontal = 40.dp),
-        color = Color.Transparent
+        modifier = modifier.fillMaxWidth().padding(vertical = 10.dp, horizontal = 40.dp),
+        color = Color.Transparent,
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
         ) {
             Box(
                 modifier = Modifier
