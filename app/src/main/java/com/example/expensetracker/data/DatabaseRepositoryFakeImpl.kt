@@ -53,9 +53,9 @@ class DatabaseRepositoryFakeImpl : DatabaseRepository {
                 currency = Currency.EURO, name = "Spanien",
                 participants = fakeParticipantsSmall,
                 transactions = listOf(
-                    createFakeExpense(fakeParticipantsBig, amount = 100.0, paidBy = fakeParticipantsSmall[0]),
-                    createFakeExpense(fakeParticipantsBig, amount = 100.0, paidBy = fakeParticipantsSmall[1]),
-                    createFakeExpense(fakeParticipantsBig, amount = 100.0, paidBy = fakeParticipantsSmall[2])
+                    createFakeExpense(fakeParticipantsSmall, amount = 100.0),
+                    createFakeExpense(fakeParticipantsSmall, amount = 100.0),
+                    createFakeExpense(fakeParticipantsSmall, amount = 100.0)
                 )
             )
         )

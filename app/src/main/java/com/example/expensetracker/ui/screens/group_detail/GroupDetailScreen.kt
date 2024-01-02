@@ -35,6 +35,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.expensetracker.R
+import com.example.expensetracker.model.Participant
 import com.example.expensetracker.ui.components.NavigationIcon
 import com.example.expensetracker.ui.screens.destinations.GroupOverviewScreenDestination
 import com.example.expensetracker.ui.screens.group_detail.tabs.ExpensesTab
@@ -54,16 +55,21 @@ fun GroupDetailScreen(
     navigator: DestinationsNavigator
 ) {
     val viewModel: GroupDetailViewModel = getViewModel { parametersOf(groupId) }
-    val uiStateFlow = viewModel.uiStateFlow.collectAsStateWithLifecycle()
 
     GroupDetailScreen(
-        uiStateFlow = uiStateFlow,
+        uiStateFlow = viewModel.uiStateFlow.collectAsStateWithLifecycle(),
+        eventCostFlow = viewModel.eventCostsFlow.collectAsStateWithLifecycle(),
+        individualSharesFlow = viewModel.individualSharesFlow.collectAsStateWithLifecycle(),
+        percentageSharesFlow = viewModel.percentageSharesFlow.collectAsStateWithLifecycle(),
         onLeave = { navigator.navigate(GroupOverviewScreenDestination()) })
 }
 
 @Composable
 private fun GroupDetailScreen(
     uiStateFlow: State<GroupDetailUiState>,
+    eventCostFlow: State<Double>,
+    individualSharesFlow: State<Map<Participant, Double>>,
+    percentageSharesFlow: State<Map<Participant, Double>>,
     onLeave: () -> Unit
 ) {
     BackHandler(onBack = onLeave)
@@ -80,6 +86,9 @@ private fun GroupDetailScreen(
 
             is GroupDetailUiState.Success -> {
                 GroupDetailScreenContent(
+                    eventCostFlow = eventCostFlow,
+                    individualSharesFlow = individualSharesFlow,
+                    percentageSharesFlow = percentageSharesFlow,
                     uiState = uiState,
                     onLeave = onLeave
                 )
@@ -92,12 +101,15 @@ private fun GroupDetailScreen(
 @Composable
 private fun GroupDetailScreenContent(
     uiState: GroupDetailUiState.Success,
+    eventCostFlow: State<Double>,
+    individualSharesFlow: State<Map<Participant, Double>>,
+    percentageSharesFlow: State<Map<Participant, Double>>,
     onLeave: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val dragThreshold = 20.dp
     var selectedTab by remember { mutableStateOf(GroupDetailScreenTabs.EXPENSES) }
-    var previousTab:  GroupDetailScreenTabs? by remember { mutableStateOf(null) }
+    var previousTab: GroupDetailScreenTabs? by remember { mutableStateOf(null) }
 
     val dragModifier = Modifier.pointerInput(Unit) {
         detectHorizontalDragGestures { _, dragAmount ->
@@ -162,10 +174,15 @@ private fun GroupDetailScreenContent(
 
             AnimatedVisibility(
                 visible = selectedTab == GroupDetailScreenTabs.STATISTICS,
-                enter = slideInHorizontally { fullWidth -> if(previousTab == GroupDetailScreenTabs.EXPENSES) fullWidth else -fullWidth },
-                exit = slideOutHorizontally { fullWidth -> if(selectedTab == GroupDetailScreenTabs.EXPENSES) fullWidth else -fullWidth }
+                enter = slideInHorizontally { fullWidth -> if (previousTab == GroupDetailScreenTabs.EXPENSES) fullWidth else -fullWidth },
+                exit = slideOutHorizontally { fullWidth -> if (selectedTab == GroupDetailScreenTabs.EXPENSES) fullWidth else -fullWidth }
             ) {
-                StatisticsTab(group = uiState.group)
+                StatisticsTab(
+                    group = uiState.group,
+                    eventCostFlow = eventCostFlow,
+                    individualSharesFlow = individualSharesFlow,
+                    percentageSharesFlow = percentageSharesFlow
+                )
             }
 
             AnimatedVisibility(
