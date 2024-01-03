@@ -79,9 +79,11 @@ fun StatisticsTab(
             Spacer(Modifier.height(20.dp))
         }
         item {
-            PieChart(
-                percentageSharesFlow = percentageSharesFlow
-            )
+            if (individualSharesFlow.value.any { it.value != 0.0 }) {
+                PieChart(
+                    percentageSharesFlow = percentageSharesFlow
+                )
+            }
         }
         item {
             BarChart(

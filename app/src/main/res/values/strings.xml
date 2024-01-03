@@ -22,4 +22,7 @@
     <string name="add_payment">Transfer within group</string>
     <string name="_2023_dgs_software">©2023 DGS Software</string>
     <string name="app_version">App version: %1$s</string>
+    <string name="participants">Participants</string>
+    <string name="transactions">Transactions: %1$s</string>
+    <string name="no_transactions">You don\'t have any transactions.</string>
 </resources>
