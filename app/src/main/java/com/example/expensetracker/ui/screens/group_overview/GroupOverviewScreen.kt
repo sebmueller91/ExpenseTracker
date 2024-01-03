@@ -53,7 +53,7 @@ import com.example.expensetracker.ui.theme.ExpenseTrackerTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import org.koin.androidx.compose.getViewModel
+import org.koin.androidx.compose.koinViewModel
 import java.util.UUID
 
 @RootNavGraph(start = true)
@@ -67,12 +67,13 @@ fun GroupOverviewScreen(
     }
 
     ExpenseTrackerTheme {
-        val viewModel: GroupOverviewViewModel = getViewModel()
+        val viewModel: GroupOverviewViewModel = koinViewModel()
         val uiStateFlow = viewModel.uiStateFlow.collectAsState()
 
         GroupOverviewScreen(
             uiStateFlow = uiStateFlow,
             onAddGroup = { navigator.navigate(AddGroupScreenDestination) },
+            formattedEventCosts = viewModel::formattedEventCosts,
             onNavigateToDetailScreen = { uuid ->
                 navigator.navigate(
                     GroupDetailScreenDestination(
@@ -87,6 +88,7 @@ fun GroupOverviewScreen(
 private fun GroupOverviewScreen(
     uiStateFlow: State<GroupOverviewUiState>,
     onAddGroup: () -> Unit,
+    formattedEventCosts: (Group) -> String,
     onNavigateToDetailScreen: (UUID) -> Unit
 ) {
     Scaffold(
@@ -114,7 +116,12 @@ private fun GroupOverviewScreen(
                 modifier = Modifier
             ) {
                 items(items = uiStateFlow.value.groups) {
-                    GroupCard(group = it, onNavigateToDetailScreen = onNavigateToDetailScreen)
+                    GroupCard(
+                        group = it,
+                        onNavigateToDetailScreen = onNavigateToDetailScreen,
+                        formattedEventCosts = formattedEventCosts,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
             Spacer(Modifier.weight(1f))
@@ -127,7 +134,8 @@ private fun GroupOverviewScreen(
 private fun GroupCard(
     group: Group,
     onNavigateToDetailScreen: (UUID) -> Unit,
-    modifier: Modifier = Modifier.fillMaxWidth()
+    formattedEventCosts: (Group) -> String,
+    modifier: Modifier = Modifier
 ) {
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -153,7 +161,7 @@ private fun GroupCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(group.name, style = MaterialTheme.typography.headlineSmall)
-                Text("Costs: 1252.32€", style = MaterialTheme.typography.bodyMedium)
+                Text(formattedEventCosts(group), style = MaterialTheme.typography.bodyMedium)
                 ExpandCollapseButton(expanded = expanded, onClick = { expanded = !expanded })
             }
             if (expanded) {
@@ -236,7 +244,11 @@ private fun GroupOverviewScreenPreview(darkMode: Boolean) {
         )
     }
     ExpenseTrackerTheme(darkMode = darkMode) {
-        GroupOverviewScreen(uiStateFlow = uiState, onAddGroup = {}, onNavigateToDetailScreen = {})
+        GroupOverviewScreen(
+            uiStateFlow = uiState,
+            onAddGroup = {},
+            onNavigateToDetailScreen = {},
+            formattedEventCosts = {_ -> "1242,22€"})
     }
 }
 
