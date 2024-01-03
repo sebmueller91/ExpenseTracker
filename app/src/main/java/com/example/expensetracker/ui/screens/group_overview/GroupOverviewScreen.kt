@@ -163,6 +163,7 @@ private fun GroupCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(group.name, style = MaterialTheme.typography.headlineSmall)
+                Spacer(Modifier.weight(1f))
                 Text(formattedEventCosts(group, LocalContext.current), style = MaterialTheme.typography.bodyMedium)
                 ExpandCollapseButton(expanded = expanded, onClick = { expanded = !expanded })
             }
@@ -171,11 +172,11 @@ private fun GroupCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
+                    verticalAlignment = Alignment.Top,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column {
-                        Text("Participants", style = MaterialTheme.typography.bodySmall)
+                        Text(stringResource(R.string.participants), style = MaterialTheme.typography.bodyLarge)
                         for (participant in group.participants) {
                             Text(
                                 participant.name,
@@ -185,7 +186,7 @@ private fun GroupCard(
                         }
                     }
                     Text(
-                        "Transactions: ${group.transactions.size}",
+                        stringResource(R.string.transactions, group.transactions.size),
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
