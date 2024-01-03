@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -52,6 +53,7 @@ import com.example.expensetracker.ui.components.RoundFloatingActionButton
 import com.example.expensetracker.ui.screens.destinations.AddGroupScreenDestination
 import com.example.expensetracker.ui.screens.destinations.GroupDetailScreenDestination
 import com.example.expensetracker.ui.theme.ExpenseTrackerTheme
+import com.example.expensetracker.ui.util.UiUtils
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -175,15 +177,13 @@ private fun GroupCard(
                     verticalAlignment = Alignment.Top,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Column {
+                    Column(Modifier.widthIn(min = 0.dp, max = 200.dp)) {
                         Text(stringResource(R.string.participants), style = MaterialTheme.typography.bodyLarge)
-                        for (participant in group.participants) {
-                            Text(
-                                participant.name,
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp)
-                            )
-                        }
+                        Text(
+                            UiUtils.formatParticipantsList(group.participants, LocalContext.current),
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
                     }
                     Text(
                         stringResource(R.string.transactions, group.transactions.size),
