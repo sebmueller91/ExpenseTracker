@@ -1,11 +1,13 @@
 package com.example.expensetracker.ui.screens.group_detail
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.expensetracker.data.DatabaseRepository
 import com.example.expensetracker.model.Currency
 import com.example.expensetracker.model.Participant
 import com.example.expensetracker.model.Transaction
+import com.example.expensetracker.ui.util.UiUtils
 import com.example.expensetracker.use_cases.EventCostCalculator
 import com.example.expensetracker.use_cases.IndividualShareCalculator
 import com.example.expensetracker.use_cases.PercentageShareCalculator
@@ -34,25 +36,40 @@ class GroupDetailViewModel(
         when (val uiState = it) {
             GroupDetailUiState.Error,
             GroupDetailUiState.Loading -> 0.0
+
             is GroupDetailUiState.Success -> eventCostCalculator.execute(uiState.group.transactions)
         }
-    }.stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(), initialValue = 0.0)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        initialValue = 0.0
+    )
 
     val individualSharesFlow: StateFlow<Map<Participant, Double>> = _uiState.map {
         when (val uiState = it) {
             GroupDetailUiState.Error,
             GroupDetailUiState.Loading -> emptyMap()
+
             is GroupDetailUiState.Success -> individualShareCalculator.execute(uiState.group)
         }
-    }.stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(), initialValue = emptyMap())
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        initialValue = emptyMap()
+    )
 
     val percentageSharesFlow: StateFlow<Map<Participant, Double>> = _uiState.map {
         when (val uiState = it) {
             GroupDetailUiState.Error,
             GroupDetailUiState.Loading -> emptyMap()
+
             is GroupDetailUiState.Success -> percentageShareCalculator.execute(uiState.group)
         }
-    }.stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(), initialValue = emptyMap())
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        initialValue = emptyMap()
+    )
 
     init {
         viewModelScope.launch {
@@ -69,21 +86,21 @@ class GroupDetailViewModel(
     }
 }
 
-fun Transaction.format(currency: Currency): FormattedTransaction {
+fun Transaction.format(currency: Currency, context: Context): FormattedTransaction {
     // TODO: Move strings into resources
     // TODO: Number formatting has 0 or 2 digits after comma
     val mainText = when (this) {
-        is Transaction.Expense -> "${paidBy.name} paid ${
-            String.format("%.2f", amount).toDouble()
-        }${currency.symbol} for $purpose"
+        is Transaction.Expense -> "${paidBy.name} paid " +
+                "${UiUtils.formatMoneyAmount(amount, currency, context)}" +
+                " for $purpose"
 
-        is Transaction.Income -> "${receivedBy.name} received ${
-            String.format("%.2f", amount).toDouble()
-        }${currency.symbol} for $purpose"
+        is Transaction.Income -> "${receivedBy.name} received" +
+                "${UiUtils.formatMoneyAmount(amount, currency, context)}" +
+                " for $purpose"
 
-        is Transaction.Payment -> "${fromParticipant.name} gave ${
-            String.format("%.2f", amount).toDouble()
-        }${currency.symbol} to ${toParticipant.name} for $purpose"
+        is Transaction.Payment -> "${fromParticipant.name} gave " +
+                "${UiUtils.formatMoneyAmount(amount, currency, context)}" +
+                " to ${toParticipant.name} for $purpose"
     }
 
     val formattedDate = "${SimpleDateFormat("dd.MM.yyyy").format(this.date)}"

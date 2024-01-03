@@ -1,5 +1,6 @@
 package com.example.expensetracker.ui.screens.group_overview
 
+import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
@@ -34,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -88,7 +90,7 @@ fun GroupOverviewScreen(
 private fun GroupOverviewScreen(
     uiStateFlow: State<GroupOverviewUiState>,
     onAddGroup: () -> Unit,
-    formattedEventCosts: (Group) -> String,
+    formattedEventCosts: (Group, Context) -> String,
     onNavigateToDetailScreen: (UUID) -> Unit
 ) {
     Scaffold(
@@ -134,7 +136,7 @@ private fun GroupOverviewScreen(
 private fun GroupCard(
     group: Group,
     onNavigateToDetailScreen: (UUID) -> Unit,
-    formattedEventCosts: (Group) -> String,
+    formattedEventCosts: (Group, Context) -> String,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -161,7 +163,7 @@ private fun GroupCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(group.name, style = MaterialTheme.typography.headlineSmall)
-                Text(formattedEventCosts(group), style = MaterialTheme.typography.bodyMedium)
+                Text(formattedEventCosts(group, LocalContext.current), style = MaterialTheme.typography.bodyMedium)
                 ExpandCollapseButton(expanded = expanded, onClick = { expanded = !expanded })
             }
             if (expanded) {
@@ -248,7 +250,7 @@ private fun GroupOverviewScreenPreview(darkMode: Boolean) {
             uiStateFlow = uiState,
             onAddGroup = {},
             onNavigateToDetailScreen = {},
-            formattedEventCosts = {_ -> "1242,22€"})
+            formattedEventCosts = {_, _ -> "1242,22€"})
     }
 }
 

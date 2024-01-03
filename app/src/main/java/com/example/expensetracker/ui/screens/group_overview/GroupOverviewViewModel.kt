@@ -1,5 +1,6 @@
 package com.example.expensetracker.ui.screens.group_overview
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.expensetracker.data.DatabaseRepository
@@ -26,7 +27,7 @@ class GroupOverviewViewModel(
         }
     }
 
-    fun formattedEventCosts(group: Group): String {
-        return UiUtils.formatMoneyAmount(eventCostCalculator.execute(group.transactions), group.currency)
+    fun formattedEventCosts(group: Group, context: Context): String {
+        return UiUtils.formatMoneyAmount(eventCostCalculator.execute(group.transactions), group.currency, context)
     }
 }
