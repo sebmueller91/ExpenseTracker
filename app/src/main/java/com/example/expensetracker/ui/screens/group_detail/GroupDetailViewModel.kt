@@ -3,6 +3,7 @@ package com.example.expensetracker.ui.screens.group_detail
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.expensetracker.R
 import com.example.expensetracker.data.DatabaseRepository
 import com.example.expensetracker.model.Currency
 import com.example.expensetracker.model.Participant
@@ -87,33 +88,49 @@ class GroupDetailViewModel(
 }
 
 fun Transaction.format(currency: Currency, context: Context): FormattedTransaction {
-    // TODO: Move strings into resources
-    // TODO: Number formatting has 0 or 2 digits after comma
     val mainText = when (this) {
-        is Transaction.Expense -> "${paidBy.name} paid " +
-                "${UiUtils.formatMoneyAmount(amount, currency, context)}" +
-                " for $purpose"
+        is Transaction.Expense -> context.getString(
+            R.string.paid_for,
+            paidBy.name,
+            UiUtils.formatMoneyAmount(amount, currency, context),
+            purpose
+        )
 
-        is Transaction.Income -> "${receivedBy.name} received" +
-                "${UiUtils.formatMoneyAmount(amount, currency, context)}" +
-                " for $purpose"
+        is Transaction.Income -> context.getString(
+            R.string.received_for,
+            receivedBy.name,
+            UiUtils.formatMoneyAmount(amount, currency, context),
+            purpose
+        )
 
-        is Transaction.Payment -> "${fromParticipant.name} gave " +
-                "${UiUtils.formatMoneyAmount(amount, currency, context)}" +
-                " to ${toParticipant.name} for $purpose"
+        is Transaction.Payment -> context.getString(
+            R.string.gave_to_for,
+            fromParticipant.name,
+            UiUtils.formatMoneyAmount(amount, currency, context),
+            toParticipant.name,
+            purpose
+        )
     }
 
     val formattedDate = "${SimpleDateFormat("dd.MM.yyyy").format(this.date)}"
     val date = when (this) {
-        is Transaction.Expense -> "Paid on: $formattedDate"
-        is Transaction.Income -> "Received on: $formattedDate"
-        is Transaction.Payment -> "Paid on $formattedDate"
+        is Transaction.Expense -> context.getString(R.string.paid_on, formattedDate)
+        is Transaction.Income -> context.getString(R.string.received_on, formattedDate)
+        is Transaction.Payment -> context.getString(R.string.paid_on, formattedDate)
     }
 
     val splitBetween = when (this) {
-        is Transaction.Expense -> "Split between ${splitBetween.joinToString(", ") { it.name }}" // TODO: Move into function and add "and"
-        is Transaction.Income -> "Split between ${splitBetween.joinToString(", ") { it.name }}"
-        is Transaction.Payment -> "From $fromParticipant to $toParticipant"
+        is Transaction.Expense -> context.getString(
+            R.string.split_between,
+            UiUtils.formatParticipantsList(splitBetween, context))
+        is Transaction.Income -> context.getString(
+            R.string.split_between,
+            UiUtils.formatParticipantsList(splitBetween, context))
+        is Transaction.Payment -> context.getString(
+            R.string.from_to,
+            fromParticipant.name,
+            toParticipant.name
+        )
     }
 
     return FormattedTransaction(
