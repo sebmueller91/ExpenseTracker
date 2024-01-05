@@ -8,7 +8,7 @@ import org.koin.dsl.module
 import java.util.UUID
 
 val uiModule = module {
-    viewModel { GroupOverviewViewModel(databaseRepository = get()) }
+    viewModel { GroupOverviewViewModel(databaseRepository = get(), eventCostCalculator = get()) }
     viewModel { AddGroupViewModel(databaseRepository = get()) }
     viewModel { (groupId: UUID) ->
         GroupDetailViewModel(
