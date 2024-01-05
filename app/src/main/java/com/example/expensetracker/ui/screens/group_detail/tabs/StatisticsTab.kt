@@ -34,6 +34,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -41,6 +42,8 @@ import androidx.compose.ui.unit.sp
 import com.example.expensetracker.model.Currency
 import com.example.expensetracker.model.Group
 import com.example.expensetracker.model.Participant
+import com.example.expensetracker.ui.util.UiUtils
+import timber.log.Timber
 
 @Composable
 fun StatisticsTab(
@@ -58,20 +61,29 @@ fun StatisticsTab(
         item {
             Text(
                 "Event costs: ${
-                    String.format("%.2f", eventCostFlow.value).toDouble()
-                }${group.currency.symbol}",
+                    UiUtils.formatMoneyAmount(
+                        eventCostFlow.value,
+                        group.currency,
+                        LocalContext.current
+                    )
+                }",
                 style = MaterialTheme.typography.headlineSmall
             )
-            Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f), modifier = Modifier.padding(horizontal = 36.dp, vertical = 24.dp))
+            Divider(
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+                modifier = Modifier.padding(horizontal = 36.dp, vertical = 24.dp)
+            )
         }
         item {
             Text("Expense distribution", style = MaterialTheme.typography.headlineSmall)
             Spacer(Modifier.height(20.dp))
         }
         item {
-            PieChart(
-                percentageSharesFlow = percentageSharesFlow
-            )
+            if (individualSharesFlow.value.any { it.value != 0.0 }) {
+                PieChart(
+                    percentageSharesFlow = percentageSharesFlow
+                )
+            }
         }
         item {
             BarChart(
@@ -156,16 +168,20 @@ private fun BarChart(
     Column(modifier = modifier) {
         individualSharesFlow.value.entries.sortedByDescending { it.value }
             .forEachIndexed { index, entry ->
+                val percentage = percentageSharesFlow.value[entry.key] ?: run {
+                    Timber.e("Could not retrieve percentage! This should not happen.")
+                    0.0
+                }
+
                 BarChartItem(
                     participantName = entry.key.name,
-                    percentage = "${
-                        String.format("%.2f", entry.value).toDouble()
-                    }${currency.symbol} (${
-                        String.format(
-                            "%.2f",
-                            percentageSharesFlow.value[entry.key]
+                    amount = "${
+                        UiUtils.formatMoneyAmount(
+                            entry.value,
+                            currency,
+                            LocalContext.current
                         )
-                    }%)",
+                    } (${UiUtils.formatPercentage(percentage)})",
                     color = getPieChartColor(index)
                 )
             }
@@ -175,13 +191,15 @@ private fun BarChart(
 @Composable
 private fun BarChartItem(
     participantName: String,
-    percentage: String, // TODO: Percentage + Amount?
+    amount: String,
     color: Color,
     height: Dp = 45.dp,
     modifier: Modifier = Modifier
 ) {
     Surface(
-        modifier = modifier.fillMaxWidth().padding(vertical = 10.dp, horizontal = 40.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 10.dp, horizontal = 40.dp),
         color = Color.Transparent,
     ) {
         Row(
@@ -207,7 +225,7 @@ private fun BarChartItem(
 
                 Text(
                     modifier = Modifier.padding(start = 15.dp),
-                    text = percentage,
+                    text = amount,
                     fontWeight = FontWeight.Medium,
                     fontSize = 16.sp,
                     color = Color.Black

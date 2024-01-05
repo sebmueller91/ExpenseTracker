@@ -23,4 +23,15 @@
     <string name="_2023_dgs_software">©2023 DGS Software</string>
     <string name="app_version">App version: %1$s</string>
     <string name="you_don_t_have_any_expenses_yet">You don\'t have any expenses yet.</string>
+    <string name="participants">Participants</string>
+    <string name="transactions">Transactions: %1$s</string>
+    <string name="no_transactions">You don\'t have any transactions.</string>
+    <string name="split_between">Split between %1$s</string>
+    <string name="from_to">From %1$s to %2$s</string>
+    <string name="paid_on">Paid on: %1$s</string>
+    <string name="received_on">Received on: %1$s</string>
+    <string name="and">" and "</string>
+    <string name="gave_to_for">%1$s gave %2$s to %3$s for %4$s</string>
+    <string name="received_for">%1$s received %2$s for %3$s</string>
+    <string name="paid_for">%1$s paid %2$s for %3$s</string>
 </resources>
