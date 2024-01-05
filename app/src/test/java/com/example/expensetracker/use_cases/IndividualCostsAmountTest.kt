@@ -3,7 +3,7 @@ package com.example.expensetracker.use_cases
 import com.example.expensetracker.model.Currency
 import com.example.expensetracker.model.Group
 import com.example.expensetracker.util.FakeData
-import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -13,15 +13,14 @@ import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.inject
 
-class IndividualShareCalculatorTest : KoinTest {
-
+class IndividualCostsAmountTest : KoinTest {
     private val DELTA = 0.001
 
     private val useCasesTestModule = module {
-        single<IndividualShareCalculator> { IndividualShareCalculatorImpl() }
+        single<IndividualCostsAmount> { IndividualCostsAmountImpl() }
     }
 
-    private val sut: IndividualShareCalculator by inject()
+    private val sut: IndividualCostsAmount by inject()
 
     @Before
     fun setUp() {
@@ -46,9 +45,9 @@ class IndividualShareCalculatorTest : KoinTest {
 
         val result = sut.execute(group)
 
-        assertEquals(1, result.entries.size)
-        assertEquals(participant, result.entries.first().key)
-        assertEquals(expense.amount, result.entries.first().value, DELTA)
+        TestCase.assertEquals(1, result.entries.size)
+        TestCase.assertEquals(participant, result.entries.first().key)
+        TestCase.assertEquals(expense.amount, result.entries.first().value, DELTA)
     }
 
     @Test
@@ -67,9 +66,9 @@ class IndividualShareCalculatorTest : KoinTest {
 
         val result = sut.execute(group)
 
-        assertEquals(2, result.entries.size)
-        assertEquals(100.0, result[participant1]!!, DELTA)
-        assertEquals(100.0, result[participant2]!!, DELTA)
+        TestCase.assertEquals(2, result.entries.size)
+        TestCase.assertEquals(100.0, result[participant1]!!, DELTA)
+        TestCase.assertEquals(100.0, result[participant2]!!, DELTA)
     }
 
     @Test
@@ -87,18 +86,19 @@ class IndividualShareCalculatorTest : KoinTest {
                     paidBy = participant1
                 ),
                 FakeData.createFakeExpense(
-                    participants = listOf(participant2),
+                    participants = listOf(participant1, participant2),
                     amount = 100.0,
-                    paidBy = participant2
+                    paidBy = participant2,
+                    splitBetween = listOf(participant2)
                 )
             )
         )
 
         val result = sut.execute(group)
 
-        assertEquals(2, result.entries.size)
-        assertEquals(100.0, result[participant1]!!, DELTA)
-        assertEquals(100.0, result[participant2]!!, DELTA)
+        TestCase.assertEquals(2, result.entries.size)
+        TestCase.assertEquals(50.0, result[participant1]!!, DELTA)
+        TestCase.assertEquals(150.0, result[participant2]!!, DELTA)
     }
 
     @Test
@@ -111,12 +111,12 @@ class IndividualShareCalculatorTest : KoinTest {
             participants = listOf(participant1, participant2),
             transactions = listOf(
                 FakeData.createFakeExpense(
-                    participants = listOf(participant1),
+                    participants = listOf(participant1, participant2),
                     amount = 100.0,
                     paidBy = participant1
                 ),
                 FakeData.createFakeExpense(
-                    participants = listOf(participant2),
+                    participants = listOf(participant1, participant2),
                     amount = 100.0,
                     paidBy = participant2
                 ),
@@ -130,9 +130,9 @@ class IndividualShareCalculatorTest : KoinTest {
 
         val result = sut.execute(group)
 
-        assertEquals(2, result.entries.size)
-        assertEquals(120.0, result[participant1]!!, DELTA)
-        assertEquals(80.0, result[participant2]!!, DELTA)
+        TestCase.assertEquals(2, result.entries.size)
+        TestCase.assertEquals(100.0, result[participant1]!!, DELTA)
+        TestCase.assertEquals(100.0, result[participant2]!!, DELTA)
     }
 
     @Test
@@ -164,9 +164,9 @@ class IndividualShareCalculatorTest : KoinTest {
 
         val result = sut.execute(group)
 
-        assertEquals(2, result.entries.size)
-        assertEquals(100.0, result[participant1]!!, DELTA)
-        assertEquals(80.0, result[participant2]!!, DELTA)
+        TestCase.assertEquals(2, result.entries.size)
+        TestCase.assertEquals(90.0, result[participant1]!!, DELTA)
+        TestCase.assertEquals(90.0, result[participant2]!!, DELTA)
     }
 
     @Test
@@ -198,8 +198,8 @@ class IndividualShareCalculatorTest : KoinTest {
 
         val result = sut.execute(group)
 
-        assertEquals(2, result.entries.size)
-        assertEquals(100.0, result[participant1]!!, DELTA)
-        assertEquals(80.0, result[participant2]!!, DELTA)
+        TestCase.assertEquals(2, result.entries.size)
+        TestCase.assertEquals(100.0, result[participant1]!!, DELTA)
+        TestCase.assertEquals(80.0, result[participant2]!!, DELTA)
     }
 }

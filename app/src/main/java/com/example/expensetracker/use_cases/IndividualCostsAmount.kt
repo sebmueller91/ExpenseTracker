@@ -4,21 +4,21 @@ import com.example.expensetracker.model.Group
 import com.example.expensetracker.model.Participant
 import com.example.expensetracker.model.Transaction
 
-interface IndividualShareCalculator {
+interface IndividualCostsAmount {
     fun execute(group: Group): Map<Participant, Double>
 }
 
-class IndividualShareCalculatorImpl : IndividualShareCalculator {
+class IndividualCostsAmountImpl() : IndividualCostsAmount {
     override fun execute(group: Group): Map<Participant, Double> {
         return group.participants.associateWith { participant ->
-            calculateParticipantsShare(
+            calculateParticipantsCosts(
                 participant,
                 group.transactions
             )
         }
     }
 
-    private fun calculateParticipantsShare(
+    private fun calculateParticipantsCosts(
         participant: Participant,
         transactions: List<Transaction>
     ): Double {
@@ -26,22 +26,19 @@ class IndividualShareCalculatorImpl : IndividualShareCalculator {
         transactions.forEach { transaction ->
             when (transaction) {
                 is Transaction.Expense -> {
-                    if (transaction.paidBy == participant ) {
-                        sum += transaction.amount
+                    if (transaction.splitBetween.contains(participant)) {
+                        sum += (transaction.amount / transaction.splitBetween.size.toDouble())
                     }
                 }
+
                 is Transaction.Income -> {
-                    if (transaction.receivedBy == participant) {
-                        sum -= transaction.amount
+                    if (transaction.splitBetween.contains(participant)) {
+                        sum -= (transaction.amount / transaction.splitBetween.size.toDouble())
                     }
                 }
+
                 is Transaction.Payment -> {
-                    if (transaction.fromParticipant == participant) {
-                        sum += transaction.amount
-                    }
-                    if (transaction.toParticipant == participant) {
-                        sum -= transaction.amount
-                    }
+                    // Does not influence costs
                 }
             }
         }

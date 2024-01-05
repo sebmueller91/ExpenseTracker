@@ -15,22 +15,22 @@ import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.inject
 
-class PercentageShareCalculatorTest : KoinTest {
+class IndividualPaymentPercentageTest : KoinTest {
     private val DELTA = 0.001
 
-    private val eventCostCalculatorMock = mockk<EventCostCalculator>()
-    private val individualShareCalculatorMock = mockk<IndividualShareCalculator>()
+    private val eventCostMock = mockk<EventCosts>()
+    private val individualPaymentAmountMock = mockk<IndividualPaymentAmount>()
 
     private val useCasesTestModule = module {
-        single<PercentageShareCalculator> {
-            PercentageShareCalculatorImpl(
-                eventCostCalculatorMock,
-                individualShareCalculatorMock
+        single<IndividualPaymentPercentage> {
+            IndividualPaymentPercentageImpl(
+                eventCostMock,
+                individualPaymentAmountMock
             )
         }
     }
 
-    private val sut: PercentageShareCalculator by inject()
+    private val sut: IndividualPaymentPercentage by inject()
 
     @Before
     fun setUp() {
@@ -52,8 +52,8 @@ class PercentageShareCalculatorTest : KoinTest {
             participants = listOf(participant),
             transactions = listOf(expense)
         )
-        every { eventCostCalculatorMock.execute(group.transactions) } returns 100.0
-        every { individualShareCalculatorMock.execute(group) } returns mapOf(participant to 100.0)
+        every { eventCostMock.execute(group.transactions) } returns 100.0
+        every { individualPaymentAmountMock.execute(group) } returns mapOf(participant to 100.0)
 
         val result = sut.execute(group)
 
@@ -75,8 +75,8 @@ class PercentageShareCalculatorTest : KoinTest {
                 FakeData.createFakeExpense(participants = listOf(participant2), amount = 120.0)
             )
         )
-        every { eventCostCalculatorMock.execute(any()) } returns 240.0
-        every { individualShareCalculatorMock.execute(group) } returns mapOf(
+        every { eventCostMock.execute(any()) } returns 240.0
+        every { individualPaymentAmountMock.execute(group) } returns mapOf(
             participant1 to 120.0,
             participant2 to 120.0
         )
@@ -109,8 +109,8 @@ class PercentageShareCalculatorTest : KoinTest {
                 )
             )
         )
-        every { eventCostCalculatorMock.execute(any()) } returns 200.0
-        every { individualShareCalculatorMock.execute(group) } returns mapOf(
+        every { eventCostMock.execute(any()) } returns 200.0
+        every { individualPaymentAmountMock.execute(group) } returns mapOf(
             participant1 to 100.0,
             participant2 to 100.0
         )
@@ -124,7 +124,7 @@ class PercentageShareCalculatorTest : KoinTest {
 
     @Test
     fun twoParticipantsIncludingPayment() {
-        every { eventCostCalculatorMock.execute(any()) } returns 100.0
+        every { eventCostMock.execute(any()) } returns 100.0
 
         val participant1 = FakeData.createFakeParticipant()
         val participant2 = FakeData.createFakeParticipant()
@@ -150,8 +150,8 @@ class PercentageShareCalculatorTest : KoinTest {
                 ),
             )
         )
-        every { eventCostCalculatorMock.execute(any()) } returns 200.0
-        every { individualShareCalculatorMock.execute(group) } returns mapOf(
+        every { eventCostMock.execute(any()) } returns 200.0
+        every { individualPaymentAmountMock.execute(group) } returns mapOf(
             participant1 to 120.0,
             participant2 to 80.0
         )
@@ -189,8 +189,8 @@ class PercentageShareCalculatorTest : KoinTest {
                 ),
             )
         )
-        every { eventCostCalculatorMock.execute(any()) } returns 180.0
-        every { individualShareCalculatorMock.execute(group) } returns mapOf(
+        every { eventCostMock.execute(any()) } returns 180.0
+        every { individualPaymentAmountMock.execute(group) } returns mapOf(
             participant1 to 100.0,
             participant2 to 80.0
         )
@@ -204,7 +204,7 @@ class PercentageShareCalculatorTest : KoinTest {
 
     @Test
     fun twoParticipantsIncludingIncomeForOneParticipant() {
-        every { eventCostCalculatorMock.execute(any()) } returns 180.0
+        every { eventCostMock.execute(any()) } returns 180.0
 
         val participant1 = FakeData.createFakeParticipant()
         val participant2 = FakeData.createFakeParticipant()
@@ -230,8 +230,8 @@ class PercentageShareCalculatorTest : KoinTest {
                 ),
             )
         )
-        every { eventCostCalculatorMock.execute(any()) } returns 180.0
-        every { individualShareCalculatorMock.execute(group) } returns mapOf(
+        every { eventCostMock.execute(any()) } returns 180.0
+        every { individualPaymentAmountMock.execute(group) } returns mapOf(
             participant1 to 100.0,
             participant2 to 80.0
         )
@@ -245,7 +245,7 @@ class PercentageShareCalculatorTest : KoinTest {
 
     @Test
     fun twoParticipantsWithOneParticipantNegative() {
-        every { eventCostCalculatorMock.execute(any()) } returns 180.0
+        every { eventCostMock.execute(any()) } returns 180.0
 
         val participant1 = FakeData.createFakeParticipant()
         val participant2 = FakeData.createFakeParticipant()
@@ -266,8 +266,8 @@ class PercentageShareCalculatorTest : KoinTest {
                 ),
             )
         )
-        every { eventCostCalculatorMock.execute(any()) } returns 80.0
-        every { individualShareCalculatorMock.execute(group) } returns mapOf(
+        every { eventCostMock.execute(any()) } returns 80.0
+        every { individualPaymentAmountMock.execute(group) } returns mapOf(
             participant1 to 100.0,
             participant2 to -20.0
         )
@@ -281,7 +281,7 @@ class PercentageShareCalculatorTest : KoinTest {
 
     @Test
     fun threeParticipantsWithNormalization() {
-        every { eventCostCalculatorMock.execute(any()) } returns 180.0
+        every { eventCostMock.execute(any()) } returns 180.0
 
         val participant1 = FakeData.createFakeParticipant()
         val participant2 = FakeData.createFakeParticipant()
@@ -308,8 +308,8 @@ class PercentageShareCalculatorTest : KoinTest {
                 ),
             )
         )
-        every { eventCostCalculatorMock.execute(any()) } returns 280.0
-        every { individualShareCalculatorMock.execute(group) } returns mapOf(
+        every { eventCostMock.execute(any()) } returns 280.0
+        every { individualPaymentAmountMock.execute(group) } returns mapOf(
             participant1 to 100.0,
             participant2 to -20.0,
             participant3 to 200.0

@@ -4,23 +4,23 @@ import com.example.expensetracker.model.Group
 import com.example.expensetracker.model.Participant
 import timber.log.Timber
 
-interface PercentageShareCalculator {
+interface IndividualPaymentPercentage {
     fun execute(group: Group): Map<Participant, Double>
 }
 
-class PercentageShareCalculatorImpl(
-    private val eventCostCalculator: EventCostCalculator,
-    private val individualShareCalculator: IndividualShareCalculator
-) : PercentageShareCalculator {
+class IndividualPaymentPercentageImpl(
+    private val eventCost: EventCosts,
+    private val individualPaymentAmount: IndividualPaymentAmount
+) : IndividualPaymentPercentage {
     override fun execute(group: Group): Map<Participant, Double> {
         val eventCost =
-            eventCostCalculator.execute(group.transactions).takeIf { it != 0.0 }
+            eventCost.execute(group.transactions).takeIf { it != 0.0 }
                 ?: return run {
                     Timber.d("No event costs, can not calculate percentage shares.")
                     mapOf()
                 }
 
-        val individualShares = individualShareCalculator.execute(group)
+        val individualShares = individualPaymentAmount.execute(group)
 
         return group.participants.associateWith { participant ->
             val participantShare = individualShares[participant] ?: return run {

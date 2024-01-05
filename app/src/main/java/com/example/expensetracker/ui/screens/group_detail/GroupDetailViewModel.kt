@@ -9,9 +9,9 @@ import com.example.expensetracker.model.Currency
 import com.example.expensetracker.model.Participant
 import com.example.expensetracker.model.Transaction
 import com.example.expensetracker.ui.util.UiUtils
-import com.example.expensetracker.use_cases.EventCostCalculator
-import com.example.expensetracker.use_cases.IndividualShareCalculator
-import com.example.expensetracker.use_cases.PercentageShareCalculator
+import com.example.expensetracker.use_cases.EventCosts
+import com.example.expensetracker.use_cases.IndividualPaymentAmount
+import com.example.expensetracker.use_cases.IndividualPaymentPercentage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -26,9 +26,9 @@ import java.util.UUID
 class GroupDetailViewModel(
     private val groupId: UUID,
     private val databaseRepository: DatabaseRepository,
-    private val eventCostCalculator: EventCostCalculator,
-    private val individualShareCalculator: IndividualShareCalculator,
-    private val percentageShareCalculator: PercentageShareCalculator
+    private val eventCost: EventCosts,
+    private val individualPaymentAmount: IndividualPaymentAmount,
+    private val percentageShareCalculator: IndividualPaymentPercentage
 ) : ViewModel() {
     private var _uiState = MutableStateFlow<GroupDetailUiState>(GroupDetailUiState.Loading)
     val uiStateFlow = _uiState.asStateFlow()
@@ -38,7 +38,7 @@ class GroupDetailViewModel(
             GroupDetailUiState.Error,
             GroupDetailUiState.Loading -> 0.0
 
-            is GroupDetailUiState.Success -> eventCostCalculator.execute(uiState.group.transactions)
+            is GroupDetailUiState.Success -> eventCost.execute(uiState.group.transactions)
         }
     }.stateIn(
         scope = viewModelScope,
@@ -51,7 +51,7 @@ class GroupDetailViewModel(
             GroupDetailUiState.Error,
             GroupDetailUiState.Loading -> emptyMap()
 
-            is GroupDetailUiState.Success -> individualShareCalculator.execute(uiState.group)
+            is GroupDetailUiState.Success -> individualPaymentAmount.execute(uiState.group)
         }
     }.stateIn(
         scope = viewModelScope,
