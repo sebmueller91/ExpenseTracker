@@ -11,14 +11,14 @@ import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.inject
 
-class EventCostsTestCalculator: KoinTest {
+class EventCostsTest: KoinTest {
     private val DELTA = 0.001
 
     private val useCasesTestModule = module {
-        single<EventCostCalculator> { EventCostCalculatorImpl() }
+        single<EventCosts> { EventCostsImpl() }
     }
 
-    private val sut: EventCostCalculator by inject()
+    private val sut: EventCosts by inject()
 
     @Before
     fun setUp() {

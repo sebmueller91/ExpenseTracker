@@ -1,20 +1,31 @@
 package com.example.expensetracker.use_cases.di
 
-import com.example.expensetracker.use_cases.EventCostCalculator
-import com.example.expensetracker.use_cases.EventCostCalculatorImpl
-import com.example.expensetracker.use_cases.IndividualShareCalculator
-import com.example.expensetracker.use_cases.IndividualShareCalculatorImpl
-import com.example.expensetracker.use_cases.PercentageShareCalculator
-import com.example.expensetracker.use_cases.PercentageShareCalculatorImpl
+import com.example.expensetracker.use_cases.EventCosts
+import com.example.expensetracker.use_cases.EventCostsImpl
+import com.example.expensetracker.use_cases.IndividualCostsAmount
+import com.example.expensetracker.use_cases.IndividualCostsAmountImpl
+import com.example.expensetracker.use_cases.IndividualPaymentAmount
+import com.example.expensetracker.use_cases.IndividualPaymentAmountImpl
+import com.example.expensetracker.use_cases.IndividualPaymentPercentage
+import com.example.expensetracker.use_cases.IndividualPaymentPercentageImpl
+import com.example.expensetracker.use_cases.SettleUp
+import com.example.expensetracker.use_cases.SettleUpImpl
 import org.koin.dsl.module
 
 val useCasesModule = module {
-    single<EventCostCalculator> { EventCostCalculatorImpl() }
-    factory<IndividualShareCalculator> { IndividualShareCalculatorImpl() }
-    factory<PercentageShareCalculator> {
-        PercentageShareCalculatorImpl(
-            eventCostCalculator = get(),
-            individualShareCalculator = get()
+    single<EventCosts> { EventCostsImpl() }
+    factory<IndividualCostsAmount> { IndividualCostsAmountImpl() }
+    factory<IndividualPaymentAmount> { IndividualPaymentAmountImpl() }
+    factory<IndividualPaymentPercentage> {
+        IndividualPaymentPercentageImpl(
+            eventCost = get(),
+            individualPaymentAmount = get()
+        )
+    }
+    factory<SettleUp> {
+        SettleUpImpl(
+            individualCostsAmount = get(),
+            individualPaymentAmount = get()
         )
     }
 }
