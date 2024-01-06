@@ -103,7 +103,7 @@ fun Transaction.format(currency: Currency, context: Context): FormattedTransacti
             purpose
         )
 
-        is Transaction.Payment -> context.getString(
+        is Transaction.Transfer -> context.getString(
             R.string.gave_to_for,
             fromParticipant.name,
             UiUtils.formatMoneyAmount(amount, currency, context),
@@ -116,7 +116,7 @@ fun Transaction.format(currency: Currency, context: Context): FormattedTransacti
     val date = when (this) {
         is Transaction.Expense -> context.getString(R.string.paid_on, formattedDate)
         is Transaction.Income -> context.getString(R.string.received_on, formattedDate)
-        is Transaction.Payment -> context.getString(R.string.paid_on, formattedDate)
+        is Transaction.Transfer -> context.getString(R.string.paid_on, formattedDate)
     }
 
     val splitBetween = when (this) {
@@ -126,7 +126,7 @@ fun Transaction.format(currency: Currency, context: Context): FormattedTransacti
         is Transaction.Income -> context.getString(
             R.string.split_between,
             UiUtils.formatParticipantsList(splitBetween, context))
-        is Transaction.Payment -> context.getString(
+        is Transaction.Transfer -> context.getString(
             R.string.from_to,
             fromParticipant.name,
             toParticipant.name

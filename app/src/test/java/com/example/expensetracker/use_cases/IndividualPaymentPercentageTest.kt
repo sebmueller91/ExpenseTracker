@@ -5,7 +5,7 @@ import com.example.expensetracker.model.Group
 import com.example.expensetracker.util.FakeData
 import io.mockk.every
 import io.mockk.mockk
-import junit.framework.TestCase
+import junit.framework.TestCase.assertEquals
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -57,9 +57,9 @@ class IndividualPaymentPercentageTest : KoinTest {
 
         val result = sut.execute(group)
 
-        TestCase.assertEquals(1, result.entries.size)
-        TestCase.assertEquals(participant, result.entries.first().key)
-        TestCase.assertEquals(100.0, result.entries.first().value, DELTA)
+        assertEquals(1, result.entries.size)
+        assertEquals(participant, result.entries.first().key)
+        assertEquals(100.0, result.entries.first().value, DELTA)
     }
 
     @Test
@@ -83,9 +83,9 @@ class IndividualPaymentPercentageTest : KoinTest {
 
         val result = sut.execute(group)
 
-        TestCase.assertEquals(2, result.entries.size)
-        TestCase.assertEquals(50.0, result[participant1]!!, DELTA)
-        TestCase.assertEquals(50.0, result[participant2]!!, DELTA)
+        assertEquals(2, result.entries.size)
+        assertEquals(50.0, result[participant1]!!, DELTA)
+        assertEquals(50.0, result[participant2]!!, DELTA)
     }
 
     @Test
@@ -117,9 +117,9 @@ class IndividualPaymentPercentageTest : KoinTest {
 
         val result = sut.execute(group)
 
-        TestCase.assertEquals(2, result.entries.size)
-        TestCase.assertEquals(50.0, result[participant1]!!, DELTA)
-        TestCase.assertEquals(50.0, result[participant2]!!, DELTA)
+        assertEquals(2, result.entries.size)
+        assertEquals(50.0, result[participant1]!!, DELTA)
+        assertEquals(50.0, result[participant2]!!, DELTA)
     }
 
     @Test
@@ -158,9 +158,9 @@ class IndividualPaymentPercentageTest : KoinTest {
 
         val result = sut.execute(group)
 
-        TestCase.assertEquals(2, result.entries.size)
-        TestCase.assertEquals(60.0, result[participant1]!!, DELTA)
-        TestCase.assertEquals(40.0, result[participant2]!!, DELTA)
+        assertEquals(2, result.entries.size)
+        assertEquals(60.0, result[participant1]!!, DELTA)
+        assertEquals(40.0, result[participant2]!!, DELTA)
     }
 
     @Test
@@ -197,9 +197,9 @@ class IndividualPaymentPercentageTest : KoinTest {
 
         val result = sut.execute(group)
 
-        TestCase.assertEquals(2, result.entries.size)
-        TestCase.assertEquals(100.0 / 1.8, result[participant1]!!, DELTA)
-        TestCase.assertEquals(80.0 / 1.8, result[participant2]!!, DELTA)
+        assertEquals(2, result.entries.size)
+        assertEquals(100.0 / 1.8, result[participant1]!!, DELTA)
+        assertEquals(80.0 / 1.8, result[participant2]!!, DELTA)
     }
 
     @Test
@@ -238,9 +238,9 @@ class IndividualPaymentPercentageTest : KoinTest {
 
         val result = sut.execute(group)
 
-        TestCase.assertEquals(2, result.entries.size)
-        TestCase.assertEquals(100.0 / 1.8, result[participant1]!!, DELTA)
-        TestCase.assertEquals(80.0 / 1.8, result[participant2]!!, DELTA)
+        assertEquals(2, result.entries.size)
+        assertEquals(100.0 / 1.8, result[participant1]!!, DELTA)
+        assertEquals(80.0 / 1.8, result[participant2]!!, DELTA)
     }
 
     @Test
@@ -274,9 +274,9 @@ class IndividualPaymentPercentageTest : KoinTest {
 
         val result = sut.execute(group)
 
-        TestCase.assertEquals(2, result.entries.size)
-        TestCase.assertEquals(100.0, result[participant1]!!, DELTA)
-        TestCase.assertEquals(0.0, result[participant2]!!, DELTA)
+        assertEquals(2, result.entries.size)
+        assertEquals(100.0, result[participant1]!!, DELTA)
+        assertEquals(0.0, result[participant2]!!, DELTA)
     }
 
     @Test
@@ -317,9 +317,9 @@ class IndividualPaymentPercentageTest : KoinTest {
 
         val result = sut.execute(group)
 
-        TestCase.assertEquals(3, result.entries.size)
-        TestCase.assertEquals(100.0/3.0, result[participant1]!!, DELTA)
-        TestCase.assertEquals(0.0, result[participant2]!!, DELTA)
-        TestCase.assertEquals(2.0*(100/3.0), result[participant3]!!, DELTA)
+        assertEquals(3, result.entries.size)
+        assertEquals(100.0/3.0, result[participant1]!!, DELTA)
+        assertEquals(0.0, result[participant2]!!, DELTA)
+        assertEquals(2.0*(100/3.0), result[participant3]!!, DELTA)
     }
 }

@@ -17,7 +17,7 @@ class EventCostsImpl : EventCosts {
                 is Transaction.Income -> {
                     sum -= transaction.amount
                 }
-                is Transaction.Payment -> {
+                is Transaction.Transfer -> {
                     // Does not influence event cost
                 }
             }
