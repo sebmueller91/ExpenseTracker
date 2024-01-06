@@ -35,7 +35,7 @@ class IndividualPaymentAmountImpl : IndividualPaymentAmount {
                         sum -= transaction.amount
                     }
                 }
-                is Transaction.Payment -> {
+                is Transaction.Transfer -> {
                     if (transaction.fromParticipant == participant) {
                         sum += transaction.amount
                     }

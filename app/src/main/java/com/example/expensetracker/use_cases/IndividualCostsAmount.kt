@@ -37,7 +37,7 @@ class IndividualCostsAmountImpl() : IndividualCostsAmount {
                     }
                 }
 
-                is Transaction.Payment -> {
+                is Transaction.Transfer -> {
                     // Does not influence costs
                 }
             }

@@ -44,8 +44,8 @@ class FakeData {
             fromParticipant: Participant = participants.subList(0, participants.size / 2).random(),
             toParticipant: Participant = participants.subList(participants.size / 2, participants.size)
                 .random()
-        ): Transaction.Payment {
-            return Transaction.Payment(
+        ): Transaction.Transfer {
+            return Transaction.Transfer(
                 amount = amount,
                 date = createFakeDate(year = 2022, day = 23, month = 8),
                 fromParticipant = fromParticipant,
