@@ -69,11 +69,12 @@ fun ExpensesTab(
         ) {
             if (transactions.isEmpty()) {
                 Column(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Text(stringResource(R.string.no_transactions))
+                    Text(stringResource(R.string.you_don_t_have_any_expenses_yet)
+                    )
                 }
             } else {
                 LazyColumn {

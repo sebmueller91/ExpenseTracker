@@ -10,7 +10,7 @@
     <string name="currency">Currency</string>
     <string name="finish">Finish</string>
     <string name="share_the_group">Invite your friends</string>
-    <string name="invitation_text">I am inviting you to join our group %1$s: %2$s\n\nIf you don\'t have the app yet, you can download it from https://github.com/sebmueller91/ExpenseTracker</string>
+    <string name="invitation_text">I am inviting you to join our Event Tracker group %1$s: %2$s\n\nIf you don\'t have the app yet, you can download it from https://github.com/sebmueller91/ExpenseTracker</string>
     <string name="group_created_successfully">Group Created Successfully!</string>
     <string name="share">Share</string>
     <string name="invite_friends">Invite friends</string>
@@ -22,6 +22,7 @@
     <string name="add_payment">Transfer within group</string>
     <string name="_2023_dgs_software">©2023 DGS Software</string>
     <string name="app_version">App version: %1$s</string>
+    <string name="you_don_t_have_any_expenses_yet">You don\'t have any expenses yet.</string>
     <string name="participants">Participants</string>
     <string name="transactions">Transactions: %1$s</string>
     <string name="no_transactions">You don\'t have any transactions.</string>
