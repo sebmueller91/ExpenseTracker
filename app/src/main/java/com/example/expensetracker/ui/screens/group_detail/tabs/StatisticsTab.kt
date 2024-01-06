@@ -243,8 +243,8 @@ private fun getPieChartColor(index: Int): Color {
 
 private val pieChartColors = listOf(
     Color(173, 216, 230, 255), // Light Blue
-    Color(128, 203, 196, 255), // Aqua Green
     Color(255, 127, 80, 255),  // Coral Pink
+    Color(128, 203, 196, 255), // Aqua Green
     Color(159, 121, 238, 255), // Muted Violet
     Color(255, 179, 71, 255),  // Pastel Orange
     Color(111, 207, 151, 255), // Seafoam Green

@@ -1,13 +1,12 @@
 package com.example.expensetracker.ui.screens.group_detail
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.BarChart
@@ -26,13 +25,12 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.expensetracker.R
 import com.example.expensetracker.model.Participant
@@ -43,10 +41,10 @@ import com.example.expensetracker.ui.screens.group_detail.tabs.SettleUpTab
 import com.example.expensetracker.ui.screens.group_detail.tabs.StatisticsTab
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
 import java.util.UUID
-import kotlin.math.absoluteValue
 
 @Destination
 @Composable
@@ -97,7 +95,7 @@ private fun GroupDetailScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun GroupDetailScreenContent(
     uiState: GroupDetailUiState.Success,
@@ -107,26 +105,12 @@ private fun GroupDetailScreenContent(
     onLeave: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val dragThreshold = 20.dp
     var selectedTab by remember { mutableStateOf(GroupDetailScreenTabs.EXPENSES) }
-    var previousTab: GroupDetailScreenTabs? by remember { mutableStateOf(null) }
-
-    val dragModifier = Modifier.pointerInput(Unit) {
-        detectHorizontalDragGestures { _, dragAmount ->
-            if (dragAmount.absoluteValue > dragThreshold.toPx()) {
-                val newTab =
-                    if (dragAmount < 0) GroupDetailScreenTabs.EXPENSES else GroupDetailScreenTabs.SETTLE_UP
-                if (newTab != selectedTab) {
-                    previousTab = selectedTab
-                    selectedTab = newTab
-                }
-            }
-        }
-    }
+    val pagerState = rememberPagerState { GroupDetailScreenTabs.entries.size }
+    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(modifier = modifier
-        .fillMaxSize()
-        .then(dragModifier),
+        .fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = { Text(uiState.group.name) },
@@ -136,13 +120,13 @@ private fun GroupDetailScreenContent(
         },
         bottomBar = {
             NavigationBar {
-                GroupDetailScreenTabs.entries.forEach { tab ->
-                    val selected = tab == selectedTab
-
+                GroupDetailScreenTabs.entries.forEachIndexed { index, tab ->
                     NavigationBarItem(
-                        selected = selected,
+                        selected = pagerState.currentPage == index,
                         onClick = {
-                            previousTab = selectedTab
+                            coroutineScope.launch {
+                                pagerState.animateScrollToPage(index)
+                            }
                             selectedTab = tab
                         },
                         icon = {
@@ -156,41 +140,24 @@ private fun GroupDetailScreenContent(
             }
         })
     { innerPadding ->
-        Box(
+        HorizontalPager(
+            state = pagerState,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-        ) {
-            AnimatedVisibility(
-                visible = selectedTab == GroupDetailScreenTabs.EXPENSES,
-                enter = slideInHorizontally { fullWidth -> -fullWidth },
-                exit = slideOutHorizontally { fullWidth -> -fullWidth }
-            ) {
-                ExpensesTab(
+        ) { page ->
+            when (GroupDetailScreenTabs.values()[page]) {
+                GroupDetailScreenTabs.EXPENSES -> ExpensesTab(
                     transactions = uiState.group.transactions,
                     currency = uiState.group.currency
                 )
-            }
-
-            AnimatedVisibility(
-                visible = selectedTab == GroupDetailScreenTabs.STATISTICS,
-                enter = slideInHorizontally { fullWidth -> if (previousTab == GroupDetailScreenTabs.EXPENSES) fullWidth else -fullWidth },
-                exit = slideOutHorizontally { fullWidth -> if (selectedTab == GroupDetailScreenTabs.EXPENSES) fullWidth else -fullWidth }
-            ) {
-                StatisticsTab(
+                GroupDetailScreenTabs.STATISTICS -> StatisticsTab(
                     group = uiState.group,
                     eventCostFlow = eventCostFlow,
                     individualSharesFlow = individualSharesFlow,
                     percentageSharesFlow = percentageSharesFlow
                 )
-            }
-
-            AnimatedVisibility(
-                visible = selectedTab == GroupDetailScreenTabs.SETTLE_UP,
-                enter = slideInHorizontally { fullWidth -> fullWidth },
-                exit = slideOutHorizontally { fullWidth -> fullWidth }
-            ) {
-                SettleUpTab(group = uiState.group)
+                GroupDetailScreenTabs.SETTLE_UP -> SettleUpTab(group = uiState.group)
             }
         }
     }
