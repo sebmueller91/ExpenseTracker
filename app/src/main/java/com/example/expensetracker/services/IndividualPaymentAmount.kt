@@ -1,24 +1,24 @@
-package com.example.expensetracker.use_cases
+package com.example.expensetracker.services
 
 import com.example.expensetracker.model.Group
 import com.example.expensetracker.model.Participant
 import com.example.expensetracker.model.Transaction
 
-interface IndividualShareCalculator {
+interface IndividualPaymentAmount {
     fun execute(group: Group): Map<Participant, Double>
 }
 
-class IndividualShareCalculatorImpl : IndividualShareCalculator {
+class IndividualPaymentAmountImpl : IndividualPaymentAmount {
     override fun execute(group: Group): Map<Participant, Double> {
         return group.participants.associateWith { participant ->
-            calculateParticipantsShare(
+            calculateParticipantsPayment(
                 participant,
                 group.transactions
             )
         }
     }
 
-    private fun calculateParticipantsShare(
+    private fun calculateParticipantsPayment(
         participant: Participant,
         transactions: List<Transaction>
     ): Double {
@@ -35,7 +35,7 @@ class IndividualShareCalculatorImpl : IndividualShareCalculator {
                         sum -= transaction.amount
                     }
                 }
-                is Transaction.Payment -> {
+                is Transaction.Transfer -> {
                     if (transaction.fromParticipant == participant) {
                         sum += transaction.amount
                     }

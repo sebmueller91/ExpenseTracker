@@ -15,7 +15,7 @@ sealed class Transaction(
         date: Date
     ) : Transaction(purpose, amount, date)
 
-    class Payment(
+    class Transfer(
         val fromParticipant: Participant,
         val toParticipant: Participant,
         purpose: String,

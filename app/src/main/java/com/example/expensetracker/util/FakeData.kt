@@ -26,14 +26,15 @@ class FakeData {
         fun createFakeExpense(
             participants: List<Participant> = fakeParticipantsSmall,
             amount: Double = Random.nextDouble(0.1, 1200.0),
-            paidBy: Participant = participants.random()
+            paidBy: Participant = participants.random(),
+            splitBetween: List<Participant> = participants
         ): Transaction.Expense {
             return Transaction.Expense(
                 amount = amount,
                 date = createFakeDate(year = 2022, day = 23, month = 8),
                 paidBy = paidBy,
                 purpose = createFakePurpose(),
-                splitBetween = participants
+                splitBetween = splitBetween
             )
         }
 
@@ -43,8 +44,8 @@ class FakeData {
             fromParticipant: Participant = participants.subList(0, participants.size / 2).random(),
             toParticipant: Participant = participants.subList(participants.size / 2, participants.size)
                 .random()
-        ): Transaction.Payment {
-            return Transaction.Payment(
+        ): Transaction.Transfer {
+            return Transaction.Transfer(
                 amount = amount,
                 date = createFakeDate(year = 2022, day = 23, month = 8),
                 fromParticipant = fromParticipant,
