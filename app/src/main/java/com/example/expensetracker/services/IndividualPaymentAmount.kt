@@ -1,24 +1,24 @@
-package com.example.expensetracker.use_cases
+package com.example.expensetracker.services
 
 import com.example.expensetracker.model.Group
 import com.example.expensetracker.model.Participant
 import com.example.expensetracker.model.Transaction
 
-interface IndividualCostsAmount {
+interface IndividualPaymentAmount {
     fun execute(group: Group): Map<Participant, Double>
 }
 
-class IndividualCostsAmountImpl() : IndividualCostsAmount {
+class IndividualPaymentAmountImpl : IndividualPaymentAmount {
     override fun execute(group: Group): Map<Participant, Double> {
         return group.participants.associateWith { participant ->
-            calculateParticipantsCosts(
+            calculateParticipantsPayment(
                 participant,
                 group.transactions
             )
         }
     }
 
-    private fun calculateParticipantsCosts(
+    private fun calculateParticipantsPayment(
         participant: Participant,
         transactions: List<Transaction>
     ): Double {
@@ -26,19 +26,22 @@ class IndividualCostsAmountImpl() : IndividualCostsAmount {
         transactions.forEach { transaction ->
             when (transaction) {
                 is Transaction.Expense -> {
-                    if (transaction.splitBetween.contains(participant)) {
-                        sum += (transaction.amount / transaction.splitBetween.size.toDouble())
+                    if (transaction.paidBy == participant ) {
+                        sum += transaction.amount
                     }
                 }
-
                 is Transaction.Income -> {
-                    if (transaction.splitBetween.contains(participant)) {
-                        sum -= (transaction.amount / transaction.splitBetween.size.toDouble())
+                    if (transaction.receivedBy == participant) {
+                        sum -= transaction.amount
                     }
                 }
-
                 is Transaction.Transfer -> {
-                    // Does not influence costs
+                    if (transaction.fromParticipant == participant) {
+                        sum += transaction.amount
+                    }
+                    if (transaction.toParticipant == participant) {
+                        sum -= transaction.amount
+                    }
                 }
             }
         }

@@ -1,4 +1,4 @@
-package com.example.expensetracker.use_cases
+package com.example.expensetracker.services
 
 import android.content.Context
 import com.example.expensetracker.model.Currency

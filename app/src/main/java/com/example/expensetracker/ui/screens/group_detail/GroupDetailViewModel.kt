@@ -9,9 +9,9 @@ import com.example.expensetracker.model.Currency
 import com.example.expensetracker.model.Participant
 import com.example.expensetracker.model.Transaction
 import com.example.expensetracker.ui.util.UiUtils
-import com.example.expensetracker.use_cases.EventCosts
-import com.example.expensetracker.use_cases.IndividualPaymentAmount
-import com.example.expensetracker.use_cases.IndividualPaymentPercentage
+import com.example.expensetracker.services.EventCosts
+import com.example.expensetracker.services.IndividualPaymentAmount
+import com.example.expensetracker.services.IndividualPaymentPercentage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
