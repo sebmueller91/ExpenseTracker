@@ -25,7 +25,8 @@ val useCasesModule = module {
     factory<SettleUp> {
         SettleUpImpl(
             individualCostsAmount = get(),
-            individualPaymentAmount = get()
+            individualPaymentAmount = get(),
+            context = get()
         )
     }
 }

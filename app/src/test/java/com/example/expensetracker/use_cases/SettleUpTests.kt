@@ -1,5 +1,6 @@
 package com.example.expensetracker.use_cases
 
+import android.content.Context
 import com.example.expensetracker.model.Currency
 import com.example.expensetracker.model.Group
 import com.example.expensetracker.util.FakeData
@@ -20,10 +21,11 @@ class SettleUpTests : KoinTest {
     private val individualPaymentAmountMock: IndividualPaymentAmount =
         mockk<IndividualPaymentAmount>()
     private val individualCostsAmountMock: IndividualCostsAmount = mockk<IndividualCostsAmount>()
+    private val contextMock: Context = mockk<Context>(relaxed = true)
 
 
     private val useCasesTestModule = module {
-        single<SettleUp> { SettleUpImpl(individualPaymentAmountMock, individualCostsAmountMock) }
+        single<SettleUp> { SettleUpImpl(individualPaymentAmountMock, individualCostsAmountMock, contextMock) }
     }
 
     private val sut: SettleUp by inject()

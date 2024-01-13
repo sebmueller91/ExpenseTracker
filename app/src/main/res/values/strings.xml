@@ -34,4 +34,5 @@
     <string name="gave_to_for">%1$s gave %2$s to %3$s for %4$s</string>
     <string name="received_for">%1$s received %2$s for %3$s</string>
     <string name="paid_for">%1$s paid %2$s for %3$s</string>
+    <string name="settle_up">Settle up</string>
 </resources>
