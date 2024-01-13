@@ -1,12 +1,12 @@
-package com.example.expensetracker.use_cases
+package com.example.expensetracker.services
 
 import com.example.expensetracker.model.Transaction
 
-interface EventCostCalculator {
+interface EventCosts {
     fun execute(transactions: List<Transaction>): Double
 }
 
-class EventCostCalculatorImpl : EventCostCalculator {
+class EventCostsImpl : EventCosts {
     override fun execute(transactions: List<Transaction>): Double {
         var sum = 0.0
         transactions.forEach {transaction ->
@@ -17,7 +17,7 @@ class EventCostCalculatorImpl : EventCostCalculator {
                 is Transaction.Income -> {
                     sum -= transaction.amount
                 }
-                is Transaction.Payment -> {
+                is Transaction.Transfer -> {
                     // Does not influence event cost
                 }
             }
