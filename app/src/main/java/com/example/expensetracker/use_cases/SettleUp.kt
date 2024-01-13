@@ -69,12 +69,12 @@ class SettleUpImpl(
             ))
 
             sortedDebtorsBalances[debtorIndex] +=amount
-            sortedDebtorsBalances[creditorIndex] -=amount
+            sortedCreditorsBalances[creditorIndex] -=amount
 
             if (sortedDebtorsBalances[debtorIndex].isEqualTo(0.0)) {
                 debtorIndex++
             }
-            if (sortedDebtorsBalances[creditorIndex].isEqualTo(0.0)) {
+            if (sortedCreditorsBalances[creditorIndex].isEqualTo(0.0)) {
                 creditorIndex++
             }
         }
