@@ -33,6 +33,8 @@ class SettleUpIntegrationTests : KoinTest {
     }
 
     private val sut: SettleUp by inject()
+    private val individualCostsAmount: IndividualCostsAmount by inject()
+    private val individualPaymentAmount: IndividualPaymentAmount by inject()
 
     @Before
     fun setUp() {
@@ -170,8 +172,178 @@ class SettleUpIntegrationTests : KoinTest {
         assert(result.size == 2)
         assert(result.filter { it.toParticipant == participant1 }.size == 1)
         assert(result.filter { it.toParticipant == participant2 }.size == 1)
-        assert(result.filter { it.fromParticipant == participant3}.size == 2)
+        assert(result.filter { it.fromParticipant == participant3 }.size == 2)
         assert(result.filter { it.amount.isEqualTo(33.33) }.size == 2)
-        assert(result.filter { it.purpose == fakePurpose}.size == 2)
+        assert(result.filter { it.purpose == fakePurpose }.size == 2)
+    }
+
+    @Test
+    fun threeParticipants_TwoPayments() {
+        val participant1 = FakeData.createFakeParticipant()
+        val participant2 = FakeData.createFakeParticipant()
+        val participant3 = FakeData.createFakeParticipant()
+        val group = Group(
+            currency = Currency.CAD,
+            name = "testGroup",
+            participants = listOf(participant1, participant2, participant3),
+            transactions = listOf(
+                FakeData.createFakePayment(
+                    fromParticipant = participant1,
+                    toParticipant = participant2,
+                    amount = 10.0
+                ),
+                FakeData.createFakePayment(
+                    fromParticipant = participant2,
+                    toParticipant = participant3,
+                    amount = 10.0
+                )
+            )
+        )
+
+        val result = sut.execute(group)
+
+        assert(result.size == 1)
+        assert(result[0].fromParticipant == participant3)
+        assert(result[0].toParticipant == participant1)
+        assert(result[0].amount == 10.0)
+        assert(result[0].purpose == fakePurpose)
+    }
+
+    @Test
+    fun fiveParticipants_DifferentBalances() {
+        val participants = listOf(
+            FakeData.createFakeParticipant(),
+            FakeData.createFakeParticipant(),
+            FakeData.createFakeParticipant(),
+            FakeData.createFakeParticipant(),
+            FakeData.createFakeParticipant()
+        )
+        val group = Group(
+            currency = Currency.CAD,
+            name = "testGroup",
+            participants = participants,
+            transactions = listOf(
+                FakeData.createFakePayment(
+                    fromParticipant = participants[0],
+                    toParticipant = participants[1],
+                    amount = 10.0
+                ),
+                FakeData.createFakePayment(
+                    fromParticipant = participants[1],
+                    toParticipant = participants[2],
+                    amount = 10.0
+                ),
+                FakeData.createFakeExpense(
+                    participants = participants,
+                    paidBy = participants[3],
+                    amount = 123.43
+                ),
+                FakeData.createFakeExpense(
+                    participants = participants,
+                    paidBy = participants[4],
+                    amount = 23443.23
+                ),
+                FakeData.createFakeIncome(
+                    participants = participants,
+                    splitBetween = participants,
+                    amount = 1000.0
+                )
+            )
+        )
+
+        val result = sut.execute(group)
+
+        assertParticipantsBalancesAreZero(group)
+    }
+
+    @Test
+    fun tenParticipants_DifferentBalances() {
+        val participants = listOf(
+            FakeData.createFakeParticipant(),
+            FakeData.createFakeParticipant(),
+            FakeData.createFakeParticipant(),
+            FakeData.createFakeParticipant(),
+            FakeData.createFakeParticipant(),
+            FakeData.createFakeParticipant(),
+            FakeData.createFakeParticipant(),
+            FakeData.createFakeParticipant(),
+            FakeData.createFakeParticipant(),
+            FakeData.createFakeParticipant()
+        )
+        val group = Group(
+            currency = Currency.CAD,
+            name = "testGroup",
+            participants = participants,
+            transactions = listOf(
+                FakeData.createFakePayment(
+                    fromParticipant = participants[0],
+                    toParticipant = participants[1],
+                    amount = 10.0
+                ),
+                FakeData.createFakePayment(
+                    fromParticipant = participants[1],
+                    toParticipant = participants[2],
+                    amount = 10.0
+                ),
+                FakeData.createFakeExpense(
+                    participants = participants,
+                    paidBy = participants[3],
+                    amount = 123.43
+                ),
+                FakeData.createFakeExpense(
+                    participants = participants,
+                    paidBy = participants[4],
+                    amount = 23443.23
+                ),
+                FakeData.createFakeIncome(
+                    participants = participants,
+                    receivedBy = participants[5],
+                    splitBetween = participants,
+                    amount = 1000.0
+                ),
+                FakeData.createFakeIncome(
+                    participants = participants,
+                    receivedBy = participants[6],
+                    splitBetween = participants,
+                    amount = 2000.0
+                ),
+                FakeData.createFakeExpense(
+                    participants = participants,
+                    paidBy = participants[7],
+                    amount = 123.43,
+                    splitBetween = listOf(participants[7])
+                ),
+                FakeData.createFakeExpense(
+                    participants = participants,
+                    paidBy = participants[8],
+                    amount = 1263.43,
+                    splitBetween = participants
+                ),
+                FakeData.createFakeExpense(
+                    participants = participants,
+                    paidBy = participants[9],
+                    amount = 0.11,
+                    splitBetween = participants
+                ),
+            )
+        )
+
+        val result = sut.execute(group)
+
+        assertParticipantsBalancesAreZero(group)
+    }
+
+    private fun assertParticipantsBalancesAreZero(group: Group) {
+        val payments = individualPaymentAmount.execute(group)
+        val costs = individualCostsAmount.execute(group)
+
+        assert(group.participants.toSet() == payments.keys)
+        assert(payments.keys == costs.keys)
+
+        val balances =
+            payments.keys.associateWith { participant -> payments[participant]!! - costs[participant]!! }
+                .map { it.value }
+
+        assert(balances.none { it.isEqualTo(0.0) })
     }
 }
