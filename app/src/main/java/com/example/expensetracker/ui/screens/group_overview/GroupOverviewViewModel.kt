@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.expensetracker.data.DatabaseRepository
 import com.example.expensetracker.model.Group
 import com.example.expensetracker.ui.util.UiUtils
-import com.example.expensetracker.use_cases.EventCosts
+import com.example.expensetracker.services.EventCosts
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
