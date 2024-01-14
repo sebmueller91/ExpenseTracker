@@ -12,10 +12,8 @@ import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.inject
-
+private val DELTA = 0.001
 class IndividualPaymentAmountTest : KoinTest {
-
-    private val DELTA = 0.001
 
     private val useCasesTestModule = module {
         single<IndividualPaymentAmount> { IndividualPaymentAmountImpl() }
