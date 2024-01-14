@@ -42,7 +42,7 @@ import com.example.expensetracker.ui.screens.group_detail.tabs.StatisticsTab
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.getViewModel
+import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import java.util.UUID
 
@@ -52,7 +52,7 @@ fun GroupDetailScreen(
     groupId: UUID,
     navigator: DestinationsNavigator
 ) {
-    val viewModel: GroupDetailViewModel = getViewModel { parametersOf(groupId) }
+    val viewModel: GroupDetailViewModel = koinViewModel { parametersOf(groupId) }
 
     GroupDetailScreen(
         uiStateFlow = viewModel.uiStateFlow.collectAsStateWithLifecycle(),
@@ -146,7 +146,7 @@ private fun GroupDetailScreenContent(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) { page ->
-            when (GroupDetailScreenTabs.values()[page]) {
+            when (GroupDetailScreenTabs.entries[page]) {
                 GroupDetailScreenTabs.EXPENSES -> ExpensesTab(
                     transactions = uiState.group.transactions,
                     currency = uiState.group.currency

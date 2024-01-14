@@ -78,14 +78,14 @@ import com.example.expensetracker.ui.screens.destinations.GroupDetailScreenDesti
 import com.example.expensetracker.ui.theme.ExpenseTrackerTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import org.koin.androidx.compose.getViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Destination
 @Composable
 fun AddGroupScreen(
     navigator: DestinationsNavigator
 ) {
-    val viewModel: AddGroupViewModel = getViewModel()
+    val viewModel: AddGroupViewModel = koinViewModel()
     val uiStateFlow = viewModel.uiStateFlow.collectAsStateWithLifecycle()
 
     AddGroupScreen(
@@ -301,7 +301,7 @@ private fun GroupNameTextField(
         keyboardType = KeyboardType.Text,
         imeAction = ImeAction.Go
     )
-    Column() {
+    Column {
         TextField(
             value = groupName,
             onValueChange = onValueChange,
@@ -408,7 +408,7 @@ fun ParticipantsInputScreen(
     ) { padding ->
         LazyColumn(modifier = modifier.padding(padding), state = listState) {
             itemsIndexed(participantsNames) { index, participantName ->
-                ParicipantTextField(
+                ParticipantTextField(
                     participantName = participantName,
                     index = index,
                     numberParticipants = participantsNames.size,
@@ -422,7 +422,7 @@ fun ParticipantsInputScreen(
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun ParicipantTextField( // TODO: Fuse this with the group name field?
+private fun ParticipantTextField( // TODO: Fuse this with the group name field?
     participantName: String,
     index: Int,
     numberParticipants: Int,

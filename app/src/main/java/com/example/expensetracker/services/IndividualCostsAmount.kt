@@ -8,7 +8,7 @@ interface IndividualCostsAmount {
     fun execute(group: Group): Map<Participant, Double>
 }
 
-class IndividualCostsAmountImpl() : IndividualCostsAmount {
+class IndividualCostsAmountImpl : IndividualCostsAmount {
     override fun execute(group: Group): Map<Participant, Double> {
         return group.participants.associateWith { participant ->
             calculateParticipantsCosts(

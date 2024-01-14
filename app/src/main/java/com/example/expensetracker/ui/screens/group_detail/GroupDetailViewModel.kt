@@ -8,10 +8,10 @@ import com.example.expensetracker.data.DatabaseRepository
 import com.example.expensetracker.model.Currency
 import com.example.expensetracker.model.Participant
 import com.example.expensetracker.model.Transaction
-import com.example.expensetracker.ui.util.UiUtils
 import com.example.expensetracker.services.EventCosts
 import com.example.expensetracker.services.IndividualPaymentAmount
 import com.example.expensetracker.services.IndividualPaymentPercentage
+import com.example.expensetracker.ui.util.UiUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -112,7 +112,7 @@ fun Transaction.format(currency: Currency, context: Context): FormattedTransacti
         )
     }
 
-    val formattedDate = "${SimpleDateFormat("dd.MM.yyyy").format(this.date)}"
+    val formattedDate = SimpleDateFormat("dd.MM.yyyy").format(this.date)
     val date = when (this) {
         is Transaction.Expense -> context.getString(R.string.paid_on, formattedDate)
         is Transaction.Income -> context.getString(R.string.received_on, formattedDate)

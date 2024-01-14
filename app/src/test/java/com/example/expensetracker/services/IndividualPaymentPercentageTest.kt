@@ -14,10 +14,8 @@ import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.inject
-
+private val DELTA = 0.001
 class IndividualPaymentPercentageTest : KoinTest {
-    private val DELTA = 0.001
-
     private val eventCostMock = mockk<EventCosts>()
     private val individualPaymentAmountMock = mockk<IndividualPaymentAmount>()
 
