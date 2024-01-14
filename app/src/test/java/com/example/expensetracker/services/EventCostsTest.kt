@@ -11,9 +11,9 @@ import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.inject
 
-class EventCostsTest: KoinTest {
-    private val DELTA = 0.001
+private val DELTA = 0.001
 
+class EventCostsTest: KoinTest {
     private val useCasesTestModule = module {
         single<EventCosts> { EventCostsImpl() }
     }
@@ -60,7 +60,7 @@ class EventCostsTest: KoinTest {
     }
 
     @Test
-    fun multipleExpensesPaymentsIncoms() {
+    fun multipleExpensesPaymentsIncomes() {
         val expenses = listOf(
             FakeData.createFakeExpense(amount = 10.0),
             FakeData.createFakeExpense(amount = 20.0),

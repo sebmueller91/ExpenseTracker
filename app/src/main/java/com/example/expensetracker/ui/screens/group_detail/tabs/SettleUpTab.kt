@@ -63,7 +63,7 @@ private fun ExpandableOverviewFabs(
 ) {
     val animationDelay = 60
 
-    Column {
+    Column(modifier = modifier) {
         AnimatedFloatingActionButton(
             visible = fabExpanded,
             icon = Icons.Filled.Share,
