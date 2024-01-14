@@ -46,36 +46,34 @@ class SettleUpImpl(
     ): List<Transaction.Transfer> {
         val transactions = mutableListOf<Transaction.Transfer>()
 
-        val sortedDebtors = debtors.entries.sortedBy { it.value }
-        val sortedCreditors = creditors.entries.sortedByDescending { it.value }
+        val debtorList = debtors.map { it.key to it.value }.toMutableList()
+        val creditorList = creditors.map { it.key to it.value }.toMutableList()
 
-        val sortedDebtorsBalances = sortedDebtors.map { it.value }.toMutableList()
-        val sortedCreditorsBalances = sortedCreditors.map { it.value }.toMutableList()
+        while (debtorList.isNotEmpty() && creditorList.isNotEmpty()) {
+            debtorList.sortBy { it.second }
+            creditorList.sortByDescending { it.second }
 
-        var debtorIndex = 0
-        var creditorIndex = 0
+            val currentDebtor = debtorList.first()
+            val currentCreditor = creditorList.first()
 
-        while (debtorIndex < sortedDebtors.size && creditorIndex < sortedCreditors.size) {
-            val debtor = sortedDebtors[debtorIndex]
-            val creditor = sortedCreditors[creditorIndex]
+            val amount = min(-currentDebtor.second, currentCreditor.second)
 
-            val amount = min (-sortedDebtorsBalances[debtorIndex], sortedCreditorsBalances[creditorIndex])
             transactions.add(Transaction.Transfer(
-                fromParticipant = debtor.key,
-                toParticipant = creditor.key,
+                fromParticipant = currentDebtor.first,
+                toParticipant = currentCreditor.first,
                 purpose = context.getString(R.string.settle_up),
                 amount = amount,
                 date = Date()
             ))
 
-            sortedDebtorsBalances[debtorIndex] +=amount
-            sortedCreditorsBalances[creditorIndex] -=amount
+            debtorList[0] = currentDebtor.first to (currentDebtor.second + amount)
+            creditorList[0] = currentCreditor.first to (currentCreditor.second - amount)
 
-            if (sortedDebtorsBalances[debtorIndex].isEqualTo(0.0)) {
-                debtorIndex++
+            if (debtorList.first().second.isEqualTo(0.0)) {
+                debtorList.removeAt(0)
             }
-            if (sortedCreditorsBalances[creditorIndex].isEqualTo(0.0)) {
-                creditorIndex++
+            if (creditorList.first().second.isEqualTo(0.0)) {
+                creditorList.removeAt(0)
             }
         }
 
