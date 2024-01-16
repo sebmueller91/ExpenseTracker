@@ -11,7 +11,8 @@ val uiModule = module {
     viewModel {
         GroupOverviewViewModel(
             databaseRepository = get(),
-            eventCost = get()
+            eventCost = get(),
+            localeAwareFormatter = get()
         )
     }
     viewModel { AddGroupViewModel(databaseRepository = get()) }
