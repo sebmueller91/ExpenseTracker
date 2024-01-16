@@ -5,13 +5,19 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,8 +27,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.expensetracker.R
+import com.example.expensetracker.model.Transaction
 import com.example.expensetracker.ui.components.AnimatedFloatingActionButton
 import com.example.expensetracker.ui.components.RoundFloatingActionButton
 import com.example.expensetracker.ui.components.ScreenWithAnimatedOverlay
@@ -48,18 +56,55 @@ fun SettleUpTab(
             modifier = Modifier.padding(paddingValues)
         ) {
             Box(
-                modifier = Modifier.padding(paddingValues),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
                 if (uiState.settleUpTransactions.isEmpty()) {
-                    Text("All group members are settled up.")
+                    Text(stringResource(R.string.all_group_members_are_settled_up))
                 } else {
-                    Text("TODO")
+                    SettleUpTransactions(uiState = uiState)
                 }
             }
         }
     }
+}
 
+@Composable
+private fun SettleUpTransactions(
+    uiState: GroupDetailUiState.Success,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(modifier = modifier) {
+        uiState.settleUpTransactions.entries.forEach { entry ->
+            item {
+                SettleUpTransactionCard(entry = entry, modifier = Modifier.fillMaxWidth())
+            }
+        }
+    }
+}
+
+@Composable
+private fun SettleUpTransactionCard(
+    entry: Map.Entry<Transaction.Transfer, String>,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.padding(vertical = 4.dp, horizontal = 12.dp),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 2.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = entry.value, style = MaterialTheme.typography.bodyLarge)
+            Spacer(modifier = Modifier.weight(1f))
+            Button(onClick = {}) {
+                Text("Mark done")
+            }
+        }
+    }
 }
 
 @Composable

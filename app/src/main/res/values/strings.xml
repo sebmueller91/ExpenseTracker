@@ -37,4 +37,5 @@
     <string name="paid_for">%1$s paid %2$s for %3$s</string>
     <string name="settle_up">Settle up</string>
     <string name="gives_to">%1$s gives %2$s to %3$s</string>
+    <string name="all_group_members_are_settled_up">All group members are settled up.</string>
 </resources>

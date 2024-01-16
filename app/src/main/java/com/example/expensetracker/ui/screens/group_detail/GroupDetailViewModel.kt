@@ -64,7 +64,7 @@ class GroupDetailViewModel(
                             formattedTransactions = group.transactions.map { it.format(group.currency) },
                             individualShares = individualPaymentAmount.execute(group),
                             percentageShares = individualPaymentPercentage.execute(group),
-                            settleUpTransactions = settleUp.execute(group).map { it.formatAsSettleUpTransfer(group.currency) }
+                            settleUpTransactions = settleUp.execute(group).associateWith { it.formatAsSettleUpTransfer(group.currency) }
                         )
                     }
                 }
@@ -75,9 +75,9 @@ class GroupDetailViewModel(
     private fun Transaction.Transfer.formatAsSettleUpTransfer(currency: Currency): String {
         return resourceResolver.getString(
             R.string.gives_to,
-            fromParticipant,
+            fromParticipant.name,
             localeAwareFormatter.formatMoneyAmount(amount, currency),
-            toParticipant
+            toParticipant.name
         )
     }
 
