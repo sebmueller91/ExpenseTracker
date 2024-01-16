@@ -1,4 +1,4 @@
-package com.example.expensetracker.ui.screens.group_detail
+package com.example.expensetracker.ui.screens.group_detail.data
 
 data class FormattedTransaction(
     val mainText: String,
