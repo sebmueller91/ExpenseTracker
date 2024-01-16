@@ -8,8 +8,10 @@ import com.example.expensetracker.util.getLocale
 import timber.log.Timber
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.text.DateFormat
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
+import java.util.Date
 import kotlin.math.roundToInt
 
 class UiUtils {
@@ -47,6 +49,12 @@ class UiUtils {
                     .joinToString(", ") { it.name }
                     .replaceLastOccurrenceOf(", ", context.getString(R.string.and))
             }
+        }
+
+        fun formatDate(date: Date, context: Context): String {
+            val locale = getLocale(context)
+            val formatter = DateFormat.getDateInstance(DateFormat.DEFAULT, locale)
+            return formatter.format(date)
         }
 
         private fun String.replaceLastOccurrenceOf(toReplace: String, replacement: String): String {

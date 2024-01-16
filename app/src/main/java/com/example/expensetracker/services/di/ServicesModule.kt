@@ -8,6 +8,10 @@ import com.example.expensetracker.services.IndividualPaymentAmount
 import com.example.expensetracker.services.IndividualPaymentAmountImpl
 import com.example.expensetracker.services.IndividualPaymentPercentage
 import com.example.expensetracker.services.IndividualPaymentPercentageImpl
+import com.example.expensetracker.services.LocaleAwareFormatter
+import com.example.expensetracker.services.LocaleAwareFormatterImpl
+import com.example.expensetracker.services.ResourceResolver
+import com.example.expensetracker.services.ResourceResolverImpl
 import com.example.expensetracker.services.SettleUp
 import com.example.expensetracker.services.SettleUpImpl
 import org.koin.dsl.module
@@ -29,4 +33,6 @@ val servicesModule = module {
             context = get()
         )
     }
+    factory<ResourceResolver> { ResourceResolverImpl(context = get()) }
+    factory<LocaleAwareFormatter> {LocaleAwareFormatterImpl(context = get()) }
 }

@@ -33,7 +33,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.expensetracker.R
-import com.example.expensetracker.model.Participant
 import com.example.expensetracker.ui.components.NavigationIcon
 import com.example.expensetracker.ui.screens.destinations.GroupOverviewScreenDestination
 import com.example.expensetracker.ui.screens.group_detail.tabs.ExpensesTab
@@ -56,18 +55,12 @@ fun GroupDetailScreen(
 
     GroupDetailScreen(
         uiStateFlow = viewModel.uiStateFlow.collectAsStateWithLifecycle(),
-        eventCostFlow = viewModel.eventCostsFlow.collectAsStateWithLifecycle(),
-        individualSharesFlow = viewModel.individualSharesFlow.collectAsStateWithLifecycle(),
-        percentageSharesFlow = viewModel.percentageSharesFlow.collectAsStateWithLifecycle(),
         onLeave = { navigator.navigate(GroupOverviewScreenDestination()) })
 }
 
 @Composable
 private fun GroupDetailScreen(
     uiStateFlow: State<GroupDetailUiState>,
-    eventCostFlow: State<Double>,
-    individualSharesFlow: State<Map<Participant, Double>>,
-    percentageSharesFlow: State<Map<Participant, Double>>,
     onLeave: () -> Unit
 ) {
     BackHandler(onBack = onLeave)
@@ -84,9 +77,6 @@ private fun GroupDetailScreen(
 
             is GroupDetailUiState.Success -> {
                 GroupDetailScreenContent(
-                    eventCostFlow = eventCostFlow,
-                    individualSharesFlow = individualSharesFlow,
-                    percentageSharesFlow = percentageSharesFlow,
                     uiState = uiState,
                     onLeave = onLeave
                 )
@@ -99,9 +89,6 @@ private fun GroupDetailScreen(
 @Composable
 private fun GroupDetailScreenContent(
     uiState: GroupDetailUiState.Success,
-    eventCostFlow: State<Double>,
-    individualSharesFlow: State<Map<Participant, Double>>,
-    percentageSharesFlow: State<Map<Participant, Double>>,
     onLeave: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -147,17 +134,9 @@ private fun GroupDetailScreenContent(
                 .padding(innerPadding)
         ) { page ->
             when (GroupDetailScreenTabs.entries[page]) {
-                GroupDetailScreenTabs.EXPENSES -> ExpensesTab(
-                    transactions = uiState.group.transactions,
-                    currency = uiState.group.currency
-                )
-                GroupDetailScreenTabs.STATISTICS -> StatisticsTab(
-                    group = uiState.group,
-                    eventCostFlow = eventCostFlow,
-                    individualSharesFlow = individualSharesFlow,
-                    percentageSharesFlow = percentageSharesFlow
-                )
-                GroupDetailScreenTabs.SETTLE_UP -> SettleUpTab(group = uiState.group)
+                GroupDetailScreenTabs.EXPENSES -> ExpensesTab(uiState)
+                GroupDetailScreenTabs.STATISTICS -> StatisticsTab(uiState)
+                GroupDetailScreenTabs.SETTLE_UP -> SettleUpTab(uiState)
             }
         }
     }

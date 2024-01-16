@@ -7,12 +7,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreHoriz
-import androidx.compose.material.icons.filled.Payment
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -25,12 +23,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.expensetracker.R
-import com.example.expensetracker.model.Group
 import com.example.expensetracker.ui.components.AnimatedFloatingActionButton
+import com.example.expensetracker.ui.components.RoundFloatingActionButton
 import com.example.expensetracker.ui.components.ScreenWithAnimatedOverlay
+import com.example.expensetracker.ui.screens.group_detail.GroupDetailUiState
 
 @Composable
-fun SettleUpTab(group: Group, modifier: Modifier = Modifier) {
+fun SettleUpTab(
+    uiState: GroupDetailUiState.Success,
+    modifier: Modifier = Modifier
+) {
     var fabExpanded by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -49,10 +51,15 @@ fun SettleUpTab(group: Group, modifier: Modifier = Modifier) {
                 modifier = Modifier.padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
-                Text("Overview")
+                if (uiState.settleUpTransactions.isEmpty()) {
+                    Text("All group members are settled up.")
+                } else {
+                    Text("TODO")
+                }
             }
         }
     }
+
 }
 
 @Composable
@@ -76,8 +83,8 @@ private fun ExpandableOverviewFabs(
         Spacer(Modifier.height(20.dp))
         AnimatedFloatingActionButton(
             visible = fabExpanded,
-            icon = Icons.Filled.Payment,
-            labelId = R.string.add_expense,
+            icon = Icons.Filled.Person,
+            labelId = R.string.add_group_member,
             animationDelayEnter = 0,
             animationDelayExit = animationDelay
         ) {
@@ -86,7 +93,7 @@ private fun ExpandableOverviewFabs(
         Spacer(Modifier.height(20.dp))
         Row {
             Spacer(Modifier.weight(1f))
-            FloatingActionButton(onClick = expandCollapseFab, shape = CircleShape) {
+            RoundFloatingActionButton(onClick = expandCollapseFab) {
                 Icon(
                     Icons.Filled.MoreHoriz,
                     contentDescription = null
