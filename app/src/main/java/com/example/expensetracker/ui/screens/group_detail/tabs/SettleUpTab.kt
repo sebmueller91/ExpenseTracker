@@ -1,5 +1,6 @@
 package com.example.expensetracker.ui.screens.group_detail.tabs
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Share
@@ -59,7 +61,7 @@ fun SettleUpTab(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.TopStart
             ) {
                 if (uiState.settleUpTransactions.isEmpty()) {
                     Text(stringResource(R.string.all_group_members_are_settled_up))
@@ -91,17 +93,25 @@ private fun SettleUpTransactionCard(
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier.padding(vertical = 4.dp, horizontal = 12.dp),
+        modifier = modifier.padding(vertical = 6.dp, horizontal = 8.dp),
         shape = RoundedCornerShape(16.dp)
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 2.dp),
+            modifier = Modifier.padding(start = 8.dp, end = 4.dp).padding(vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(text = entry.value, style = MaterialTheme.typography.bodyLarge)
             Spacer(modifier = Modifier.weight(1f))
-            Button(onClick = {}) {
-                Text("Mark done")
+            Button(onClick = {
+                // TODO
+            }) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Icon(imageVector = Icons.Filled.Done, contentDescription = null, Modifier.height(15.dp))
+                    Text("Mark done", style = MaterialTheme.typography.labelSmall)
+                }
             }
         }
     }
