@@ -243,7 +243,7 @@ private val pieChartColors = listOf(
     Color(128, 203, 196, 255), // Aqua Green
     Color(159, 121, 238, 255), // Muted Violet
     Color(255, 179, 71, 255),  // Pastel Orange
-    Color(111, 207, 151, 255), // Seafoam Green
+    Color(111, 207, 151, 255), // Sea foam Green
     Color(112, 128, 144, 255), // Slate Gray
     Color(255, 218, 185, 255), // Peach
     Color(54, 117, 136, 255),  // Teal
