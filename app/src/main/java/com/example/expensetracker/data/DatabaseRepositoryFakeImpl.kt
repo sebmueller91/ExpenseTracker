@@ -2,6 +2,7 @@ package com.example.expensetracker.data
 
 import com.example.expensetracker.model.Currency
 import com.example.expensetracker.model.Group
+import com.example.expensetracker.model.Transaction
 import com.example.expensetracker.util.FakeData.Companion.createFakeExpense
 import com.example.expensetracker.util.FakeData.Companion.createFakeIncome
 import com.example.expensetracker.util.FakeData.Companion.createFakePayment
@@ -68,6 +69,10 @@ class DatabaseRepositoryFakeImpl : DatabaseRepository {
             newList.add(group)
             newList.toList()
         }
+    }
+
+    override fun addTransaction(group: Group, transaction: Transaction) {
+        TODO("Not yet implemented")
     }
 
     override suspend fun getGroup(groupId: UUID): Group? {

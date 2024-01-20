@@ -1,5 +1,8 @@
 package com.example.expensetracker.ui.screens.group_detail.tabs
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,6 +41,7 @@ import com.example.expensetracker.ui.components.AnimatedFloatingActionButton
 import com.example.expensetracker.ui.components.RoundFloatingActionButton
 import com.example.expensetracker.ui.components.ScreenWithAnimatedOverlay
 import com.example.expensetracker.ui.screens.group_detail.GroupDetailUiState
+import kotlinx.coroutines.delay
 
 @Composable
 fun SettleUpTab(
@@ -78,10 +83,14 @@ private fun SettleUpTransactions(
     uiState: GroupDetailUiState.Success,
     modifier: Modifier = Modifier
 ) {
+    var settleUpTransactions by remember { mutableStateOf(uiState.settleUpTransactions) }
+
     LazyColumn(modifier = modifier) {
         uiState.settleUpTransactions.entries.forEach { entry ->
             item {
-                SettleUpTransactionCard(entry = entry, modifier = Modifier.fillMaxWidth())
+                SettleUpTransactionCard(entry = entry, modifier = Modifier.fillMaxWidth()) {
+                    settleUpTransactions -= entry.key
+                }
             }
         }
     }
@@ -90,29 +99,54 @@ private fun SettleUpTransactions(
 @Composable
 private fun SettleUpTransactionCard(
     entry: Map.Entry<Transaction.Transfer, String>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onDismissed: () -> Unit
 ) {
+    val animationDuration = 1000
+    var isVisible by remember { mutableStateOf(true) }
+
     Card(
-        modifier = modifier.padding(vertical = 6.dp, horizontal = 8.dp),
-        shape = RoundedCornerShape(16.dp)
+        modifier = modifier
+            .animateContentSize(
+                animationSpec = tween(
+                    durationMillis = animationDuration,
+                    easing = LinearOutSlowInEasing
+                )
+            )
+            .height(if (isVisible) 70.dp else 0.dp)
+            .padding(vertical = 6.dp, horizontal = 8.dp),
+        shape = RoundedCornerShape(16.dp),
     ) {
         Row(
-            modifier = Modifier.padding(start = 8.dp, end = 4.dp).padding(vertical = 4.dp),
+            modifier = Modifier
+                .padding(start = 8.dp, end = 4.dp)
+                .padding(vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(text = entry.value, style = MaterialTheme.typography.bodyLarge)
             Spacer(modifier = Modifier.weight(1f))
             Button(onClick = {
-                // TODO
+                isVisible = false
             }) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Icon(imageVector = Icons.Filled.Done, contentDescription = null, Modifier.height(15.dp))
+                    Icon(
+                        imageVector = Icons.Filled.Done,
+                        contentDescription = null,
+                        Modifier.height(15.dp)
+                    )
                     Text("Mark done", style = MaterialTheme.typography.labelSmall)
                 }
             }
+        }
+    }
+
+    LaunchedEffect(key1 = isVisible) {
+        if (isVisible) {
+            delay(animationDuration.toLong())
+            onDismissed()
         }
     }
 }

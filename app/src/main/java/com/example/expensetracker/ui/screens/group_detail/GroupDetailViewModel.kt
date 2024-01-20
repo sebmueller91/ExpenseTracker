@@ -14,11 +14,7 @@ import com.example.expensetracker.services.ResourceResolver
 import com.example.expensetracker.services.SettleUp
 import com.example.expensetracker.ui.screens.group_detail.data.FormattedTransaction
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -36,19 +32,6 @@ class GroupDetailViewModel(
     private var _uiState = MutableStateFlow<GroupDetailUiState>(GroupDetailUiState.Loading)
     val uiStateFlow = _uiState.asStateFlow()
 
-    val eventCostsFlow: StateFlow<Double> = _uiState.map {
-        when (val uiState = it) {
-            is GroupDetailUiState.Error,
-            is GroupDetailUiState.Loading -> 0.0
-
-            is GroupDetailUiState.Success -> eventCost.execute(uiState.group.transactions)
-        }
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(),
-        initialValue = 0.0
-    )
-
     init {
         viewModelScope.launch {
             when (val group = databaseRepository.getGroup(groupId)) {
@@ -64,12 +47,27 @@ class GroupDetailViewModel(
                             formattedTransactions = group.transactions.map { it.format(group.currency) },
                             individualShares = individualPaymentAmount.execute(group),
                             percentageShares = individualPaymentPercentage.execute(group),
-                            settleUpTransactions = settleUp.execute(group).associateWith { it.formatAsSettleUpTransfer(group.currency) }
+                            settleUpTransactions = settleUp.execute(group)
+                                .associateWith { it.formatAsSettleUpTransfer(group.currency) }
                         )
                     }
                 }
             }
         }
+    }
+
+    fun applySettleUpTransaction(transfer: Transaction.Transfer) {
+        _uiState.update {
+            when (val uiState = it) {
+                GroupDetailUiState.Error -> uiState
+                GroupDetailUiState.Loading -> uiState
+                is GroupDetailUiState.Success -> {
+                    val settleUpTransactions = uiState.settleUpTransactions - transfer
+                    uiState.copy()
+                }
+            }
+        }
+
     }
 
     private fun Transaction.Transfer.formatAsSettleUpTransfer(currency: Currency): String {
