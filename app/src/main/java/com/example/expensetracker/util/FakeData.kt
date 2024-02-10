@@ -20,7 +20,8 @@ class FakeData {
             Participant("Lisa"),
             Participant("BLisa"),
             Participant("Alex"),
-            Participant("Eli")
+            Participant("Eli"),
+            Participant("Participant with very long name")
         )
 
         fun createFakeExpense(
