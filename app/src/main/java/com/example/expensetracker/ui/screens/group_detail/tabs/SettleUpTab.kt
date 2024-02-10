@@ -45,8 +45,9 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun SettleUpTab(
+    modifier: Modifier = Modifier,
     uiState: GroupDetailUiState.Success,
-    modifier: Modifier = Modifier
+    applySettleUpTransaction: (Transaction.Transfer) -> Unit
 ) {
     var fabExpanded by remember { mutableStateOf(false) }
 
@@ -71,7 +72,7 @@ fun SettleUpTab(
                 if (uiState.settleUpTransactions.isEmpty()) {
                     Text(stringResource(R.string.all_group_members_are_settled_up))
                 } else {
-                    SettleUpTransactions(uiState = uiState)
+                    SettleUpTransactions(uiState = uiState, applySettleUpTransaction = applySettleUpTransaction)
                 }
             }
         }
@@ -80,15 +81,16 @@ fun SettleUpTab(
 
 @Composable
 private fun SettleUpTransactions(
+    modifier: Modifier = Modifier,
     uiState: GroupDetailUiState.Success,
-    modifier: Modifier = Modifier
+    applySettleUpTransaction: (Transaction.Transfer) -> Unit
 ) {
     var settleUpTransactions by remember { mutableStateOf(uiState.settleUpTransactions) }
 
     LazyColumn(modifier = modifier) {
         uiState.settleUpTransactions.entries.forEach { entry ->
             item {
-                SettleUpTransactionCard(entry = entry, modifier = Modifier.fillMaxWidth()) {
+                SettleUpTransactionCard(entry = entry, modifier = Modifier.fillMaxWidth(), applySettleUpTransaction = applySettleUpTransaction) {
                     settleUpTransactions -= entry.key
                 }
             }
@@ -100,6 +102,7 @@ private fun SettleUpTransactions(
 private fun SettleUpTransactionCard(
     entry: Map.Entry<Transaction.Transfer, String>,
     modifier: Modifier = Modifier,
+    applySettleUpTransaction: (Transaction.Transfer) -> Unit,
     onDismissed: () -> Unit
 ) {
     val animationDuration = 1000
@@ -127,6 +130,7 @@ private fun SettleUpTransactionCard(
             Spacer(modifier = Modifier.weight(1f))
             Button(onClick = {
                 isVisible = false
+                applySettleUpTransaction(entry.key)
             }) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -137,7 +141,7 @@ private fun SettleUpTransactionCard(
                         contentDescription = null,
                         Modifier.height(15.dp)
                     )
-                    Text("Mark done", style = MaterialTheme.typography.labelSmall)
+                    Text(stringResource(R.string.mark_done), style = MaterialTheme.typography.labelSmall)
                 }
             }
         }

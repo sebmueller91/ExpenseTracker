@@ -58,17 +58,7 @@ class GroupDetailViewModel(
     }
 
     fun applySettleUpTransaction(transfer: Transaction.Transfer) {
-        _uiState.update {
-            when (val uiState = it) {
-                GroupDetailUiState.Error -> uiState
-                GroupDetailUiState.Loading -> uiState
-                is GroupDetailUiState.Success -> {
-                    val settleUpTransactions = uiState.settleUpTransactions - transfer
-                    uiState.copy()
-                }
-            }
-        }
-
+        databaseRepository.addTransaction(groupId = groupId, transaction = transfer)
     }
 
     private fun Transaction.Transfer.formatAsSettleUpTransfer(currency: Currency): String {

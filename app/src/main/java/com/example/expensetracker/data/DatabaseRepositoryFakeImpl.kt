@@ -71,8 +71,14 @@ class DatabaseRepositoryFakeImpl : DatabaseRepository {
         }
     }
 
-    override fun addTransaction(group: Group, transaction: Transaction) {
-        TODO("Not yet implemented")
+    override fun addTransaction(groupId: UUID, transaction: Transaction) {
+        val groupIndex = _groups.value.indexOfFirst { it.id == groupId }
+        val group = _groups.value[groupIndex]
+        val updatedGroup = group.copy(transactions = group.transactions + transaction)
+        val updatedGroups = _groups.value.toMutableList().apply {
+            this[groupIndex] = updatedGroup
+        }
+        _groups.value = updatedGroups
     }
 
     override suspend fun getGroup(groupId: UUID): Group? {
