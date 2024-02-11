@@ -39,41 +39,41 @@ class SettleUpImpl(
     }
 
     private fun balanceUpParticipants(
-        debtors: Map<Participant, Double>,
-        creditors: Map<Participant, Double>,
+        debtors: List<ParticipantBalance>,
+        creditors: List<ParticipantBalance>,
     ): List<Transaction.Transfer> {
         val transactions = mutableListOf<Transaction.Transfer>()
 
-        val debtorList = debtors.map { it.key to it.value }.toMutableList()
-        val creditorList = creditors.map { it.key to it.value }.toMutableList()
+        val mutableDebtorList = debtors.toMutableList()
+        val mutableCreditorList = creditors.toMutableList()
 
-        while (debtorList.isNotEmpty() && creditorList.isNotEmpty()) {
-            debtorList.sortBy { it.second }
-            creditorList.sortByDescending { it.second }
+        while (mutableDebtorList.isNotEmpty() && mutableCreditorList.isNotEmpty()) {
+            mutableDebtorList.sortBy { it.balance }
+            mutableCreditorList.sortByDescending { it.balance }
 
-            val currentDebtor = debtorList.first()
-            val currentCreditor = creditorList.first()
+            val currentDebtor = mutableDebtorList.first()
+            val currentCreditor = mutableCreditorList.first()
 
-            val amount = min(-currentDebtor.second, currentCreditor.second)
+            val amount = min(-currentDebtor.balance, currentCreditor.balance)
 
             transactions.add(
                 Transaction.Transfer(
-                    fromParticipant = currentDebtor.first,
-                    toParticipant = currentCreditor.first,
+                    fromParticipant = currentDebtor.participant,
+                    toParticipant = currentCreditor.participant,
                     purpose = context.getString(R.string.settle_up),
                     amount = amount,
                     date = Date()
                 )
             )
 
-            debtorList[0] = currentDebtor.first to (currentDebtor.second + amount)
-            creditorList[0] = currentCreditor.first to (currentCreditor.second - amount)
+            mutableDebtorList[0] = currentDebtor.copy(balance = currentDebtor.balance + amount)
+            mutableCreditorList[0] = currentCreditor.copy(balance = currentCreditor.balance - amount)
 
-            if (debtorList.first().second.isEqualTo(0.0)) {
-                debtorList.removeAt(0)
+            if (mutableDebtorList.first().balance.isEqualTo(0.0)) {
+                mutableDebtorList.removeAt(0)
             }
-            if (creditorList.first().second.isEqualTo(0.0)) {
-                creditorList.removeAt(0)
+            if (mutableCreditorList.first().balance.isEqualTo(0.0)) {
+                mutableCreditorList.removeAt(0)
             }
         }
 
@@ -83,8 +83,17 @@ class SettleUpImpl(
     private fun calculateBalances(
         payments: Map<Participant, Double>,
         costs: Map<Participant, Double>
-    ) = payments.keys.associateWith { participant -> payments[participant]!! - costs[participant]!! }
+    ) =
+        payments.keys.associateWith { participant -> payments[participant]!! - costs[participant]!! }
 
-    private fun Map<Participant, Double>.getCreditors() = filter { it.value.isBiggerThan(0.0) }
-    private fun Map<Participant, Double>.getDebtors() = filter { it.value.isSmallerThan(0.0) }
+    private fun Map<Participant, Double>.getCreditors() = filter { it.value.isBiggerThan(0.0) }.toList()
+    private fun Map<Participant, Double>.getDebtors() = filter { it.value.isSmallerThan(0.0) }.toList()
+
+    private fun Map<Participant, Double>.toList() =
+        map { ParticipantBalance(participant = it.key, balance = it.value) }
 }
+
+private data class ParticipantBalance(
+    val participant: Participant,
+    val balance: Double
+)
