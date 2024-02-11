@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.expensetracker.R
 import com.example.expensetracker.data.DatabaseRepository
 import com.example.expensetracker.model.Currency
-import com.example.expensetracker.model.Participant
 import com.example.expensetracker.model.Transaction
 import com.example.expensetracker.services.EventCosts
 import com.example.expensetracker.services.IndividualPaymentAmount
@@ -14,10 +13,10 @@ import com.example.expensetracker.services.LocaleAwareFormatter
 import com.example.expensetracker.services.ResourceResolver
 import com.example.expensetracker.services.SettleUp
 import com.example.expensetracker.ui.screens.group_detail.data.FormattedTransaction
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import java.util.UUID
 
 class GroupDetailViewModel(
@@ -30,32 +29,22 @@ class GroupDetailViewModel(
     private val resourceResolver: ResourceResolver,
     private val localeAwareFormatter: LocaleAwareFormatter
 ) : ViewModel() {
-    private var _uiState = MutableStateFlow<GroupDetailUiState>(GroupDetailUiState.Loading)
-    val uiStateFlow = _uiState.asStateFlow()
-
-    init {
-        viewModelScope.launch {
-            when (val group = databaseRepository.getGroup(groupId)) {
-                null -> {
-                    _uiState.update { GroupDetailUiState.Error }
-                }
-
-                else -> {
-                    _uiState.update {
-                        GroupDetailUiState.Success(
-                            group = group,
-                            eventCosts = eventCost.execute(group.transactions),
-                            formattedTransactions = group.transactions.map { it.format(group.currency) },
-                            individualShares = individualPaymentAmount.execute(group),
-                            percentageShares = individualPaymentPercentage.execute(group),
-                            settleUpTransactions = settleUp.execute(group)
-                                .associateWith { it.formatAsSettleUpTransfer(group.currency) }
-                        )
-                    }
-                }
-            }
+    val uiStateFlow: StateFlow<GroupDetailUiState> = databaseRepository.groups.map {
+        it.firstOrNull { it.id == groupId }
+    }.map { group ->
+        when (group) {
+            null -> GroupDetailUiState.Error
+            else -> GroupDetailUiState.Success(
+                group = group,
+                eventCosts = eventCost.execute(group.transactions),
+                formattedTransactions = group.transactions.map { it.format(group.currency) },
+                individualShares = individualPaymentAmount.execute(group),
+                percentageShares = individualPaymentPercentage.execute(group),
+                settleUpTransactions = settleUp.execute(group)
+                    .associateWith { it.formatAsSettleUpTransfer(group.currency) }
+            )
         }
-    }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, GroupDetailUiState.Loading)
 
     fun applySettleUpTransaction(transfer: Transaction.Transfer) {
         databaseRepository.addTransaction(groupId = groupId, transaction = transfer)
@@ -125,9 +114,5 @@ class GroupDetailViewModel(
             date = date,
             splitBetween = splitBetween
         )
-    }
-
-    private fun Map<Participant, Double>.sortByValueDescending(): Map<Participant, Double> {
-        return toList().sortedByDescending { (_, value) -> value }.toMap()
     }
 }
