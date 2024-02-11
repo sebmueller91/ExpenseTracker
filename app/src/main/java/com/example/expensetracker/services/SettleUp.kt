@@ -67,14 +67,10 @@ class SettleUpImpl(
             )
 
             mutableDebtorList[0] = currentDebtor.copy(balance = currentDebtor.balance + amount)
-            mutableCreditorList[0] = currentCreditor.copy(balance = currentCreditor.balance - amount)
+            mutableDebtorList.removeIfBalanceZero(0)
 
-            if (mutableDebtorList.first().balance.isEqualTo(0.0)) {
-                mutableDebtorList.removeAt(0)
-            }
-            if (mutableCreditorList.first().balance.isEqualTo(0.0)) {
-                mutableCreditorList.removeAt(0)
-            }
+            mutableCreditorList[0] = currentCreditor.copy(balance = currentCreditor.balance - amount)
+            mutableCreditorList.removeIfBalanceZero(0)
         }
 
         return transactions
@@ -87,10 +83,17 @@ class SettleUpImpl(
         payments.keys.associateWith { participant -> payments[participant]!! - costs[participant]!! }
 
     private fun Map<Participant, Double>.getCreditors() = filter { it.value.isBiggerThan(0.0) }.toList()
+
     private fun Map<Participant, Double>.getDebtors() = filter { it.value.isSmallerThan(0.0) }.toList()
 
     private fun Map<Participant, Double>.toList() =
         map { ParticipantBalance(participant = it.key, balance = it.value) }
+
+    private fun MutableList<ParticipantBalance>.removeIfBalanceZero(index: Int) = this.apply {
+        if (this[index].balance.isEqualTo(0.0)) {
+            removeAt(index)
+        }
+    }
 }
 
 private data class ParticipantBalance(
