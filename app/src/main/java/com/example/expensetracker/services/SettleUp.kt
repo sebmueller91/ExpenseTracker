@@ -12,6 +12,8 @@ import timber.log.Timber
 import java.util.Date
 import kotlin.math.min
 
+private const val EXPLORATION_DEPTH = 3
+
 interface SettleUp {
     fun execute(group: Group): List<Transaction.Transfer>
 }
@@ -30,53 +32,115 @@ class SettleUpImpl(
             return emptyList()
         }
 
-        val balances =
-            payments.keys.associateWith { participant -> payments[participant]!! - costs[participant]!! }
+        val balances = calculateBalances(payments, costs)
 
-        val debtors = balances.filter { it.value.isSmallerThan(0.0)}
-        val creditors = balances.filter { it.value.isBiggerThan(0.0) }
+        val debtors = balances.getDebtors()
+        val creditors = balances.getCreditors()
 
-        return balanceUpParticipants(debtors = debtors, creditors = creditors, context = context)
+        return balanceUpParticipants(
+            debtors = debtors,
+            creditors = creditors,
+            transactions = listOf()
+        )
     }
 
     private fun balanceUpParticipants(
-        debtors: Map<Participant, Double>,
-        creditors: Map<Participant, Double>,
-        context: Context
+        debtors: List<ParticipantBalance>,
+        creditors: List<ParticipantBalance>,
+        transactions: List<Transaction.Transfer>
     ): List<Transaction.Transfer> {
-        val transactions = mutableListOf<Transaction.Transfer>()
+        if (debtors.isEmpty() && creditors.isNotEmpty() || debtors.isNotEmpty() && creditors.isEmpty()) {
+            Timber.e("Invalid state when balancing up participants. Creditor size is ${creditors.size} and debtors size is ${debtors.size}!")
+            return listOf()
+        } else if (debtors.isEmpty() && creditors.isEmpty()) {
+            return transactions
+        }
 
-        val debtorList = debtors.map { it.key to it.value }.toMutableList()
-        val creditorList = creditors.map { it.key to it.value }.toMutableList()
+        val sortedDebtors =
+            debtors.sortedWith(compareBy<ParticipantBalance> { it.balance }.thenBy { it.participant.id })
+        val sortedCreditors =
+            creditors.sortedWith(compareBy<ParticipantBalance> { it.balance }.thenBy { it.participant.id })
 
-        while (debtorList.isNotEmpty() && creditorList.isNotEmpty()) {
-            debtorList.sortBy { it.second }
-            creditorList.sortByDescending { it.second }
+        val transactionOptions = mutableListOf<List<Transaction.Transfer>>()
+        sortedDebtors.take(EXPLORATION_DEPTH).forEachIndexed { debtorIndex, debtor ->
+            sortedCreditors.take(EXPLORATION_DEPTH).forEachIndexed { creditorIndex, creditor ->
+                val currentTransactions = transactions.toMutableList()
+                val currentDebtors = sortedDebtors.toMutableList()
+                val currentCreditors = sortedCreditors.toMutableList()
 
-            val currentDebtor = debtorList.first()
-            val currentCreditor = creditorList.first()
+                val transaction =
+                    currentTransactions.addSettleUpTransaction(debtor = debtor, creditor = creditor)
+                currentDebtors.applyPositiveTransaction(debtorIndex, transaction)
+                currentCreditors.applyNegativeTransaction(creditorIndex, transaction)
 
-            val amount = min(-currentDebtor.second, currentCreditor.second)
+                transactionOptions.add(
+                    balanceUpParticipants(
+                        debtors = currentDebtors,
+                        creditors = currentCreditors,
+                        transactions = currentTransactions
+                    )
+                )
+            }
+        }
+        return transactionOptions.minBy { it.size }
+    }
 
-            transactions.add(Transaction.Transfer(
-                fromParticipant = currentDebtor.first,
-                toParticipant = currentCreditor.first,
+    private fun calculateBalances(
+        payments: Map<Participant, Double>,
+        costs: Map<Participant, Double>
+    ) =
+        payments.keys.associateWith { participant -> payments[participant]!! - costs[participant]!! }
+
+    private fun Map<Participant, Double>.getCreditors() =
+        filter { it.value.isBiggerThan(0.0) }.toList()
+
+    private fun Map<Participant, Double>.getDebtors() =
+        filter { it.value.isSmallerThan(0.0) }.toList()
+
+    private fun Map<Participant, Double>.toList() =
+        map { ParticipantBalance(participant = it.key, balance = it.value) }
+
+    private fun MutableList<ParticipantBalance>.removeIfBalanceZero(index: Int) = this.apply {
+        if (this[index].balance.isEqualTo(0.0)) {
+            removeAt(index)
+        }
+    }
+
+    private fun MutableList<Transaction.Transfer>.addSettleUpTransaction(
+        debtor: ParticipantBalance,
+        creditor: ParticipantBalance
+    ): Transaction.Transfer {
+        val amount = min(-debtor.balance, creditor.balance)
+        add(
+            Transaction.Transfer(
+                fromParticipant = debtor.participant,
+                toParticipant = creditor.participant,
                 purpose = context.getString(R.string.settle_up),
                 amount = amount,
                 date = Date()
-            ))
+            )
+        )
+        return last()
+    }
 
-            debtorList[0] = currentDebtor.first to (currentDebtor.second + amount)
-            creditorList[0] = currentCreditor.first to (currentCreditor.second - amount)
+    private fun MutableList<ParticipantBalance>.applyPositiveTransaction(
+        index: Int,
+        transaction: Transaction
+    ) {
+        this[index] = this[index].copy(balance = this[index].balance + transaction.amount)
+        this.removeIfBalanceZero(index)
+    }
 
-            if (debtorList.first().second.isEqualTo(0.0)) {
-                debtorList.removeAt(0)
-            }
-            if (creditorList.first().second.isEqualTo(0.0)) {
-                creditorList.removeAt(0)
-            }
-        }
-
-        return transactions
+    private fun MutableList<ParticipantBalance>.applyNegativeTransaction(
+        index: Int,
+        transaction: Transaction
+    ) {
+        this[index] = this[index].copy(balance = this[index].balance - transaction.amount)
+        this.removeIfBalanceZero(index)
     }
 }
+
+private data class ParticipantBalance(
+    val participant: Participant,
+    val balance: Double
+)
