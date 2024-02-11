@@ -30,19 +30,17 @@ class SettleUpImpl(
             return emptyList()
         }
 
-        val balances =
-            payments.keys.associateWith { participant -> payments[participant]!! - costs[participant]!! }
+        val balances = calculateBalances(payments, costs)
 
-        val debtors = balances.filter { it.value.isSmallerThan(0.0)}
-        val creditors = balances.filter { it.value.isBiggerThan(0.0) }
+        val debtors = balances.getDebtors()
+        val creditors = balances.getCreditors()
 
-        return balanceUpParticipants(debtors = debtors, creditors = creditors, context = context)
+        return balanceUpParticipants(debtors = debtors, creditors = creditors)
     }
 
     private fun balanceUpParticipants(
         debtors: Map<Participant, Double>,
         creditors: Map<Participant, Double>,
-        context: Context
     ): List<Transaction.Transfer> {
         val transactions = mutableListOf<Transaction.Transfer>()
 
@@ -58,13 +56,15 @@ class SettleUpImpl(
 
             val amount = min(-currentDebtor.second, currentCreditor.second)
 
-            transactions.add(Transaction.Transfer(
-                fromParticipant = currentDebtor.first,
-                toParticipant = currentCreditor.first,
-                purpose = context.getString(R.string.settle_up),
-                amount = amount,
-                date = Date()
-            ))
+            transactions.add(
+                Transaction.Transfer(
+                    fromParticipant = currentDebtor.first,
+                    toParticipant = currentCreditor.first,
+                    purpose = context.getString(R.string.settle_up),
+                    amount = amount,
+                    date = Date()
+                )
+            )
 
             debtorList[0] = currentDebtor.first to (currentDebtor.second + amount)
             creditorList[0] = currentCreditor.first to (currentCreditor.second - amount)
@@ -79,4 +79,12 @@ class SettleUpImpl(
 
         return transactions
     }
+
+    private fun calculateBalances(
+        payments: Map<Participant, Double>,
+        costs: Map<Participant, Double>
+    ) = payments.keys.associateWith { participant -> payments[participant]!! - costs[participant]!! }
+
+    private fun Map<Participant, Double>.getCreditors() = filter { it.value.isBiggerThan(0.0) }
+    private fun Map<Participant, Double>.getDebtors() = filter { it.value.isSmallerThan(0.0) }
 }
