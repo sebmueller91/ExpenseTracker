@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -70,9 +72,14 @@ fun SettleUpTab(
                 contentAlignment = Alignment.TopStart
             ) {
                 if (uiState.settleUpTransactions.isEmpty()) {
-                    Text(stringResource(R.string.all_group_members_are_settled_up))
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(stringResource(R.string.all_group_members_are_settled_up))
+                    }
                 } else {
-                    SettleUpTransactions(uiState = uiState, applySettleUpTransaction = applySettleUpTransaction)
+                    SettleUpTransactions(
+                        uiState = uiState,
+                        applySettleUpTransaction = applySettleUpTransaction
+                    )
                 }
             }
         }
@@ -85,14 +92,14 @@ private fun SettleUpTransactions(
     uiState: GroupDetailUiState.Success,
     applySettleUpTransaction: (Transaction.Transfer) -> Unit
 ) {
-    var settleUpTransactions by remember { mutableStateOf(uiState.settleUpTransactions) }
-
     LazyColumn(modifier = modifier) {
         uiState.settleUpTransactions.entries.forEach { entry ->
             item {
-                SettleUpTransactionCard(entry = entry, modifier = Modifier.fillMaxWidth(), applySettleUpTransaction = applySettleUpTransaction) {
-                    settleUpTransactions -= entry.key
-                }
+                SettleUpTransactionCard(
+                    entry = entry,
+                    modifier = Modifier.fillMaxWidth(),
+                    applySettleUpTransaction = applySettleUpTransaction
+                )
             }
         }
     }
@@ -102,8 +109,7 @@ private fun SettleUpTransactions(
 private fun SettleUpTransactionCard(
     entry: Map.Entry<Transaction.Transfer, String>,
     modifier: Modifier = Modifier,
-    applySettleUpTransaction: (Transaction.Transfer) -> Unit,
-    onDismissed: () -> Unit
+    applySettleUpTransaction: (Transaction.Transfer) -> Unit
 ) {
     val animationDuration = 1000
     var isVisible by remember { mutableStateOf(true) }
@@ -126,11 +132,18 @@ private fun SettleUpTransactionCard(
                 .padding(vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = entry.value, style = MaterialTheme.typography.bodyLarge)
-            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = entry.value,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .wrapContentWidth(Alignment.Start)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
             Button(onClick = {
                 isVisible = false
-                applySettleUpTransaction(entry.key)
+
             }) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -139,18 +152,21 @@ private fun SettleUpTransactionCard(
                     Icon(
                         imageVector = Icons.Filled.Done,
                         contentDescription = null,
-                        Modifier.height(15.dp)
+                        modifier = Modifier.height(15.dp)
                     )
-                    Text(stringResource(R.string.mark_done), style = MaterialTheme.typography.labelSmall)
+                    Text(
+                        stringResource(R.string.mark_done),
+                        style = MaterialTheme.typography.labelSmall
+                    )
                 }
             }
         }
     }
 
     LaunchedEffect(key1 = isVisible) {
-        if (isVisible) {
+        if (!isVisible) {
             delay(animationDuration.toLong())
-            onDismissed()
+            applySettleUpTransaction(entry.key)
         }
     }
 }
