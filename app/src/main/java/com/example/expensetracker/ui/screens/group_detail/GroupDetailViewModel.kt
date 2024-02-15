@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.expensetracker.R
 import com.example.expensetracker.data.DatabaseRepository
 import com.example.expensetracker.model.Currency
+import com.example.expensetracker.model.Participant
 import com.example.expensetracker.model.Transaction
 import com.example.expensetracker.services.EventCosts
 import com.example.expensetracker.services.IndividualPaymentAmount
@@ -38,8 +39,8 @@ class GroupDetailViewModel(
                 group = group,
                 eventCosts = eventCost.execute(group.transactions),
                 formattedTransactions = group.transactions.map { it.format(group.currency) },
-                individualShares = individualPaymentAmount.execute(group),
-                percentageShares = individualPaymentPercentage.execute(group),
+                individualShares = individualPaymentAmount.execute(group).sortByValueDesc(),
+                percentageShares = individualPaymentPercentage.execute(group).sortByValueDesc(),
                 settleUpTransactions = settleUp.execute(group)
                     .associateWith { it.formatAsSettleUpTransfer(group.currency) }
             )
@@ -115,4 +116,7 @@ class GroupDetailViewModel(
             splitBetween = splitBetween
         )
     }
+
+    private fun Map<Participant, Double>.sortByValueDesc(): Map<Participant, Double> =
+        toList().sortedByDescending { it.second }.toMap()
 }
