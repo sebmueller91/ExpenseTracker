@@ -3,7 +3,7 @@ package com.example.expensetracker.ui.screens.group_overview
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.expensetracker.data.DatabaseRepository
+import com.example.expensetracker.data.repository.DatabaseRepository
 import com.example.expensetracker.model.Group
 import com.example.expensetracker.ui.util.UiUtils
 import com.example.expensetracker.services.EventCosts

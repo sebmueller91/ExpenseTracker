@@ -8,6 +8,7 @@ espressoCoreVersion = "3.5.1"
 junit = "1.1.5"
 junitVersion = "4.13.2"
 koinAndroidVersion = "3.5.3"
+libraryBaseVersion = "1.13.0"
 lifecycle-runtime-compose = "2.6.2"
 material3 = "1.1.2"
 materialIconsExtendedVersion = "1.5.4"
@@ -35,6 +36,7 @@ koin-android = { module = "io.insert-koin:koin-android", version.ref = "koinAndr
 koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koinAndroidVersion" }
 koin-test = { module = "io.insert-koin:koin-test", version.ref = "koinAndroidVersion" }
 ksp = { module = "io.github.raamcosta.compose-destinations:ksp", version.ref = "coreVersion" }
+realm-library-base = { module = "io.realm.kotlin:library-base", version.ref = "libraryBaseVersion" }
 lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle-runtime-compose" }
 material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockkVersion" }

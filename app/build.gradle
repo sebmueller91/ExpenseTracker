@@ -3,6 +3,7 @@ plugins {
     id("kotlin-android")
     id("kotlin-kapt")
     id("com.google.devtools.ksp")
+    id("io.realm.kotlin")
 }
 
 def getVersionProperties() {
@@ -131,6 +132,8 @@ dependencies {
 
     implementation libs.koin.android
     implementation libs.koin.androidx.compose
+
+    implementation(libs.realm.library.base)
 
     testImplementation libs.junit
     testImplementation libs.koin.test
