@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.expensetracker.R
-import com.example.expensetracker.data.DatabaseRepository
+import com.example.expensetracker.data.repository.DatabaseRepository
 import com.example.expensetracker.model.Currency
 import com.example.expensetracker.model.Participant
 import com.example.expensetracker.model.Transaction

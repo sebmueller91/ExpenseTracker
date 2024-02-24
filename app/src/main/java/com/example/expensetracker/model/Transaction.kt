@@ -1,12 +1,13 @@
 package com.example.expensetracker.model
 
+import io.realm.kotlin.types.RealmObject
 import java.util.Date
 
 sealed class Transaction(
     val purpose: String,
     val amount: Double,
     val date: Date
-) {
+) : RealmObject {
     class Expense(
         val paidBy: Participant,
         val splitBetween: List<Participant>,

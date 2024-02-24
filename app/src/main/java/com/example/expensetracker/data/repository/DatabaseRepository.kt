@@ -1,4 +1,4 @@
-package com.example.expensetracker.data
+package com.example.expensetracker.data.repository
 
 import com.example.expensetracker.model.Group
 import kotlinx.coroutines.flow.StateFlow
