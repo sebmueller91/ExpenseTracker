@@ -23,7 +23,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -40,17 +39,14 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.expensetracker.model.Currency
-import com.example.expensetracker.model.Group
 import com.example.expensetracker.model.Participant
+import com.example.expensetracker.ui.screens.group_detail.GroupDetailUiState
 import com.example.expensetracker.ui.util.UiUtils
 import timber.log.Timber
 
 @Composable
 fun StatisticsTab(
-    group: Group,
-    eventCostFlow: State<Double>,
-    individualSharesFlow: State<Map<Participant, Double>>,
-    percentageSharesFlow: State<Map<Participant, Double>>,
+    uiState: GroupDetailUiState.Success,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -62,8 +58,8 @@ fun StatisticsTab(
             Text(
                 "Event costs: ${
                     UiUtils.formatMoneyAmount(
-                        eventCostFlow.value,
-                        group.currency,
+                        uiState.eventCosts,
+                        uiState.group.currency,
                         LocalContext.current
                     )
                 }",
@@ -79,17 +75,17 @@ fun StatisticsTab(
             Spacer(Modifier.height(20.dp))
         }
         item {
-            if (individualSharesFlow.value.any { it.value != 0.0 }) {
+            if (uiState.individualShares.any { it.value != 0.0 }) {
                 PieChart(
-                    percentageSharesFlow = percentageSharesFlow
+                    percentageShares = uiState.percentageShares
                 )
             }
         }
         item {
             BarChart(
-                individualSharesFlow = individualSharesFlow,
-                percentageSharesFlow = percentageSharesFlow,
-                currency = group.currency,
+                individualShares = uiState.individualShares,
+                percentageShares = uiState.percentageShares,
+                currency = uiState.group.currency,
                 modifier = Modifier.padding(top = 10.dp)
             )
         }
@@ -98,17 +94,17 @@ fun StatisticsTab(
 
 @Composable
 private fun PieChart(
-    percentageSharesFlow: State<Map<Participant, Double>>,
+    percentageShares: Map<Participant, Double>,
+    modifier: Modifier = Modifier,
     outerRadius: Dp = 90.dp,
     chartBarWidth: Dp = 20.dp,
-    animationDuration: Int = 1000,
-    modifier: Modifier = Modifier
+    animationDuration: Int = 1000
 ) {
     var animationFinished by rememberSaveable { mutableStateOf(false) }
     var lastValue = 0f
 
     val pieChartChunks =
-        percentageSharesFlow.value.values.map { value -> ((value / 100.0) * 360.0).toFloat() }
+        percentageShares.values.map { value -> ((value / 100.0) * 360.0).toFloat() }
 
     val animatedSize by animateFloatAsState(
         targetValue = if (animationFinished) outerRadius.value * 2f else 0f,
@@ -161,14 +157,14 @@ private fun PieChart(
 @Composable
 private fun BarChart(
     currency: Currency,
-    individualSharesFlow: State<Map<Participant, Double>>,
-    percentageSharesFlow: State<Map<Participant, Double>>,
+    individualShares: Map<Participant, Double>,
+    percentageShares: Map<Participant, Double>,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
-        individualSharesFlow.value.entries.sortedByDescending { it.value }
+        individualShares.entries.sortedByDescending { it.value }
             .forEachIndexed { index, entry ->
-                val percentage = percentageSharesFlow.value[entry.key] ?: run {
+                val percentage = percentageShares[entry.key] ?: run {
                     Timber.e("Could not retrieve percentage! This should not happen.")
                     0.0
                 }
@@ -193,8 +189,8 @@ private fun BarChartItem(
     participantName: String,
     amount: String,
     color: Color,
-    height: Dp = 45.dp,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    height: Dp = 45.dp
 ) {
     Surface(
         modifier = modifier
@@ -247,7 +243,7 @@ private val pieChartColors = listOf(
     Color(128, 203, 196, 255), // Aqua Green
     Color(159, 121, 238, 255), // Muted Violet
     Color(255, 179, 71, 255),  // Pastel Orange
-    Color(111, 207, 151, 255), // Seafoam Green
+    Color(111, 207, 151, 255), // Sea foam Green
     Color(112, 128, 144, 255), // Slate Gray
     Color(255, 218, 185, 255), // Peach
     Color(54, 117, 136, 255),  // Teal
