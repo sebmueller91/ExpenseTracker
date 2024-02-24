@@ -2,6 +2,7 @@ package com.example.expensetracker.data
 
 import com.example.expensetracker.model.Currency
 import com.example.expensetracker.model.Group
+import com.example.expensetracker.model.Transaction
 import com.example.expensetracker.util.FakeData.Companion.createFakeExpense
 import com.example.expensetracker.util.FakeData.Companion.createFakeIncome
 import com.example.expensetracker.util.FakeData.Companion.createFakePayment
@@ -68,6 +69,16 @@ class DatabaseRepositoryFakeImpl : DatabaseRepository {
             newList.add(group)
             newList.toList()
         }
+    }
+
+    override fun addTransaction(groupId: UUID, transaction: Transaction) {
+        val groupIndex = _groups.value.indexOfFirst { it.id == groupId }
+        val group = _groups.value[groupIndex]
+        val updatedGroup = group.copy(transactions = group.transactions + transaction)
+        val updatedGroups = _groups.value.toMutableList().apply {
+            this[groupIndex] = updatedGroup
+        }
+        _groups.value = updatedGroups
     }
 
     override suspend fun getGroup(groupId: UUID): Group? {

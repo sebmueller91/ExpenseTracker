@@ -12,7 +12,7 @@ import timber.log.Timber
 import java.util.Date
 import kotlin.math.min
 
-private const val EXPLORATION_DEPTH = 3
+private const val EXPLORATION_DEPTH = 1
 
 interface SettleUp {
     fun execute(group: Group): List<Transaction.Transfer>
@@ -49,11 +49,11 @@ class SettleUpImpl(
         creditors: List<ParticipantBalance>,
         transactions: List<Transaction.Transfer>
     ): List<Transaction.Transfer> {
-        if (debtors.isEmpty() && creditors.isNotEmpty() || debtors.isNotEmpty() && creditors.isEmpty()) {
+        if (debtors.isEmpty() && creditors.isEmpty()) {
+            return transactions
+        } else if (debtors.isEmpty() || creditors.isEmpty()) {
             Timber.e("Invalid state when balancing up participants. Creditor size is ${creditors.size} and debtors size is ${debtors.size}!")
             return listOf()
-        } else if (debtors.isEmpty() && creditors.isEmpty()) {
-            return transactions
         }
 
         val sortedDebtors =
