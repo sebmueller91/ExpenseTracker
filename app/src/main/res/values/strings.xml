@@ -6,6 +6,7 @@
     <string name="group_name">Group name</string>
     <string name="next">Next</string>
     <string name="add_group_members">Add group members</string>
+    <string name="add_group_member">Add group member</string>
     <string name="add_new_group">Add new group</string>
     <string name="currency">Currency</string>
     <string name="finish">Finish</string>
@@ -35,4 +36,7 @@
     <string name="received_for">%1$s received %2$s for %3$s</string>
     <string name="paid_for">%1$s paid %2$s for %3$s</string>
     <string name="settle_up">Settle up</string>
+    <string name="gives_to">%1$s gives %2$s to %3$s</string>
+    <string name="all_group_members_are_settled_up">All group members are settled up.</string>
+    <string name="mark_done">Mark done</string>
 </resources>

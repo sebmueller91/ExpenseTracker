@@ -8,7 +8,13 @@ import org.koin.dsl.module
 import java.util.UUID
 
 val uiModule = module {
-    viewModel { GroupOverviewViewModel(databaseRepository = get(), eventCost = get()) }
+    viewModel {
+        GroupOverviewViewModel(
+            databaseRepository = get(),
+            eventCost = get(),
+            localeAwareFormatter = get()
+        )
+    }
     viewModel { AddGroupViewModel(databaseRepository = get()) }
     viewModel { (groupId: UUID) ->
         GroupDetailViewModel(
@@ -16,7 +22,10 @@ val uiModule = module {
             databaseRepository = get(),
             eventCost = get(),
             individualPaymentAmount = get(),
-            percentageShareCalculator = get()
+            individualPaymentPercentage = get(),
+            settleUp = get(),
+            resourceResolver = get(),
+            localeAwareFormatter = get()
         )
     }
 }
