@@ -33,7 +33,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.expensetracker.R
-import com.example.expensetracker.model.Participant
+import com.example.expensetracker.model.Transaction
 import com.example.expensetracker.ui.components.NavigationIcon
 import com.example.expensetracker.ui.screens.destinations.GroupOverviewScreenDestination
 import com.example.expensetracker.ui.screens.group_detail.tabs.ExpensesTab
@@ -56,18 +56,14 @@ fun GroupDetailScreen(
 
     GroupDetailScreen(
         uiStateFlow = viewModel.uiStateFlow.collectAsStateWithLifecycle(),
-        eventCostFlow = viewModel.eventCostsFlow.collectAsStateWithLifecycle(),
-        individualSharesFlow = viewModel.individualSharesFlow.collectAsStateWithLifecycle(),
-        percentageSharesFlow = viewModel.percentageSharesFlow.collectAsStateWithLifecycle(),
+        applySettleUpTransaction = viewModel::applySettleUpTransaction,
         onLeave = { navigator.navigate(GroupOverviewScreenDestination()) })
 }
 
 @Composable
 private fun GroupDetailScreen(
     uiStateFlow: State<GroupDetailUiState>,
-    eventCostFlow: State<Double>,
-    individualSharesFlow: State<Map<Participant, Double>>,
-    percentageSharesFlow: State<Map<Participant, Double>>,
+    applySettleUpTransaction: (Transaction.Transfer) -> Unit,
     onLeave: () -> Unit
 ) {
     BackHandler(onBack = onLeave)
@@ -84,11 +80,9 @@ private fun GroupDetailScreen(
 
             is GroupDetailUiState.Success -> {
                 GroupDetailScreenContent(
-                    eventCostFlow = eventCostFlow,
-                    individualSharesFlow = individualSharesFlow,
-                    percentageSharesFlow = percentageSharesFlow,
                     uiState = uiState,
-                    onLeave = onLeave
+                    onLeave = onLeave,
+                    applySettleUpTransaction = applySettleUpTransaction,
                 )
             }
         }
@@ -98,12 +92,10 @@ private fun GroupDetailScreen(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun GroupDetailScreenContent(
+    modifier: Modifier = Modifier,
+    applySettleUpTransaction: (Transaction.Transfer) -> Unit,
     uiState: GroupDetailUiState.Success,
-    eventCostFlow: State<Double>,
-    individualSharesFlow: State<Map<Participant, Double>>,
-    percentageSharesFlow: State<Map<Participant, Double>>,
-    onLeave: () -> Unit,
-    modifier: Modifier = Modifier
+    onLeave: () -> Unit
 ) {
     var selectedTab by remember { mutableStateOf(GroupDetailScreenTabs.EXPENSES) }
     val pagerState = rememberPagerState { GroupDetailScreenTabs.entries.size }
@@ -147,17 +139,9 @@ private fun GroupDetailScreenContent(
                 .padding(innerPadding)
         ) { page ->
             when (GroupDetailScreenTabs.entries[page]) {
-                GroupDetailScreenTabs.EXPENSES -> ExpensesTab(
-                    transactions = uiState.group.transactions,
-                    currency = uiState.group.currency
-                )
-                GroupDetailScreenTabs.STATISTICS -> StatisticsTab(
-                    group = uiState.group,
-                    eventCostFlow = eventCostFlow,
-                    individualSharesFlow = individualSharesFlow,
-                    percentageSharesFlow = percentageSharesFlow
-                )
-                GroupDetailScreenTabs.SETTLE_UP -> SettleUpTab(group = uiState.group)
+                GroupDetailScreenTabs.EXPENSES -> ExpensesTab(uiState)
+                GroupDetailScreenTabs.STATISTICS -> StatisticsTab(uiState)
+                GroupDetailScreenTabs.SETTLE_UP -> SettleUpTab(uiState = uiState, applySettleUpTransaction = applySettleUpTransaction)
             }
         }
     }

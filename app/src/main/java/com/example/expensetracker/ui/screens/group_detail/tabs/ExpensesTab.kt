@@ -30,26 +30,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.expensetracker.R
-import com.example.expensetracker.model.Currency
-import com.example.expensetracker.model.Transaction
 import com.example.expensetracker.ui.components.AnimatedFloatingActionButton
 import com.example.expensetracker.ui.components.ExpandCollapseButton
 import com.example.expensetracker.ui.components.RoundFloatingActionButton
 import com.example.expensetracker.ui.components.ScreenWithAnimatedOverlay
-import com.example.expensetracker.ui.screens.group_detail.FormattedTransaction
-import com.example.expensetracker.ui.screens.group_detail.format
+import com.example.expensetracker.ui.screens.group_detail.GroupDetailUiState
+import com.example.expensetracker.ui.screens.group_detail.data.FormattedTransaction
 import com.example.expensetracker.ui.theme.ExpenseTrackerTheme
 
 
 @Composable
 fun ExpensesTab(
-    transactions: List<Transaction>,
-    currency: Currency,
+    uiState: GroupDetailUiState.Success,
     modifier: Modifier = Modifier
 ) {
     var fabExpanded by remember { mutableStateOf(false) }
@@ -67,7 +63,7 @@ fun ExpensesTab(
             applyOverlay = fabExpanded,
             modifier = Modifier.padding(paddingValues)
         ) {
-            if (transactions.isEmpty()) {
+            if (uiState.formattedTransactions.isEmpty()) {
                 Column(
                     modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -78,12 +74,9 @@ fun ExpensesTab(
                 }
             } else {
                 LazyColumn {
-                    items(items = transactions) { transaction ->
+                    items(items = uiState.formattedTransactions) { formattedTransaction ->
                         ExpenseEntry(
-                            formattedTransaction = transaction.format(
-                                currency,
-                                LocalContext.current
-                            )
+                            formattedTransaction = formattedTransaction
                         )
                     }
                 }
@@ -175,7 +168,7 @@ private fun ExpenseEntry(
 @Composable
 fun Entry(
     modifier: Modifier = Modifier,
-    mainContent: @Composable (modifier: Modifier) -> Unit,
+    mainContent: @Composable (Modifier) -> Unit,
     expandedContent: @Composable () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -202,7 +195,7 @@ fun Entry(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                mainContent(modifier = Modifier.weight(1f))
+                mainContent(Modifier.weight(1f))
                 ExpandCollapseButton(
                     expanded = expanded,
                     onClick = { expanded = !expanded }
