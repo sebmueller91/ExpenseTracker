@@ -1,4 +1,4 @@
-package com.example.data.model
+package com.example.core.model
 
 import java.util.UUID
 

@@ -1,23 +1,23 @@
 package com.example.expensetracker.services
 
-import com.example.data.model.Transaction
+import com.example.core.model.Transaction
 
 interface EventCosts {
-    fun execute(transactions: List<com.example.data.model.Transaction>): Double
+    fun execute(transactions: List<Transaction>): Double
 }
 
 class EventCostsImpl : EventCosts {
-    override fun execute(transactions: List<com.example.data.model.Transaction>): Double {
+    override fun execute(transactions: List<Transaction>): Double {
         var sum = 0.0
         transactions.forEach {transaction ->
             when (transaction) {
-                is com.example.data.model.Transaction.Expense -> {
+                is Transaction.Expense -> {
                     sum += transaction.amount
                 }
-                is com.example.data.model.Transaction.Income -> {
+                is Transaction.Income -> {
                     sum -= transaction.amount
                 }
-                is com.example.data.model.Transaction.Transfer -> {
+                is Transaction.Transfer -> {
                     // Does not influence event cost
                 }
             }

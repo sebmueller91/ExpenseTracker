@@ -1,8 +1,8 @@
 package com.example.expensetracker.services
 
-import com.example.data.model.Currency
-import com.example.data.model.Group
-import com.example.expensetracker.util.FakeData
+import com.example.core.model.Currency
+import com.example.core.model.Group
+import com.example.data.util.FakeData
 import junit.framework.TestCase.assertEquals
 import org.junit.After
 import org.junit.Before
@@ -35,8 +35,8 @@ class IndividualPaymentAmountTest : KoinTest {
     fun singleParticipant() {
         val participant = FakeData.createFakeParticipant()
         val expense = FakeData.createFakeExpense(participants = listOf(participant))
-        val group = com.example.data.model.Group(
-            currency = com.example.data.model.Currency.CAD,
+        val group = Group(
+            currency = Currency.CAD,
             name = "testGroup",
             participants = listOf(participant),
             transactions = listOf(expense)
@@ -53,8 +53,8 @@ class IndividualPaymentAmountTest : KoinTest {
     fun twoParticipantsEqualShare() {
         val participant1 = FakeData.createFakeParticipant()
         val participant2 = FakeData.createFakeParticipant()
-        val group = com.example.data.model.Group(
-            currency = com.example.data.model.Currency.CAD,
+        val group = Group(
+            currency = Currency.CAD,
             name = "testGroup",
             participants = listOf(participant1, participant2),
             transactions = listOf(
@@ -74,8 +74,8 @@ class IndividualPaymentAmountTest : KoinTest {
     fun twoParticipantsNonEqualShare() {
         val participant1 = FakeData.createFakeParticipant()
         val participant2 = FakeData.createFakeParticipant()
-        val group = com.example.data.model.Group(
-            currency = com.example.data.model.Currency.CAD,
+        val group = Group(
+            currency = Currency.CAD,
             name = "testGroup",
             participants = listOf(participant1, participant2),
             transactions = listOf(
@@ -103,8 +103,8 @@ class IndividualPaymentAmountTest : KoinTest {
     fun twoParticipantsIncludingPayment() {
         val participant1 = FakeData.createFakeParticipant()
         val participant2 = FakeData.createFakeParticipant()
-        val group = com.example.data.model.Group(
-            currency = com.example.data.model.Currency.CAD,
+        val group = Group(
+            currency = Currency.CAD,
             name = "testGroup",
             participants = listOf(participant1, participant2),
             transactions = listOf(
@@ -137,8 +137,8 @@ class IndividualPaymentAmountTest : KoinTest {
     fun twoParticipantsIncludingIncome() {
         val participant1 = FakeData.createFakeParticipant()
         val participant2 = FakeData.createFakeParticipant()
-        val group = com.example.data.model.Group(
-            currency = com.example.data.model.Currency.CAD,
+        val group = Group(
+            currency = Currency.CAD,
             name = "testGroup",
             participants = listOf(participant1, participant2),
             transactions = listOf(
@@ -171,8 +171,8 @@ class IndividualPaymentAmountTest : KoinTest {
     fun twoParticipantsIncludingIncomeForOneParticipant() {
         val participant1 = FakeData.createFakeParticipant()
         val participant2 = FakeData.createFakeParticipant()
-        val group = com.example.data.model.Group(
-            currency = com.example.data.model.Currency.CAD,
+        val group = Group(
+            currency = Currency.CAD,
             name = "testGroup",
             participants = listOf(participant1, participant2),
             transactions = listOf(

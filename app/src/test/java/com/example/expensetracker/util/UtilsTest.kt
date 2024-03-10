@@ -1,5 +1,8 @@
 package com.example.expensetracker.util
 
+import com.example.core.util.isBiggerThan
+import com.example.core.util.isEqualTo
+import com.example.core.util.isSmallerThan
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import org.junit.Test

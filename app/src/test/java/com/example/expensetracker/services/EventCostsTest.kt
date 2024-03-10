@@ -1,6 +1,6 @@
 package com.example.expensetracker.services
 
-import com.example.expensetracker.util.FakeData
+import com.example.data.util.FakeData
 import junit.framework.TestCase.assertEquals
 import org.junit.After
 import org.junit.Before

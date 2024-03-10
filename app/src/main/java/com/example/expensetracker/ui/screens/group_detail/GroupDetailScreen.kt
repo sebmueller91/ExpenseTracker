@@ -33,7 +33,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.expensetracker.R
-import com.example.data.model.Transaction
+import com.example.core.model.Transaction
 import com.example.expensetracker.ui.components.NavigationIcon
 import com.example.expensetracker.ui.screens.destinations.GroupOverviewScreenDestination
 import com.example.expensetracker.ui.screens.group_detail.tabs.ExpensesTab
@@ -63,7 +63,7 @@ fun GroupDetailScreen(
 @Composable
 private fun GroupDetailScreen(
     uiStateFlow: State<GroupDetailUiState>,
-    applySettleUpTransaction: (com.example.data.model.Transaction.Transfer) -> Unit,
+    applySettleUpTransaction: (Transaction.Transfer) -> Unit,
     onLeave: () -> Unit
 ) {
     BackHandler(onBack = onLeave)
@@ -93,7 +93,7 @@ private fun GroupDetailScreen(
 @Composable
 private fun GroupDetailScreenContent(
     modifier: Modifier = Modifier,
-    applySettleUpTransaction: (com.example.data.model.Transaction.Transfer) -> Unit,
+    applySettleUpTransaction: (Transaction.Transfer) -> Unit,
     uiState: GroupDetailUiState.Success,
     onLeave: () -> Unit
 ) {

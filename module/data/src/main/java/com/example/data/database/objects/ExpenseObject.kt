@@ -1,15 +1,29 @@
 package com.example.data.database.objects
 
-import com.example.data.model.Transaction
+import com.example.core.model.Transaction
 import io.realm.kotlin.types.RealmObject
+import java.util.Date
 
 internal class ExpenseObject : RealmObject{
+    var paidBy: ParticipantObject = ParticipantObject()
+    var amount: Double = 0.0
+    var timestamp: Long = 0
+    var purpose: String = ""
+    var splitBetween: List<ParticipantObject> = listOf()
 }
 
-internal fun ExpenseObject.toExpense(): Transaction.Expense {
-    throw NotImplementedError()
-}
+internal fun ExpenseObject.toExpense(): Transaction.Expense = Transaction.Expense(
+    paidBy = this@toExpense.paidBy.toParticipant(),
+    amount = this@toExpense.amount,
+    date = Date(this@toExpense.timestamp),
+    purpose = this@toExpense.purpose,
+    splitBetween = this@toExpense.splitBetween.map { it.toParticipant() }
+)
 
-internal fun Transaction.Expense.toExpenseObject(): ExpenseObject {
-    throw NotImplementedError()
+internal fun Transaction.Expense.toExpenseObject(): ExpenseObject = ExpenseObject().apply {
+    paidBy = this@toExpenseObject.paidBy.toParticipantObject()
+    amount = this@toExpenseObject.amount
+    timestamp = this@toExpenseObject.date.time
+    purpose = this@toExpenseObject.purpose
+    splitBetween = this@toExpenseObject.splitBetween.map { it.toParticipantObject() }
 }

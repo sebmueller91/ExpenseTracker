@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 rootProject.name = "Expense Tracker"
 include ':app'
 include ':module:data'
+include ':module:core'

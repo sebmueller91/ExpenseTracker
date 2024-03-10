@@ -1,15 +1,16 @@
 package com.example.data.database.objects
 
-import com.example.data.model.Currency
+import com.example.core.model.Currency
 import io.realm.kotlin.types.RealmObject
 
 internal class CurrencyObject : RealmObject {
+    var abbreviation: String = ""
 }
 
-internal fun CurrencyObject.toCurrency(): Currency {
-    throw NotImplementedError()
-}
+internal fun CurrencyObject.toCurrency(): Currency =
+    Currency.values().first { it.abbreviation == abbreviation }
 
-internal fun Currency.toCurrencyObject(): CurrencyObject {
-    throw NotImplementedError()
+
+internal fun Currency.toCurrencyObject(): CurrencyObject = CurrencyObject().apply {
+    abbreviation = this@toCurrencyObject.abbreviation
 }
