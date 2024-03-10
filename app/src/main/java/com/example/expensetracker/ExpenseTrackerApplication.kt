@@ -1,7 +1,7 @@
 package com.example.expensetracker
 
 import android.app.Application
-import com.example.expensetracker.data.di.databaseModule
+import com.example.data.databaseModule
 import com.example.expensetracker.ui.di.uiModule
 import com.example.expensetracker.services.di.servicesModule
 import org.koin.android.ext.koin.androidContext
@@ -20,7 +20,7 @@ class ExpenseTrackerApplication : Application() {
         startKoin {
             androidLogger()
             androidContext(this@ExpenseTrackerApplication)
-            modules(databaseModule, servicesModule, uiModule)
+            modules(com.example.data.databaseModule, servicesModule, uiModule)
         }
     }
 }

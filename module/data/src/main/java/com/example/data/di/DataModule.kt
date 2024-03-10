@@ -1,13 +1,13 @@
-package com.example.expensetracker.data.di
+package com.example.data.di
 
-import com.example.expensetracker.data.realm.objects.GroupObject
-import com.example.expensetracker.data.repository.DatabaseRepository
-import com.example.expensetracker.data.repository.DatabaseRepositoryFakeImpl
+import com.example.data.database.objects.GroupObject
+import com.example.data.repository.DatabaseRepository
+import com.example.data.repository.DatabaseRepositoryFakeImpl
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 import org.koin.dsl.module
 
-val databaseModule = module {
+val dataModule = module {
     single<Realm> {
         Realm.open(
             configuration = RealmConfiguration.create(

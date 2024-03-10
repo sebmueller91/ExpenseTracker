@@ -1,7 +1,7 @@
 package com.example.expensetracker.util
 
-import com.example.expensetracker.model.Participant
-import com.example.expensetracker.model.Transaction
+import com.example.data.model.Participant
+import com.example.data.model.Transaction
 import java.util.Calendar
 import java.util.Date
 import kotlin.random.Random
@@ -9,28 +9,31 @@ import kotlin.random.Random
 class FakeData {
 
     companion object {
-        val fakeParticipantsSmall = listOf(Participant("Dennis"), Participant("Johnny"))
+        val fakeParticipantsSmall = listOf(
+            com.example.data.model.Participant("Dennis"),
+            com.example.data.model.Participant("Johnny")
+        )
         val fakeParticipantsBig = listOf(
-            Participant("Dennis"),
-            Participant("Johnny"),
-            Participant("Alisa"),
-            Participant("Sebastian"),
-            Participant("Peter"),
-            Participant("Jonas"),
-            Participant("Lisa"),
-            Participant("BLisa"),
-            Participant("Alex"),
-            Participant("Eli"),
-            Participant("Participant with very long name")
+            com.example.data.model.Participant("Dennis"),
+            com.example.data.model.Participant("Johnny"),
+            com.example.data.model.Participant("Alisa"),
+            com.example.data.model.Participant("Sebastian"),
+            com.example.data.model.Participant("Peter"),
+            com.example.data.model.Participant("Jonas"),
+            com.example.data.model.Participant("Lisa"),
+            com.example.data.model.Participant("BLisa"),
+            com.example.data.model.Participant("Alex"),
+            com.example.data.model.Participant("Eli"),
+            com.example.data.model.Participant("Participant with very long name")
         )
 
         fun createFakeExpense(
-            participants: List<Participant> = fakeParticipantsSmall,
+            participants: List<com.example.data.model.Participant> = fakeParticipantsSmall,
             amount: Double = Random.nextDouble(0.1, 1200.0),
-            paidBy: Participant = participants.random(),
-            splitBetween: List<Participant> = participants
-        ): Transaction.Expense {
-            return Transaction.Expense(
+            paidBy: com.example.data.model.Participant = participants.random(),
+            splitBetween: List<com.example.data.model.Participant> = participants
+        ): com.example.data.model.Transaction.Expense {
+            return com.example.data.model.Transaction.Expense(
                 amount = amount,
                 date = createFakeDate(year = 2022, day = 23, month = 8),
                 paidBy = paidBy,
@@ -40,13 +43,13 @@ class FakeData {
         }
 
         fun createFakePayment(
-            participants: List<Participant> = fakeParticipantsSmall,
+            participants: List<com.example.data.model.Participant> = fakeParticipantsSmall,
             amount: Double = Random.nextDouble(0.1, 1200.0),
-            fromParticipant: Participant = participants.subList(0, participants.size / 2).random(),
-            toParticipant: Participant = participants.subList(participants.size / 2, participants.size)
+            fromParticipant: com.example.data.model.Participant = participants.subList(0, participants.size / 2).random(),
+            toParticipant: com.example.data.model.Participant = participants.subList(participants.size / 2, participants.size)
                 .random()
-        ): Transaction.Transfer {
-            return Transaction.Transfer(
+        ): com.example.data.model.Transaction.Transfer {
+            return com.example.data.model.Transaction.Transfer(
                 amount = amount,
                 date = createFakeDate(year = 2022, day = 23, month = 8),
                 fromParticipant = fromParticipant,
@@ -56,12 +59,12 @@ class FakeData {
         }
 
         fun createFakeIncome(
-            participants: List<Participant> = fakeParticipantsSmall,
+            participants: List<com.example.data.model.Participant> = fakeParticipantsSmall,
             amount: Double = Random.nextDouble(0.1, 1200.0),
-            receivedBy: Participant = participants.random(),
-            splitBetween: List<Participant> = participants
-        ): Transaction.Income {
-            return Transaction.Income(
+            receivedBy: com.example.data.model.Participant = participants.random(),
+            splitBetween: List<com.example.data.model.Participant> = participants
+        ): com.example.data.model.Transaction.Income {
+            return com.example.data.model.Transaction.Income(
                 amount = amount,
                 date = createFakeDate(year = 2022, day = 23, month = 8),
                 receivedBy = receivedBy,
@@ -70,8 +73,8 @@ class FakeData {
             )
         }
 
-        fun createFakeParticipant(name: String = "P${Random.nextInt()}"): Participant {
-            return Participant(name)
+        fun createFakeParticipant(name: String = "P${Random.nextInt()}"): com.example.data.model.Participant {
+            return com.example.data.model.Participant(name)
         }
 
         private fun createFakeDate(year: Int, month: Int, day: Int): Date {
