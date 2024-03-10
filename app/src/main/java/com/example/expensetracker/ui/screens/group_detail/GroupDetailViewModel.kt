@@ -2,11 +2,10 @@ package com.example.expensetracker.ui.screens.group_detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.expensetracker.R
-import com.example.data.repository.DatabaseRepository
 import com.example.core.model.Currency
 import com.example.core.model.Participant
 import com.example.core.model.Transaction
+import com.example.expensetracker.R
 import com.example.expensetracker.services.EventCosts
 import com.example.expensetracker.services.IndividualPaymentAmount
 import com.example.expensetracker.services.IndividualPaymentPercentage
@@ -22,7 +21,7 @@ import java.util.UUID
 
 class GroupDetailViewModel(
     private val groupId: UUID,
-    private val databaseRepository: com.example.data.repository.DatabaseRepository,
+    private val dataRepository: com.example.data.repository.DataRepository,
     private val eventCost: EventCosts,
     private val individualPaymentAmount: IndividualPaymentAmount,
     private val individualPaymentPercentage: IndividualPaymentPercentage,
@@ -30,7 +29,7 @@ class GroupDetailViewModel(
     private val resourceResolver: ResourceResolver,
     private val localeAwareFormatter: LocaleAwareFormatter
 ) : ViewModel() {
-    val uiStateFlow: StateFlow<GroupDetailUiState> = databaseRepository.groups.map {
+    val uiStateFlow: StateFlow<GroupDetailUiState> = dataRepository.groups.map {
         it.firstOrNull { it.id == groupId }
     }.map { group ->
         when (group) {
@@ -48,7 +47,7 @@ class GroupDetailViewModel(
     }.stateIn(viewModelScope, SharingStarted.Eagerly, GroupDetailUiState.Loading)
 
     fun applySettleUpTransaction(transfer: Transaction.Transfer) {
-        databaseRepository.addTransaction(groupId = groupId, transaction = transfer)
+        dataRepository.addTransaction(groupId = groupId, transaction = transfer)
     }
 
     private fun Transaction.Transfer.formatAsSettleUpTransfer(currency: Currency): String {

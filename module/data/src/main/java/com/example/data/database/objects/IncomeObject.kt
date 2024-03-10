@@ -1,6 +1,9 @@
 package com.example.data.database.objects
 
 import com.example.core.model.Transaction
+import io.realm.kotlin.ext.realmListOf
+import io.realm.kotlin.ext.toRealmList
+import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import java.util.Date
 
@@ -9,7 +12,7 @@ internal class IncomeObject : RealmObject {
     var timestamp: Long = 0L
     var purpose: String = ""
     var receivedBy: ParticipantObject = ParticipantObject()
-    var splitBetween: List<ParticipantObject> = listOf()
+    var splitBetween: RealmList<ParticipantObject> = realmListOf()
 
 }
 
@@ -26,5 +29,5 @@ internal fun Transaction.Income.toIncomeObject(): IncomeObject = IncomeObject().
     timestamp = this@toIncomeObject.date.time
     purpose = this@toIncomeObject.purpose
     receivedBy = this@toIncomeObject.receivedBy.toParticipantObject()
-    splitBetween = this@toIncomeObject.splitBetween.map { it.toParticipantObject() }
+    splitBetween = this@toIncomeObject.splitBetween.map { it.toParticipantObject() }.toRealmList()
 }
