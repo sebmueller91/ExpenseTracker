@@ -1,9 +1,9 @@
 package com.example.expensetracker.services
 
 import android.content.Context
-import com.example.expensetracker.model.Currency
-import com.example.expensetracker.model.Group
-import com.example.expensetracker.model.Transaction
+import com.example.data.model.Currency
+import com.example.data.model.Group
+import com.example.data.model.Transaction
 import com.example.expensetracker.util.FakeData
 import com.example.expensetracker.util.isEqualTo
 import io.mockk.every
@@ -55,8 +55,8 @@ class SettleUpIntegrationTests : KoinTest {
     fun singleParticipant_noSettleUp() {
         val participant = FakeData.createFakeParticipant()
         val expense = FakeData.createFakeExpense(participants = listOf(participant))
-        val group = Group(
-            currency = Currency.EURO,
+        val group = com.example.data.model.Group(
+            currency = com.example.data.model.Currency.EURO,
             name = "testGroup",
             participants = listOf(participant),
             transactions = listOf(expense)
@@ -71,8 +71,8 @@ class SettleUpIntegrationTests : KoinTest {
     fun twoParticipantsEqualShare() {
         val participant1 = FakeData.createFakeParticipant()
         val participant2 = FakeData.createFakeParticipant()
-        val group = Group(
-            currency = Currency.CAD,
+        val group = com.example.data.model.Group(
+            currency = com.example.data.model.Currency.CAD,
             name = "testGroup",
             participants = listOf(participant1, participant2),
             transactions = listOf(
@@ -90,8 +90,8 @@ class SettleUpIntegrationTests : KoinTest {
     fun twoParticipants_SingleExpense() {
         val participant1 = FakeData.createFakeParticipant()
         val participant2 = FakeData.createFakeParticipant()
-        val group = Group(
-            currency = Currency.CAD,
+        val group = com.example.data.model.Group(
+            currency = com.example.data.model.Currency.CAD,
             name = "testGroup",
             participants = listOf(participant1, participant2),
             transactions = listOf(
@@ -117,8 +117,8 @@ class SettleUpIntegrationTests : KoinTest {
         val participant1 = FakeData.createFakeParticipant()
         val participant2 = FakeData.createFakeParticipant()
         val participant3 = FakeData.createFakeParticipant()
-        val group = Group(
-            currency = Currency.CAD,
+        val group = com.example.data.model.Group(
+            currency = com.example.data.model.Currency.CAD,
             name = "testGroup",
             participants = listOf(participant1, participant2, participant3),
             transactions = listOf(
@@ -150,8 +150,8 @@ class SettleUpIntegrationTests : KoinTest {
         val participant1 = FakeData.createFakeParticipant()
         val participant2 = FakeData.createFakeParticipant()
         val participant3 = FakeData.createFakeParticipant()
-        val group = Group(
-            currency = Currency.CAD,
+        val group = com.example.data.model.Group(
+            currency = com.example.data.model.Currency.CAD,
             name = "testGroup",
             participants = listOf(participant1, participant2, participant3),
             transactions = listOf(
@@ -183,8 +183,8 @@ class SettleUpIntegrationTests : KoinTest {
         val participant1 = FakeData.createFakeParticipant()
         val participant2 = FakeData.createFakeParticipant()
         val participant3 = FakeData.createFakeParticipant()
-        val group = Group(
-            currency = Currency.CAD,
+        val group = com.example.data.model.Group(
+            currency = com.example.data.model.Currency.CAD,
             name = "testGroup",
             participants = listOf(participant1, participant2, participant3),
             transactions = listOf(
@@ -219,8 +219,8 @@ class SettleUpIntegrationTests : KoinTest {
             FakeData.createFakeParticipant(),
             FakeData.createFakeParticipant()
         )
-        val group = Group(
-            currency = Currency.CAD,
+        val group = com.example.data.model.Group(
+            currency = com.example.data.model.Currency.CAD,
             name = "testGroup",
             participants = participants,
             transactions = listOf(
@@ -271,8 +271,8 @@ class SettleUpIntegrationTests : KoinTest {
             FakeData.createFakeParticipant(),
             FakeData.createFakeParticipant()
         )
-        val group = Group(
-            currency = Currency.CAD,
+        val group = com.example.data.model.Group(
+            currency = com.example.data.model.Currency.CAD,
             name = "testGroup",
             participants = participants,
             transactions = listOf(
@@ -334,7 +334,7 @@ class SettleUpIntegrationTests : KoinTest {
         assertParticipantsBalancesAreZero(group, result)
     }
 
-    private fun assertParticipantsBalancesAreZero(group: Group, settleUpTransactions: List<Transaction.Transfer>) {
+    private fun assertParticipantsBalancesAreZero(group: com.example.data.model.Group, settleUpTransactions: List<com.example.data.model.Transaction.Transfer>) {
         val settledUpGroup = group.copy(transactions = group.transactions + settleUpTransactions)
         val payments = individualPaymentAmount.execute(settledUpGroup)
         val costs = individualCostsAmount.execute(settledUpGroup)

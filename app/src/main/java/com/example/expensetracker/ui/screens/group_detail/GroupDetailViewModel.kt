@@ -3,10 +3,10 @@ package com.example.expensetracker.ui.screens.group_detail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.expensetracker.R
-import com.example.expensetracker.data.repository.DatabaseRepository
-import com.example.expensetracker.model.Currency
-import com.example.expensetracker.model.Participant
-import com.example.expensetracker.model.Transaction
+import com.example.data.repository.DatabaseRepository
+import com.example.data.model.Currency
+import com.example.data.model.Participant
+import com.example.data.model.Transaction
 import com.example.expensetracker.services.EventCosts
 import com.example.expensetracker.services.IndividualPaymentAmount
 import com.example.expensetracker.services.IndividualPaymentPercentage
@@ -22,7 +22,7 @@ import java.util.UUID
 
 class GroupDetailViewModel(
     private val groupId: UUID,
-    private val databaseRepository: DatabaseRepository,
+    private val databaseRepository: com.example.data.repository.DatabaseRepository,
     private val eventCost: EventCosts,
     private val individualPaymentAmount: IndividualPaymentAmount,
     private val individualPaymentPercentage: IndividualPaymentPercentage,
@@ -47,11 +47,11 @@ class GroupDetailViewModel(
         }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, GroupDetailUiState.Loading)
 
-    fun applySettleUpTransaction(transfer: Transaction.Transfer) {
+    fun applySettleUpTransaction(transfer: com.example.data.model.Transaction.Transfer) {
         databaseRepository.addTransaction(groupId = groupId, transaction = transfer)
     }
 
-    private fun Transaction.Transfer.formatAsSettleUpTransfer(currency: Currency): String {
+    private fun com.example.data.model.Transaction.Transfer.formatAsSettleUpTransfer(currency: com.example.data.model.Currency): String {
         return resourceResolver.getString(
             R.string.gives_to,
             fromParticipant.name,
@@ -60,23 +60,23 @@ class GroupDetailViewModel(
         )
     }
 
-    private fun Transaction.format(currency: Currency): FormattedTransaction {
+    private fun com.example.data.model.Transaction.format(currency: com.example.data.model.Currency): FormattedTransaction {
         val mainText = when (this) {
-            is Transaction.Expense -> resourceResolver.getString(
+            is com.example.data.model.Transaction.Expense -> resourceResolver.getString(
                 R.string.paid_for,
                 paidBy.name,
                 localeAwareFormatter.formatMoneyAmount(amount, currency),
                 purpose
             )
 
-            is Transaction.Income -> resourceResolver.getString(
+            is com.example.data.model.Transaction.Income -> resourceResolver.getString(
                 R.string.received_for,
                 receivedBy.name,
                 localeAwareFormatter.formatMoneyAmount(amount, currency),
                 purpose
             )
 
-            is Transaction.Transfer -> resourceResolver.getString(
+            is com.example.data.model.Transaction.Transfer -> resourceResolver.getString(
                 R.string.gave_to_for,
                 fromParticipant.name,
                 localeAwareFormatter.formatMoneyAmount(amount, currency),
@@ -87,23 +87,23 @@ class GroupDetailViewModel(
 
         val formattedDate = localeAwareFormatter.formatDate(this.date)
         val date = when (this) {
-            is Transaction.Expense -> resourceResolver.getString(R.string.paid_on, formattedDate)
-            is Transaction.Income -> resourceResolver.getString(R.string.received_on, formattedDate)
-            is Transaction.Transfer -> resourceResolver.getString(R.string.paid_on, formattedDate)
+            is com.example.data.model.Transaction.Expense -> resourceResolver.getString(R.string.paid_on, formattedDate)
+            is com.example.data.model.Transaction.Income -> resourceResolver.getString(R.string.received_on, formattedDate)
+            is com.example.data.model.Transaction.Transfer -> resourceResolver.getString(R.string.paid_on, formattedDate)
         }
 
         val splitBetween = when (this) {
-            is Transaction.Expense -> resourceResolver.getString(
+            is com.example.data.model.Transaction.Expense -> resourceResolver.getString(
                 R.string.split_between,
                 localeAwareFormatter.formatParticipantsList(splitBetween)
             )
 
-            is Transaction.Income -> resourceResolver.getString(
+            is com.example.data.model.Transaction.Income -> resourceResolver.getString(
                 R.string.split_between,
                 localeAwareFormatter.formatParticipantsList(splitBetween)
             )
 
-            is Transaction.Transfer -> resourceResolver.getString(
+            is com.example.data.model.Transaction.Transfer -> resourceResolver.getString(
                 R.string.from_to,
                 fromParticipant.name,
                 toParticipant.name
@@ -117,6 +117,6 @@ class GroupDetailViewModel(
         )
     }
 
-    private fun Map<Participant, Double>.sortByValueDesc(): Map<Participant, Double> =
+    private fun Map<com.example.data.model.Participant, Double>.sortByValueDesc(): Map<com.example.data.model.Participant, Double> =
         toList().sortedByDescending { it.second }.toMap()
 }

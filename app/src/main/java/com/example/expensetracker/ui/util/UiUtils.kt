@@ -2,8 +2,8 @@ package com.example.expensetracker.ui.util
 
 import android.content.Context
 import com.example.expensetracker.R
-import com.example.expensetracker.model.Currency
-import com.example.expensetracker.model.Participant
+import com.example.data.model.Currency
+import com.example.data.model.Participant
 import com.example.expensetracker.util.getLocale
 import timber.log.Timber
 import java.math.BigDecimal
@@ -16,7 +16,7 @@ import kotlin.math.roundToInt
 
 class UiUtils {
     companion object {
-        fun formatMoneyAmount(amount: Double, currency: Currency, context: Context): String {
+        fun formatMoneyAmount(amount: Double, currency: com.example.data.model.Currency, context: Context): String {
             val locale = getLocale(context)
             val symbols = DecimalFormatSymbols(locale)
             val formatter = DecimalFormat("#,##0.00", symbols)
@@ -39,7 +39,7 @@ class UiUtils {
             return "${value.roundToInt()}%"
         }
 
-        fun formatParticipantsList(participants: List<Participant>, context: Context): String {
+        fun formatParticipantsList(participants: List<com.example.data.model.Participant>, context: Context): String {
             if (participants.isEmpty()) {
                 return ""
             } else if (participants.size == 1) {

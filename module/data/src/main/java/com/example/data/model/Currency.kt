@@ -1,4 +1,4 @@
-package com.example.expensetracker.model
+package com.example.data.model
 
 enum class Currency(
     val currency_name: String,

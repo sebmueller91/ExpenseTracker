@@ -1,16 +1,16 @@
 package com.example.expensetracker.ui.screens.add_group
 
 import androidx.lifecycle.ViewModel
-import com.example.expensetracker.model.Currency
-import com.example.expensetracker.model.Group
-import com.example.expensetracker.model.Participant
-import com.example.expensetracker.data.repository.DatabaseRepository
+import com.example.data.model.Currency
+import com.example.data.model.Group
+import com.example.data.model.Participant
+import com.example.data.repository.DatabaseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import java.util.UUID
 
-class AddGroupViewModel(private val databaseRepository: DatabaseRepository) : ViewModel() {
+class AddGroupViewModel(private val databaseRepository: com.example.data.repository.DatabaseRepository) : ViewModel() {
     private var _uiState = MutableStateFlow(AddGroupUiState())
     val uiStateFlow = _uiState.asStateFlow()
 
@@ -81,7 +81,7 @@ class AddGroupViewModel(private val databaseRepository: DatabaseRepository) : Vi
         }
     }
 
-    fun selectCurrency(currency: Currency) {
+    fun selectCurrency(currency: com.example.data.model.Currency) {
         _uiState.update {
             it.copy(currency = currency)
         }
@@ -90,10 +90,14 @@ class AddGroupViewModel(private val databaseRepository: DatabaseRepository) : Vi
     fun createNewGroup(): UUID {
         val uuid = UUID.randomUUID()
         databaseRepository.addGroup(
-            Group(
+            com.example.data.model.Group(
                 id = uuid,
                 name = _uiState.value.groupName,
-                participants = _uiState.value.participantsNames.map { Participant(name = it) },
+                participants = _uiState.value.participantsNames.map {
+                    com.example.data.model.Participant(
+                        name = it
+                    )
+                },
                 currency = _uiState.value.currency,
                 transactions = listOf()
             )

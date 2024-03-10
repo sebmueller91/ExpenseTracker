@@ -38,8 +38,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.expensetracker.model.Currency
-import com.example.expensetracker.model.Participant
+import com.example.data.model.Currency
+import com.example.data.model.Participant
 import com.example.expensetracker.ui.screens.group_detail.GroupDetailUiState
 import com.example.expensetracker.ui.util.UiUtils
 import timber.log.Timber
@@ -94,7 +94,7 @@ fun StatisticsTab(
 
 @Composable
 private fun PieChart(
-    percentageShares: Map<Participant, Double>,
+    percentageShares: Map<com.example.data.model.Participant, Double>,
     modifier: Modifier = Modifier,
     outerRadius: Dp = 90.dp,
     chartBarWidth: Dp = 20.dp,
@@ -156,9 +156,9 @@ private fun PieChart(
 
 @Composable
 private fun BarChart(
-    currency: Currency,
-    individualShares: Map<Participant, Double>,
-    percentageShares: Map<Participant, Double>,
+    currency: com.example.data.model.Currency,
+    individualShares: Map<com.example.data.model.Participant, Double>,
+    percentageShares: Map<com.example.data.model.Participant, Double>,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
