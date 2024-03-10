@@ -1,4 +1,4 @@
-package com.example.data.model
+package com.example.core.model
 
 enum class Currency(
     val currency_name: String,

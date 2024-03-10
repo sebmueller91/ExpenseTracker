@@ -1,21 +1,21 @@
 package com.example.expensetracker.services
 
-import com.example.data.model.Group
-import com.example.data.model.Participant
-import com.example.expensetracker.util.isBiggerThan
-import com.example.expensetracker.util.isEqualTo
-import com.example.expensetracker.util.isSmallerThan
+import com.example.core.model.Group
+import com.example.core.model.Participant
+import com.example.core.util.isBiggerThan
+import com.example.core.util.isEqualTo
+import com.example.core.util.isSmallerThan
 import timber.log.Timber
 
 interface IndividualPaymentPercentage {
-    fun execute(group: com.example.data.model.Group): Map<com.example.data.model.Participant, Double>
+    fun execute(group: Group): Map<Participant, Double>
 }
 
 class IndividualPaymentPercentageImpl(
     private val eventCost: EventCosts,
     private val individualPaymentAmount: IndividualPaymentAmount
 ) : IndividualPaymentPercentage {
-    override fun execute(group: com.example.data.model.Group): Map<com.example.data.model.Participant, Double> {
+    override fun execute(group: Group): Map<Participant, Double> {
         val eventCost =
             eventCost.execute(group.transactions).takeIf { !it.isEqualTo(0.0) }
                 ?: return run {
@@ -42,7 +42,7 @@ class IndividualPaymentPercentageImpl(
         }.normalize()
     }
 
-    private fun Map<com.example.data.model.Participant, Double>.normalize(): Map<com.example.data.model.Participant, Double> {
+    private fun Map<Participant, Double>.normalize(): Map<Participant, Double> {
         val sum = values.sum()
         return if (!sum.isEqualTo(0.0)) {
             mapValues { (_, value) -> (value / sum) * 100.0}

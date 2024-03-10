@@ -1,10 +1,13 @@
 package com.example.data.repository
 
-import com.example.expensetracker.util.FakeData.Companion.createFakeExpense
-import com.example.expensetracker.util.FakeData.Companion.createFakeIncome
-import com.example.expensetracker.util.FakeData.Companion.createFakePayment
-import com.example.expensetracker.util.FakeData.Companion.fakeParticipantsBig
-import com.example.expensetracker.util.FakeData.Companion.fakeParticipantsSmall
+import com.example.core.model.Currency
+import com.example.core.model.Group
+import com.example.core.model.Transaction
+import com.example.data.util.FakeData.Companion.createFakeExpense
+import com.example.data.util.FakeData.Companion.createFakeIncome
+import com.example.data.util.FakeData.Companion.createFakePayment
+import com.example.data.util.FakeData.Companion.fakeParticipantsBig
+import com.example.data.util.FakeData.Companion.fakeParticipantsSmall
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,8 +18,8 @@ import java.util.UUID
 class DatabaseRepositoryFakeImpl : DatabaseRepository {
     private var _groups = MutableStateFlow(
         listOf(
-            com.example.data.model.Group(
-                currency = com.example.data.model.Currency.USD, name = "Summer Breeze",
+            Group(
+                currency = Currency.USD, name = "Summer Breeze",
                 participants = (fakeParticipantsSmall),
                 transactions = listOf(
                     createFakeExpense(fakeParticipantsSmall, amount = 100.0),
@@ -31,8 +34,8 @@ class DatabaseRepositoryFakeImpl : DatabaseRepository {
                     createFakeIncome(fakeParticipantsSmall, amount = 10.3),
                 )
             ),
-            com.example.data.model.Group(
-                currency = com.example.data.model.Currency.EURO, name = "Rock im Park",
+            Group(
+                currency = Currency.EURO, name = "Rock im Park",
                 participants = fakeParticipantsBig,
                 transactions = listOf(
                     createFakeExpense(fakeParticipantsBig, amount = 100.0),
@@ -47,8 +50,8 @@ class DatabaseRepositoryFakeImpl : DatabaseRepository {
                     createFakePayment(fakeParticipantsBig, amount = 22.0),
                 )
             ),
-            com.example.data.model.Group(
-                currency = com.example.data.model.Currency.EURO, name = "Spanien",
+            Group(
+                currency = Currency.EURO, name = "Spanien",
                 participants = fakeParticipantsSmall,
                 transactions = listOf(
                     createFakeExpense(fakeParticipantsSmall, amount = 100.0),
@@ -58,9 +61,9 @@ class DatabaseRepositoryFakeImpl : DatabaseRepository {
             )
         )
     )
-    override val groups: StateFlow<List<com.example.data.model.Group>> = _groups.asStateFlow()
+    override val groups: StateFlow<List<Group>> = _groups.asStateFlow()
 
-    override fun addGroup(group: com.example.data.model.Group) {
+    override fun addGroup(group: Group) {
         _groups.update {
             val newList = it.toMutableList()
             newList.add(group)
@@ -68,7 +71,7 @@ class DatabaseRepositoryFakeImpl : DatabaseRepository {
         }
     }
 
-    override fun addTransaction(groupId: UUID, transaction: com.example.data.model.Transaction) {
+    override fun addTransaction(groupId: UUID, transaction: Transaction) {
         val groupIndex = _groups.value.indexOfFirst { it.id == groupId }
         val group = _groups.value[groupIndex]
         val updatedGroup = group.copy(transactions = group.transactions + transaction)
@@ -78,7 +81,7 @@ class DatabaseRepositoryFakeImpl : DatabaseRepository {
         _groups.value = updatedGroups
     }
 
-    override suspend fun getGroup(groupId: UUID): com.example.data.model.Group? {
+    override suspend fun getGroup(groupId: UUID): Group? {
         delay(1000)
         return _groups.value.firstOrNull { it.id == groupId }
     }

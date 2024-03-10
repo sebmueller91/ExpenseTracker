@@ -71,7 +71,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.expensetracker.R
-import com.example.data.model.Currency
+import com.example.core.model.Currency
 import com.example.expensetracker.ui.components.NavigationIcon
 import com.example.expensetracker.ui.components.RoundFloatingActionButton
 import com.example.expensetracker.ui.screens.destinations.GroupDetailScreenDestination
@@ -135,7 +135,7 @@ private fun AddGroupScreen(
     addParticipant: () -> Unit,
     updateParticipant: (Int, String) -> Unit,
     deleteParticipant: (Int) -> Unit,
-    selectCurrency: (com.example.data.model.Currency) -> Unit,
+    selectCurrency: (Currency) -> Unit,
     onClose: () -> Unit,
     onBack: () -> Unit,
     onFinish: () -> Unit
@@ -256,7 +256,7 @@ private fun GroupNameCurrencyScreen(
     uiStateFlow: State<AddGroupUiState>,
     goToNextSubScreen: () -> Unit,
     updateGroupName: (String) -> Unit,
-    selectCurrency: (com.example.data.model.Currency) -> Unit,
+    selectCurrency: (Currency) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val groupNameFocusRequester by remember { mutableStateOf(FocusRequester()) }
@@ -320,8 +320,8 @@ private fun GroupNameTextField(
 
 @Composable
 private fun CurrencyDropdown(
-    selectedCurrency: com.example.data.model.Currency,
-    selectCurrency: (com.example.data.model.Currency) -> Unit,
+    selectedCurrency: Currency,
+    selectCurrency: (Currency) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -358,7 +358,7 @@ private fun CurrencyDropdown(
                     .align(Alignment.BottomStart)
                     .heightIn(max = 300.dp)
             ) {
-                com.example.data.model.Currency.entries.forEach { currency ->
+                Currency.entries.forEach { currency ->
                     DropdownMenuItem(
                         onClick = {
                             selectCurrency(currency)

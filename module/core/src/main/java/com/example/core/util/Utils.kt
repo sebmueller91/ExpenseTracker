@@ -1,4 +1,4 @@
-package com.example.expensetracker.util
+package com.example.core.util
 
 import android.content.Context
 import androidx.core.os.ConfigurationCompat

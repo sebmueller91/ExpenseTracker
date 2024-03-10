@@ -38,7 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.expensetracker.R
-import com.example.data.model.Transaction
+import com.example.core.model.Transaction
 import com.example.expensetracker.ui.components.AnimatedFloatingActionButton
 import com.example.expensetracker.ui.components.RoundFloatingActionButton
 import com.example.expensetracker.ui.components.ScreenWithAnimatedOverlay
@@ -49,7 +49,7 @@ import kotlinx.coroutines.delay
 fun SettleUpTab(
     modifier: Modifier = Modifier,
     uiState: GroupDetailUiState.Success,
-    applySettleUpTransaction: (com.example.data.model.Transaction.Transfer) -> Unit
+    applySettleUpTransaction: (Transaction.Transfer) -> Unit
 ) {
     var fabExpanded by remember { mutableStateOf(false) }
 
@@ -90,7 +90,7 @@ fun SettleUpTab(
 private fun SettleUpTransactions(
     modifier: Modifier = Modifier,
     uiState: GroupDetailUiState.Success,
-    applySettleUpTransaction: (com.example.data.model.Transaction.Transfer) -> Unit
+    applySettleUpTransaction: (Transaction.Transfer) -> Unit
 ) {
     LazyColumn(modifier = modifier) {
         uiState.settleUpTransactions.entries.forEach { entry ->
@@ -107,9 +107,9 @@ private fun SettleUpTransactions(
 
 @Composable
 private fun SettleUpTransactionCard(
-    entry: Map.Entry<com.example.data.model.Transaction.Transfer, String>,
+    entry: Map.Entry<Transaction.Transfer, String>,
     modifier: Modifier = Modifier,
-    applySettleUpTransaction: (com.example.data.model.Transaction.Transfer) -> Unit
+    applySettleUpTransaction: (Transaction.Transfer) -> Unit
 ) {
     val animationDuration = 1000
     var isVisible by remember { mutableStateOf(true) }

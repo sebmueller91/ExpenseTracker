@@ -44,9 +44,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.expensetracker.BuildConfig
 import com.example.expensetracker.R
-import com.example.data.model.Currency
-import com.example.data.model.Group
-import com.example.data.model.Participant
+import com.example.core.model.Currency
+import com.example.core.model.Group
+import com.example.core.model.Participant
 import com.example.expensetracker.ui.components.ExpandCollapseButton
 import com.example.expensetracker.ui.components.RoundFloatingActionButton
 import com.example.expensetracker.ui.screens.destinations.AddGroupScreenDestination
@@ -137,7 +137,7 @@ private fun GroupOverviewScreen(
 
 @Composable
 private fun GroupCard(
-    group: com.example.data.model.Group,
+    group: Group,
     eventCosts: String,
     onNavigateToDetailScreen: (UUID) -> Unit,
     modifier: Modifier = Modifier
@@ -235,21 +235,21 @@ private fun GroupOverviewScreenPreview(darkMode: Boolean) {
         mutableStateOf(
             GroupOverviewUiState(
                 groups = listOf(
-                    com.example.data.model.Group(
+                    Group(
                         name = "Rock im Park",
                         participants = listOf(
-                            com.example.data.model.Participant("Participant 1"),
-                            com.example.data.model.Participant("Participant 2")
+                            Participant("Participant 1"),
+                            Participant("Participant 2")
                         ),
-                        currency = com.example.data.model.Currency.EURO,
+                        currency = Currency.EURO,
                         transactions = listOf()
-                    ), com.example.data.model.Group(
+                    ), Group(
                         name = "Summer Breeze",
                         participants = listOf(
-                            com.example.data.model.Participant("Participant 3"),
-                            com.example.data.model.Participant("Participant 4")
+                            Participant("Participant 3"),
+                            Participant("Participant 4")
                         ),
-                        currency = com.example.data.model.Currency.EURO,
+                        currency = Currency.EURO,
                         transactions = listOf()
                     )
                 )

@@ -1,15 +1,15 @@
 package com.example.expensetracker.services
 
-import com.example.data.model.Group
-import com.example.data.model.Participant
-import com.example.data.model.Transaction
+import com.example.core.model.Group
+import com.example.core.model.Participant
+import com.example.core.model.Transaction
 
 interface IndividualCostsAmount {
-    fun execute(group: com.example.data.model.Group): Map<com.example.data.model.Participant, Double>
+    fun execute(group: Group): Map<Participant, Double>
 }
 
 class IndividualCostsAmountImpl : IndividualCostsAmount {
-    override fun execute(group: com.example.data.model.Group): Map<com.example.data.model.Participant, Double> {
+    override fun execute(group: Group): Map<Participant, Double> {
         return group.participants.associateWith { participant ->
             calculateParticipantsCosts(
                 participant,
@@ -19,25 +19,25 @@ class IndividualCostsAmountImpl : IndividualCostsAmount {
     }
 
     private fun calculateParticipantsCosts(
-        participant: com.example.data.model.Participant,
-        transactions: List<com.example.data.model.Transaction>
+        participant: Participant,
+        transactions: List<Transaction>
     ): Double {
         var sum = 0.0
         transactions.forEach { transaction ->
             when (transaction) {
-                is com.example.data.model.Transaction.Expense -> {
+                is Transaction.Expense -> {
                     if (transaction.splitBetween.contains(participant)) {
                         sum += (transaction.amount / transaction.splitBetween.size.toDouble())
                     }
                 }
 
-                is com.example.data.model.Transaction.Income -> {
+                is Transaction.Income -> {
                     if (transaction.splitBetween.contains(participant)) {
                         sum -= (transaction.amount / transaction.splitBetween.size.toDouble())
                     }
                 }
 
-                is com.example.data.model.Transaction.Transfer -> {
+                is Transaction.Transfer -> {
                     // Does not influence costs
                 }
             }

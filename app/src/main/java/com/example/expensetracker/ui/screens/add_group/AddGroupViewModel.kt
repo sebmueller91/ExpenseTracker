@@ -1,9 +1,9 @@
 package com.example.expensetracker.ui.screens.add_group
 
 import androidx.lifecycle.ViewModel
-import com.example.data.model.Currency
-import com.example.data.model.Group
-import com.example.data.model.Participant
+import com.example.core.model.Currency
+import com.example.core.model.Group
+import com.example.core.model.Participant
 import com.example.data.repository.DatabaseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -81,7 +81,7 @@ class AddGroupViewModel(private val databaseRepository: com.example.data.reposit
         }
     }
 
-    fun selectCurrency(currency: com.example.data.model.Currency) {
+    fun selectCurrency(currency: Currency) {
         _uiState.update {
             it.copy(currency = currency)
         }
@@ -90,11 +90,11 @@ class AddGroupViewModel(private val databaseRepository: com.example.data.reposit
     fun createNewGroup(): UUID {
         val uuid = UUID.randomUUID()
         databaseRepository.addGroup(
-            com.example.data.model.Group(
+            Group(
                 id = uuid,
                 name = _uiState.value.groupName,
                 participants = _uiState.value.participantsNames.map {
-                    com.example.data.model.Participant(
+                    Participant(
                         name = it
                     )
                 },
