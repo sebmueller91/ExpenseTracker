@@ -1,16 +1,17 @@
 package com.example.expensetracker.ui.screens.add_group
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.core.model.Currency
 import com.example.core.model.Group
 import com.example.core.model.Participant
-import com.example.data.repository.DatabaseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.util.UUID
 
-class AddGroupViewModel(private val databaseRepository: com.example.data.repository.DatabaseRepository) : ViewModel() {
+class AddGroupViewModel(private val dataRepository: com.example.data.repository.DataRepository) : ViewModel() {
     private var _uiState = MutableStateFlow(AddGroupUiState())
     val uiStateFlow = _uiState.asStateFlow()
 
@@ -89,19 +90,21 @@ class AddGroupViewModel(private val databaseRepository: com.example.data.reposit
 
     fun createNewGroup(): UUID {
         val uuid = UUID.randomUUID()
-        databaseRepository.addGroup(
-            Group(
-                id = uuid,
-                name = _uiState.value.groupName,
-                participants = _uiState.value.participantsNames.map {
-                    Participant(
-                        name = it
-                    )
-                },
-                currency = _uiState.value.currency,
-                transactions = listOf()
+        viewModelScope.launch {
+            dataRepository.addGroup(
+                Group(
+                    id = uuid,
+                    name = _uiState.value.groupName,
+                    participants = _uiState.value.participantsNames.map {
+                        Participant(
+                            name = it
+                        )
+                    },
+                    currency = _uiState.value.currency,
+                    transactions = listOf()
+                )
             )
-        )
+        }
         return uuid
     }
 }

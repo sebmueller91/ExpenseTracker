@@ -8,7 +8,7 @@ internal class CurrencyObject : RealmObject {
 }
 
 internal fun CurrencyObject.toCurrency(): Currency =
-    Currency.values().first { it.abbreviation == abbreviation }
+    Currency.entries.first { it.abbreviation == abbreviation }
 
 
 internal fun Currency.toCurrencyObject(): CurrencyObject = CurrencyObject().apply {

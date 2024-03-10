@@ -8,14 +8,13 @@ import com.example.data.util.FakeData.Companion.createFakeIncome
 import com.example.data.util.FakeData.Companion.createFakePayment
 import com.example.data.util.FakeData.Companion.fakeParticipantsBig
 import com.example.data.util.FakeData.Companion.fakeParticipantsSmall
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import java.util.UUID
 
-class DatabaseRepositoryFakeImpl : DatabaseRepository {
+internal class DataRepositoryFakeImpl : DataRepository {
     private var _groups = MutableStateFlow(
         listOf(
             Group(
@@ -63,7 +62,7 @@ class DatabaseRepositoryFakeImpl : DatabaseRepository {
     )
     override val groups: StateFlow<List<Group>> = _groups.asStateFlow()
 
-    override fun addGroup(group: Group) {
+    override suspend fun addGroup(group: Group) {
         _groups.update {
             val newList = it.toMutableList()
             newList.add(group)
@@ -79,10 +78,5 @@ class DatabaseRepositoryFakeImpl : DatabaseRepository {
             this[groupIndex] = updatedGroup
         }
         _groups.value = updatedGroups
-    }
-
-    override suspend fun getGroup(groupId: UUID): Group? {
-        delay(1000)
-        return _groups.value.firstOrNull { it.id == groupId }
     }
 }

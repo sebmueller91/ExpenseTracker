@@ -2,7 +2,6 @@ package com.example.expensetracker.ui.screens.group_overview
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.data.repository.DatabaseRepository
 import com.example.core.model.Group
 import com.example.expensetracker.services.EventCosts
 import com.example.expensetracker.services.LocaleAwareFormatter
@@ -12,7 +11,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class GroupOverviewViewModel(
-    private val databaseRepository: com.example.data.repository.DatabaseRepository,
+    private val dataRepository: com.example.data.repository.DataRepository,
     private val eventCost: EventCosts,
     private val localeAwareFormatter: LocaleAwareFormatter
 ) : ViewModel() {
@@ -21,7 +20,7 @@ class GroupOverviewViewModel(
 
     init {
         viewModelScope.launch {
-            databaseRepository.groups.collect { groups ->
+            dataRepository.groups.collect { groups ->
                 _uiState.update { GroupOverviewUiState(groups = groups, eventCosts = groups.map { it.formattedEventCosts() }) }
             }
         }
