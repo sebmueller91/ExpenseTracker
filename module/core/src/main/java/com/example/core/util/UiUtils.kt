@@ -1,10 +1,9 @@
-package com.example.expensetracker.ui.util
+package com.example.core.util
 
 import android.content.Context
-import com.example.expensetracker.R
+import com.example.core.R
 import com.example.core.model.Currency
 import com.example.core.model.Participant
-import com.example.core.util.getLocale
 import timber.log.Timber
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -17,7 +16,7 @@ import kotlin.math.roundToInt
 class UiUtils {
     companion object {
         fun formatMoneyAmount(amount: Double, currency: Currency, context: Context): String {
-            val locale = com.example.core.util.getLocale(context)
+            val locale = getLocale(context)
             val symbols = DecimalFormatSymbols(locale)
             val formatter = DecimalFormat("#,##0.00", symbols)
 
@@ -51,8 +50,9 @@ class UiUtils {
             }
         }
 
+        // TODO: Remove?
         fun formatDate(date: Date, context: Context): String {
-            val locale = com.example.core.util.getLocale(context)
+            val locale = getLocale(context)
             val formatter = DateFormat.getDateInstance(DateFormat.DEFAULT, locale)
             return formatter.format(date)
         }

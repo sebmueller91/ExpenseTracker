@@ -1,9 +1,9 @@
-package com.example.expensetracker.services
+package com.example.core.services
 
 import android.content.Context
 import com.example.core.model.Currency
 import com.example.core.model.Participant
-import com.example.expensetracker.ui.util.UiUtils
+import com.example.core.util.UiUtils
 import java.util.Date
 
 interface LocaleAwareFormatter {

@@ -1,10 +1,16 @@
-package com.example.expensetracker.services
+package com.example.core.services
 
 import android.content.Context
 import com.example.core.model.Currency
 import com.example.core.model.Group
 import com.example.core.model.Transaction
-import com.example.data.util.FakeData
+import com.example.core.services.IndividualCostsAmount
+import com.example.core.services.IndividualCostsAmountImpl
+import com.example.core.services.IndividualPaymentAmount
+import com.example.core.services.IndividualPaymentAmountImpl
+import com.example.core.services.SettleUp
+import com.example.core.services.SettleUpImpl
+import com.example.core.util.FakeData
 import com.example.core.util.isEqualTo
 import io.mockk.every
 import io.mockk.mockk

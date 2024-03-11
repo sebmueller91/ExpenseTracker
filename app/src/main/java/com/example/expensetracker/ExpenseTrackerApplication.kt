@@ -2,7 +2,7 @@ package com.example.expensetracker
 
 import android.app.Application
 import com.example.data.di.dataModule
-import com.example.expensetracker.services.di.servicesModule
+import com.example.core.services.di.servicesModule
 import com.example.expensetracker.ui.di.uiModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger

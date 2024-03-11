@@ -1,4 +1,4 @@
-package com.example.expensetracker.services
+package com.example.core.services
 
 import com.example.core.model.Group
 import com.example.core.model.Participant

@@ -1,7 +1,7 @@
-package com.example.expensetracker.services
+package com.example.core.services
 
 import android.content.Context
-import com.example.expensetracker.R
+import com.example.core.R
 import com.example.core.model.Group
 import com.example.core.model.Participant
 import com.example.core.model.Transaction

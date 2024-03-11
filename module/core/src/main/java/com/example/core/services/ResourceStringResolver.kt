@@ -1,4 +1,4 @@
-package com.example.expensetracker.services
+package com.example.core.services
 
 import android.content.Context
 import androidx.annotation.StringRes

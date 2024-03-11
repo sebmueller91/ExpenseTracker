@@ -1,4 +1,4 @@
-package com.example.data.util
+package com.example.core.util
 
 import com.example.core.model.Participant
 import com.example.core.model.Transaction
@@ -6,7 +6,7 @@ import java.util.Calendar
 import java.util.Date
 import kotlin.random.Random
 
-internal class FakeData {
+class FakeData {
 
     companion object {
         val fakeParticipantsSmall = listOf(

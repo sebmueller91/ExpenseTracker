@@ -3,11 +3,11 @@ package com.example.data.repository
 import com.example.core.model.Currency
 import com.example.core.model.Group
 import com.example.core.model.Transaction
-import com.example.data.util.FakeData.Companion.createFakeExpense
-import com.example.data.util.FakeData.Companion.createFakeIncome
-import com.example.data.util.FakeData.Companion.createFakePayment
-import com.example.data.util.FakeData.Companion.fakeParticipantsBig
-import com.example.data.util.FakeData.Companion.fakeParticipantsSmall
+import com.example.core.util.FakeData.Companion.createFakeExpense
+import com.example.core.util.FakeData.Companion.createFakeIncome
+import com.example.core.util.FakeData.Companion.createFakePayment
+import com.example.core.util.FakeData.Companion.fakeParticipantsBig
+import com.example.core.util.FakeData.Companion.fakeParticipantsSmall
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
