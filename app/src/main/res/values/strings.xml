@@ -31,7 +31,6 @@
     <string name="from_to">From %1$s to %2$s</string>
     <string name="paid_on">Paid on: %1$s</string>
     <string name="received_on">Received on: %1$s</string>
-    <string name="and">" and "</string>
     <string name="gave_to_for">%1$s gave %2$s to %3$s for %4$s</string>
     <string name="received_for">%1$s received %2$s for %3$s</string>
     <string name="paid_for">%1$s paid %2$s for %3$s</string>

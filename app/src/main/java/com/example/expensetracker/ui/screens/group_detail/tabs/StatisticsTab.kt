@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.sp
 import com.example.core.model.Currency
 import com.example.core.model.Participant
 import com.example.expensetracker.ui.screens.group_detail.GroupDetailUiState
-import com.example.expensetracker.ui.util.UiUtils
+import com.example.core.util.UiUtils
 import timber.log.Timber
 
 @Composable

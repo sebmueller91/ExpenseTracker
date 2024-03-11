@@ -3,8 +3,8 @@ package com.example.expensetracker.ui.screens.group_overview
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.model.Group
-import com.example.expensetracker.services.EventCosts
-import com.example.expensetracker.services.LocaleAwareFormatter
+import com.example.core.services.EventCosts
+import com.example.core.services.LocaleAwareFormatter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

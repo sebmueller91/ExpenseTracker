@@ -1,4 +1,4 @@
-package com.example.expensetracker.util
+package com.example.core.services
 
 import com.example.core.util.isBiggerThan
 import com.example.core.util.isEqualTo
