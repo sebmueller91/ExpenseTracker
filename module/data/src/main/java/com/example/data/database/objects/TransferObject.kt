@@ -5,16 +5,16 @@ import io.realm.kotlin.types.RealmObject
 import java.util.Date
 
 internal class TransferObject : RealmObject{
-    var fromParticipant: ParticipantObject = ParticipantObject()
-    var toParticipant: ParticipantObject = ParticipantObject()
+    var fromParticipant: ParticipantObject? = ParticipantObject()
+    var toParticipant: ParticipantObject? = ParticipantObject()
     var amount: Double = 0.0
     var timestamp: Long = 0
     var purpose: String = ""
 }
 
 internal fun TransferObject.toTransfer(): Transaction.Transfer = Transaction.Transfer(
-    fromParticipant = this@toTransfer.fromParticipant.toParticipant(),
-    toParticipant = this@toTransfer.toParticipant.toParticipant(),
+    fromParticipant = this@toTransfer.fromParticipant?.toParticipant()!!, // TODO: Get rid of !!
+    toParticipant = this@toTransfer.toParticipant?.toParticipant()!!, // TODO: Get rid of !!
     amount = this@toTransfer.amount,
     date = Date(this@toTransfer.timestamp),
     purpose = this@toTransfer.purpose

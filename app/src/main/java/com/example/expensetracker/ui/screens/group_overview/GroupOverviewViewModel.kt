@@ -5,13 +5,14 @@ import androidx.lifecycle.viewModelScope
 import com.example.core.model.Group
 import com.example.core.services.EventCosts
 import com.example.core.services.LocaleAwareFormatter
+import com.example.data.repository.DataRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class GroupOverviewViewModel(
-    private val dataRepository: com.example.data.repository.DataRepository,
+    private val dataRepository: DataRepository,
     private val eventCost: EventCosts,
     private val localeAwareFormatter: LocaleAwareFormatter
 ) : ViewModel() {

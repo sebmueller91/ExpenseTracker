@@ -28,5 +28,5 @@ val dataModule = module {
         )
     }
 
-    single<DataRepository> { DataRepositoryImpl(realmDb = get()) }
+    single<DataRepository> { DataRepositoryImpl(realm = get()) }
 }

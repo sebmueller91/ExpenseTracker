@@ -17,7 +17,7 @@ internal class GroupObject : RealmObject {
     var id: String = ""
     var name: String = ""
     var participants: RealmList<ParticipantObject> = realmListOf()
-    var currency: CurrencyObject = Currency.EURO.toCurrencyObject()
+    var currency: CurrencyObject? = Currency.EURO.toCurrencyObject()
     var transfers: RealmList<TransferObject> = realmListOf()
     var expenses: RealmList<ExpenseObject> = realmListOf()
     var incomes: RealmList<IncomeObject> = realmListOf()
@@ -30,12 +30,12 @@ internal fun GroupObject.toGroup(): Group {
         id = UUID.fromString(this@toGroup.id),
         name = this@toGroup.name,
         participants = this@toGroup.participants.map { it.toParticipant() },
-        currency = this@toGroup.currency.toCurrency(),
+        currency = this@toGroup.currency?.toCurrency()!!, // TODO: Get rid of !!
         transactions = transactions
     )
 }
 
-internal fun Group.toGroupObject(): GroupObject = toGroupObject().apply {
+internal fun Group.toGroupObject(): GroupObject = GroupObject().apply {
     id = this@toGroupObject.id.toString()
     name = this@toGroupObject.name
     participants = this@toGroupObject.participants.map { it.toParticipantObject() }.toRealmList()
