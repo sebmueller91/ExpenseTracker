@@ -11,7 +11,7 @@ internal class IncomeObject : RealmObject {
     var amount: Double = 0.0
     var timestamp: Long = 0L
     var purpose: String = ""
-    var receivedBy: ParticipantObject = ParticipantObject()
+    var receivedBy: ParticipantObject? = ParticipantObject()
     var splitBetween: RealmList<ParticipantObject> = realmListOf()
 
 }
@@ -20,7 +20,7 @@ internal fun IncomeObject.toIncome(): Transaction.Income = Transaction.Income(
     amount = amount,
     date = Date(timestamp),
     purpose = purpose,
-    receivedBy = receivedBy.toParticipant(),
+    receivedBy = receivedBy?.toParticipant()!!, // TODO: Get rid of !!
     splitBetween = splitBetween.map { it.toParticipant() }
 )
 

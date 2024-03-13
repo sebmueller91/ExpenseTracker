@@ -12,16 +12,16 @@ import kotlinx.coroutines.flow.map
 import java.util.UUID
 
 internal class DataRepositoryImpl(
-    val realmDb: Realm
+    val realm: Realm
 ): DataRepository{
-    override val groups: Flow<List<Group>> = realmDb
+    override val groups: Flow<List<Group>> = realm
             .query(GroupObject::class)
             .asFlow()
         .map {results -> results.list.map { it.toGroup() }}
 
 
     override suspend fun addGroup(group: Group) {
-        realmDb.write {
+        realm.write {
             copyToRealm(group.toGroupObject(), UpdatePolicy.ALL)
         }
     }

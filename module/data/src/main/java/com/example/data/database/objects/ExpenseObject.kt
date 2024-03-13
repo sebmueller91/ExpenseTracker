@@ -8,7 +8,7 @@ import io.realm.kotlin.types.RealmObject
 import java.util.Date
 
 internal class ExpenseObject : RealmObject{
-    var paidBy: ParticipantObject = ParticipantObject()
+    var paidBy: ParticipantObject? = ParticipantObject()
     var amount: Double = 0.0
     var timestamp: Long = 0
     var purpose: String = ""
@@ -16,7 +16,7 @@ internal class ExpenseObject : RealmObject{
 }
 
 internal fun ExpenseObject.toExpense(): Transaction.Expense = Transaction.Expense(
-    paidBy = this@toExpense.paidBy.toParticipant(),
+    paidBy = this@toExpense.paidBy?.toParticipant()!!, // TODO: Get rid of !!
     amount = this@toExpense.amount,
     date = Date(this@toExpense.timestamp),
     purpose = this@toExpense.purpose,
