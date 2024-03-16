@@ -13,11 +13,12 @@ import java.util.UUID
 
 internal class DataRepositoryImpl(
     val realm: Realm
-): DataRepository{
+) : DataRepository {
+
     override val groups: Flow<List<Group>> = realm
-            .query(GroupObject::class)
-            .asFlow()
-        .map {results -> results.list.map { it.toGroup() }}
+        .query(GroupObject::class)
+        .asFlow()
+        .map { results -> results.list.map { it.toGroup() } }
 
 
     override suspend fun addGroup(group: Group) {
