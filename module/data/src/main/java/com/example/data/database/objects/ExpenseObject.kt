@@ -6,6 +6,7 @@ import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import java.util.Date
+import java.util.UUID
 
 internal class ExpenseObject : RealmObject{
     var paidBy: ParticipantObject? = ParticipantObject()
@@ -13,6 +14,7 @@ internal class ExpenseObject : RealmObject{
     var timestamp: Long = 0
     var purpose: String = ""
     var splitBetween: RealmList<ParticipantObject> = realmListOf()
+    var id: String = ""
 }
 
 internal fun ExpenseObject.toExpense(): Transaction.Expense = Transaction.Expense(
@@ -20,7 +22,8 @@ internal fun ExpenseObject.toExpense(): Transaction.Expense = Transaction.Expens
     amount = this@toExpense.amount,
     date = Date(this@toExpense.timestamp),
     purpose = this@toExpense.purpose,
-    splitBetween = this@toExpense.splitBetween.map { it.toParticipant() }
+    splitBetween = this@toExpense.splitBetween.map { it.toParticipant() },
+    id = UUID.fromString(this@toExpense.id)
 )
 
 internal fun Transaction.Expense.toExpenseObject(): ExpenseObject = ExpenseObject().apply {
@@ -29,4 +32,5 @@ internal fun Transaction.Expense.toExpenseObject(): ExpenseObject = ExpenseObjec
     timestamp = this@toExpenseObject.date.time
     purpose = this@toExpenseObject.purpose
     splitBetween = this@toExpenseObject.splitBetween.map { it.toParticipantObject() }.toRealmList()
+    id = this@toExpenseObject.id.toString()
 }

@@ -23,11 +23,11 @@ class GroupOverviewViewModel(
 
     init {
         viewModelScope.launch {
-            dataRepository.groups.collect { groups ->
+            dataRepository.groups.collect { settleUpGroups ->
                 _uiState.update {
                     GroupOverviewUiState(
-                        groups = groups,
-                        eventCosts = groups.map { it.formattedEventCosts() })
+                        groups = settleUpGroups.map { settleUpGroup -> settleUpGroup.group },
+                        eventCosts = settleUpGroups.map { settleUpGroup -> settleUpGroup.group.formattedEventCosts() })
                 }
             }
         }
