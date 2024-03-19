@@ -5,6 +5,7 @@ import com.example.data.database.objects.ExpenseObject
 import com.example.data.database.objects.GroupObject
 import com.example.data.database.objects.IncomeObject
 import com.example.data.database.objects.ParticipantObject
+import com.example.data.database.objects.SettleUpGroupObject
 import com.example.data.database.objects.TransferObject
 import com.example.data.repository.DataRepository
 import com.example.data.repository.DataRepositoryImpl
@@ -23,10 +24,11 @@ val dataModule = module {
                     TransferObject::class,
                     ParticipantObject::class,
                     GroupObject::class,
+                    SettleUpGroupObject::class
                 )
             )
         )
     }
 
-    single<DataRepository> { DataRepositoryImpl(realm = get()) }
+    single<DataRepository> { DataRepositoryImpl(realm = get(), settleUp = get()) }
 }

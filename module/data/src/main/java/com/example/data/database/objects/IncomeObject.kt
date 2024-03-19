@@ -6,6 +6,7 @@ import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import java.util.Date
+import java.util.UUID
 
 internal class IncomeObject : RealmObject {
     var amount: Double = 0.0
@@ -13,7 +14,7 @@ internal class IncomeObject : RealmObject {
     var purpose: String = ""
     var receivedBy: ParticipantObject? = ParticipantObject()
     var splitBetween: RealmList<ParticipantObject> = realmListOf()
-
+    var id: String = ""
 }
 
 internal fun IncomeObject.toIncome(): Transaction.Income = Transaction.Income(
@@ -21,7 +22,8 @@ internal fun IncomeObject.toIncome(): Transaction.Income = Transaction.Income(
     date = Date(timestamp),
     purpose = purpose,
     receivedBy = receivedBy?.toParticipant()!!, // TODO: Get rid of !!
-    splitBetween = splitBetween.map { it.toParticipant() }
+    splitBetween = splitBetween.map { it.toParticipant() },
+    id = UUID.fromString(this@toIncome.id)
 )
 
 internal fun Transaction.Income.toIncomeObject(): IncomeObject = IncomeObject().apply {
@@ -30,4 +32,5 @@ internal fun Transaction.Income.toIncomeObject(): IncomeObject = IncomeObject().
     purpose = this@toIncomeObject.purpose
     receivedBy = this@toIncomeObject.receivedBy.toParticipantObject()
     splitBetween = this@toIncomeObject.splitBetween.map { it.toParticipantObject() }.toRealmList()
+    id = this@toIncomeObject.id.toString()
 }

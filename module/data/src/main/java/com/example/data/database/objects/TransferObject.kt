@@ -3,6 +3,7 @@ package com.example.data.database.objects
 import com.example.core.model.Transaction
 import io.realm.kotlin.types.RealmObject
 import java.util.Date
+import java.util.UUID
 
 internal class TransferObject : RealmObject{
     var fromParticipant: ParticipantObject? = ParticipantObject()
@@ -10,6 +11,7 @@ internal class TransferObject : RealmObject{
     var amount: Double = 0.0
     var timestamp: Long = 0
     var purpose: String = ""
+    var id: String = ""
 }
 
 internal fun TransferObject.toTransfer(): Transaction.Transfer = Transaction.Transfer(
@@ -17,7 +19,8 @@ internal fun TransferObject.toTransfer(): Transaction.Transfer = Transaction.Tra
     toParticipant = this@toTransfer.toParticipant?.toParticipant()!!, // TODO: Get rid of !!
     amount = this@toTransfer.amount,
     date = Date(this@toTransfer.timestamp),
-    purpose = this@toTransfer.purpose
+    purpose = this@toTransfer.purpose,
+    id = UUID.fromString(this@toTransfer.id)
 )
 
 internal fun Transaction.Transfer.toTransferObject(): TransferObject = TransferObject().apply {
@@ -26,4 +29,5 @@ internal fun Transaction.Transfer.toTransferObject(): TransferObject = TransferO
     amount = this@toTransferObject.amount
     timestamp = this@toTransferObject.date.time
     purpose = this@toTransferObject.purpose
+    id = this@toTransferObject.id.toString()
 }
