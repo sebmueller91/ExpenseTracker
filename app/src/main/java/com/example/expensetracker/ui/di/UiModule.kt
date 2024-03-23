@@ -23,7 +23,6 @@ val uiModule = module {
             eventCost = get(),
             individualPaymentAmount = get(),
             individualPaymentPercentage = get(),
-            settleUp = get(),
             resourceResolver = get(),
             localeAwareFormatter = get()
         )
