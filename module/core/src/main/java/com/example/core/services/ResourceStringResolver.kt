@@ -8,7 +8,7 @@ interface ResourceResolver {
     fun getString(@StringRes resId: Int, vararg formatArgs: Any): String
 }
 
-class ResourceResolverImpl(private val context: Context): ResourceResolver {
+internal class ResourceResolverImpl(private val context: Context): ResourceResolver {
     override fun getString(resId: Int): String {
         return context.getString(resId)
     }

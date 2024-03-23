@@ -18,7 +18,7 @@ interface SettleUp {
     fun execute(group: Group): List<Transaction.Transfer>
 }
 
-class SettleUpImpl(
+internal class SettleUpImpl(
     private val individualPaymentAmount: IndividualPaymentAmount,
     private val individualCostsAmount: IndividualCostsAmount,
     private val context: Context
