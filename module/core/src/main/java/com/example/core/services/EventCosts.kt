@@ -6,7 +6,7 @@ interface EventCosts {
     fun execute(transactions: List<Transaction>): Double
 }
 
-class EventCostsImpl : EventCosts {
+internal class EventCostsImpl : EventCosts {
     override fun execute(transactions: List<Transaction>): Double {
         var sum = 0.0
         transactions.forEach {transaction ->

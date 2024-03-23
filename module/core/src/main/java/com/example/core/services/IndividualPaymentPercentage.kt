@@ -11,7 +11,7 @@ interface IndividualPaymentPercentage {
     fun execute(group: Group): Map<Participant, Double>
 }
 
-class IndividualPaymentPercentageImpl(
+internal class IndividualPaymentPercentageImpl(
     private val eventCost: EventCosts,
     private val individualPaymentAmount: IndividualPaymentAmount
 ) : IndividualPaymentPercentage {

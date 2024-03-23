@@ -39,18 +39,21 @@ class UiUtils {
         }
 
         fun formatParticipantsList(participants: List<Participant>, context: Context): String {
-            if (participants.isEmpty()) {
-                return ""
-            } else if (participants.size == 1) {
-                return participants.first().name
-            } else {
-                return participants
-                    .joinToString(", ") { it.name }
-                    .replaceLastOccurrenceOf(", ", context.getString(R.string.and))
+            return when {
+                participants.isEmpty() -> {
+                    ""
+                }
+                participants.size == 1 -> {
+                    participants.first().name
+                }
+                else -> {
+                    participants
+                        .joinToString(", ") { it.name }
+                        .replaceLastOccurrenceOf(", ", context.getString(R.string.and))
+                }
             }
         }
 
-        // TODO: Remove?
         fun formatDate(date: Date, context: Context): String {
             val locale = getLocale(context)
             val formatter = DateFormat.getDateInstance(DateFormat.DEFAULT, locale)

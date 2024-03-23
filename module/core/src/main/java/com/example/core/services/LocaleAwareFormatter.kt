@@ -13,7 +13,7 @@ interface LocaleAwareFormatter {
     fun formatDate(date: Date): String
 }
 
-class LocaleAwareFormatterImpl(
+internal class LocaleAwareFormatterImpl(
     private val context: Context
 ): LocaleAwareFormatter {
     override fun formatMoneyAmount(amount: Double, currency: Currency): String = UiUtils.formatMoneyAmount(amount, currency, context)
