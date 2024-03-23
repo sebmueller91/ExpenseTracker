@@ -3,7 +3,8 @@ package com.example.data.repository
 import com.example.core.model.Group
 import com.example.core.model.SettleUpGroup
 import com.example.core.model.Transaction
-import com.example.core.services.SettleUp
+import com.example.core.services.EventCostsCalculator
+import com.example.core.services.SettleUpCalculator
 import com.example.data.database.objects.SettleUpGroupObject
 import com.example.data.database.objects.toExpenseObject
 import com.example.data.database.objects.toGroup
@@ -22,7 +23,8 @@ import java.util.UUID
 
 internal class DataRepositoryImpl(
     val realm: Realm,
-    val settleUp: SettleUp
+    val settleUpCalculator: SettleUpCalculator,
+    val eventCostsCalculator: EventCostsCalculator
 ) : DataRepository {
 
     override val groups: Flow<List<SettleUpGroup>> = realm
@@ -32,11 +34,12 @@ internal class DataRepositoryImpl(
 
     override suspend fun addGroup(group: Group) {
         realm.write {
-            val settleUpTransactions = settleUp.execute(group)
+            val settleUpTransactions = settleUpCalculator.execute(group)
             val settleUpGroup = SettleUpGroupObject().apply {
                 this.group = group.toGroupObject()
                 this.settleUpTransactions =
                     settleUpTransactions.map { it.toTransferObject() }.toRealmList()
+                this.eventCosts = eventCostsCalculator.execute(group.transactions)
             }
             copyToRealm(settleUpGroup, UpdatePolicy.ALL)
         }
@@ -59,7 +62,7 @@ internal class DataRepositoryImpl(
             if (isSettleUpTransaction) {
                 newGroupObject.removeSettleUpTransaction(transaction.id.toString())
             } else {
-                newGroupObject.recalculateSettleUpTransactions()
+                newGroupObject.recalculate()
             }
             copyToRealm(newGroupObject, UpdatePolicy.ALL)
         }
@@ -83,10 +86,11 @@ internal class DataRepositoryImpl(
         settleUpTransactions.removeIf { it.id == transactionId }
     }
 
-    private fun SettleUpGroupObject.recalculateSettleUpTransactions() {
+    private fun SettleUpGroupObject.recalculate() {
         group?.toGroup()?.let { group ->
             settleUpTransactions =
-                settleUp.execute(group).map { it.toTransferObject() }.toRealmList()
+                settleUpCalculator.execute(group).map { it.toTransferObject() }.toRealmList()
+            eventCosts = eventCostsCalculator.execute(group.transactions)
         }
     }
 }
