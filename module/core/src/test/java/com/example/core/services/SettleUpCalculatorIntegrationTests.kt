@@ -4,12 +4,6 @@ import android.content.Context
 import com.example.core.model.Currency
 import com.example.core.model.Group
 import com.example.core.model.Transaction
-import com.example.core.services.IndividualCostsAmount
-import com.example.core.services.IndividualCostsAmountImpl
-import com.example.core.services.IndividualPaymentAmount
-import com.example.core.services.IndividualPaymentAmountImpl
-import com.example.core.services.SettleUp
-import com.example.core.services.SettleUpImpl
 import com.example.core.util.FakeData
 import com.example.core.util.isEqualTo
 import io.mockk.every
@@ -23,15 +17,15 @@ import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.inject
 
-class SettleUpIntegrationTests : KoinTest {
+class SettleUpCalculatorIntegrationTests : KoinTest {
     private val contextMock: Context = mockk<Context>(relaxed = true)
     private val fakePurpose = "asdasdjansdjasndjnbgfdsb"
 
     private val useCasesTestModule = module {
         single<IndividualCostsAmount> { IndividualCostsAmountImpl() }
         single<IndividualPaymentAmount> { IndividualPaymentAmountImpl() }
-        single<SettleUp> {
-            SettleUpImpl(
+        single<SettleUpCalculator> {
+            SettleUpCalculatorImpl(
                 individualCostsAmount = get(),
                 individualPaymentAmount = get(),
                 context = contextMock
@@ -39,7 +33,7 @@ class SettleUpIntegrationTests : KoinTest {
         }
     }
 
-    private val sut: SettleUp by inject()
+    private val sut: SettleUpCalculator by inject()
     private val individualCostsAmount: IndividualCostsAmount by inject()
     private val individualPaymentAmount: IndividualPaymentAmount by inject()
 

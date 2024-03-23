@@ -1,7 +1,7 @@
 package com.example.core.services.di
 
-import com.example.core.services.EventCosts
-import com.example.core.services.EventCostsImpl
+import com.example.core.services.EventCostsCalculator
+import com.example.core.services.EventCostsCalculatorImpl
 import com.example.core.services.IndividualCostsAmount
 import com.example.core.services.IndividualCostsAmountImpl
 import com.example.core.services.IndividualPaymentAmount
@@ -12,12 +12,12 @@ import com.example.core.services.LocaleAwareFormatter
 import com.example.core.services.LocaleAwareFormatterImpl
 import com.example.core.services.ResourceResolver
 import com.example.core.services.ResourceResolverImpl
-import com.example.core.services.SettleUp
-import com.example.core.services.SettleUpImpl
+import com.example.core.services.SettleUpCalculator
+import com.example.core.services.SettleUpCalculatorImpl
 import org.koin.dsl.module
 
 val servicesModule = module {
-    single<EventCosts> { EventCostsImpl() }
+    single<EventCostsCalculator> { EventCostsCalculatorImpl() }
     factory<IndividualCostsAmount> { IndividualCostsAmountImpl() }
     factory<IndividualPaymentAmount> { IndividualPaymentAmountImpl() }
     factory<IndividualPaymentPercentage> {
@@ -26,8 +26,8 @@ val servicesModule = module {
             individualPaymentAmount = get()
         )
     }
-    factory<SettleUp> {
-        SettleUpImpl(
+    factory<SettleUpCalculator> {
+        SettleUpCalculatorImpl(
             individualCostsAmount = get(),
             individualPaymentAmount = get(),
             context = get()

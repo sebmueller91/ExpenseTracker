@@ -12,7 +12,7 @@ interface IndividualPaymentPercentage {
 }
 
 internal class IndividualPaymentPercentageImpl(
-    private val eventCost: EventCosts,
+    private val eventCost: EventCostsCalculator,
     private val individualPaymentAmount: IndividualPaymentAmount
 ) : IndividualPaymentPercentage {
     override fun execute(group: Group): Map<Participant, Double> {
