@@ -10,7 +10,6 @@ import com.example.core.services.IndividualPaymentAmount
 import com.example.core.services.IndividualPaymentPercentage
 import com.example.core.services.LocaleAwareFormatter
 import com.example.core.services.ResourceResolver
-import com.example.core.services.SettleUp
 import com.example.expensetracker.R
 import com.example.expensetracker.ui.screens.group_detail.data.FormattedTransaction
 import kotlinx.coroutines.flow.SharingStarted
@@ -26,7 +25,6 @@ class GroupDetailViewModel(
     private val eventCost: EventCosts,
     private val individualPaymentAmount: IndividualPaymentAmount,
     private val individualPaymentPercentage: IndividualPaymentPercentage,
-    private val settleUp: SettleUp,
     private val resourceResolver: ResourceResolver,
     private val localeAwareFormatter: LocaleAwareFormatter
 ) : ViewModel() {

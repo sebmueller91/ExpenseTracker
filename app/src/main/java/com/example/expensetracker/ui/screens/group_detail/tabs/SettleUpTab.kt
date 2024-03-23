@@ -1,8 +1,5 @@
 package com.example.expensetracker.ui.screens.group_detail.tabs
 
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,7 +25,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,13 +33,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.example.expensetracker.R
 import com.example.core.model.Transaction
+import com.example.expensetracker.R
 import com.example.expensetracker.ui.components.AnimatedFloatingActionButton
 import com.example.expensetracker.ui.components.RoundFloatingActionButton
 import com.example.expensetracker.ui.components.ScreenWithAnimatedOverlay
 import com.example.expensetracker.ui.screens.group_detail.GroupDetailUiState
-import kotlinx.coroutines.delay
 
 @Composable
 fun SettleUpTab(
@@ -111,18 +106,9 @@ private fun SettleUpTransactionCard(
     modifier: Modifier = Modifier,
     applySettleUpTransaction: (Transaction.Transfer) -> Unit
 ) {
-    val animationDuration = 1000
-    var isVisible by remember { mutableStateOf(true) }
-
     Card(
         modifier = modifier
-            .animateContentSize(
-                animationSpec = tween(
-                    durationMillis = animationDuration,
-                    easing = LinearOutSlowInEasing
-                )
-            )
-            .height(if (isVisible) 70.dp else 0.dp)
+            .height(70.dp)
             .padding(vertical = 6.dp, horizontal = 8.dp),
         shape = RoundedCornerShape(16.dp),
     ) {
@@ -142,8 +128,7 @@ private fun SettleUpTransactionCard(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Button(onClick = {
-                isVisible = false
-
+                applySettleUpTransaction(entry.key)
             }) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -160,13 +145,6 @@ private fun SettleUpTransactionCard(
                     )
                 }
             }
-        }
-    }
-
-    LaunchedEffect(key1 = isVisible) {
-        if (!isVisible) {
-            delay(animationDuration.toLong())
-            applySettleUpTransaction(entry.key)
         }
     }
 }
