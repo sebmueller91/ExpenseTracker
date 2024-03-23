@@ -30,5 +30,5 @@ val dataModule = module {
         )
     }
 
-    single<DataRepository> { DataRepositoryImpl(realm = get(), settleUpCalculator = get()) }
+    single<DataRepository> { DataRepositoryImpl(realm = get(), settleUpCalculator = get(), eventCostsCalculator = get()) }
 }

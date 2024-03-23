@@ -20,7 +20,6 @@ val uiModule = module {
         GroupDetailViewModel(
             groupId = groupId,
             dataRepository = get(),
-            eventCost = get(),
             individualPaymentAmount = get(),
             individualPaymentPercentage = get(),
             resourceResolver = get(),
