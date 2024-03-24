@@ -14,13 +14,14 @@ import org.koin.test.KoinTest
 import org.koin.test.inject
 
 private val DELTA = 0.001
-class IndividualPaymentAmountTest : KoinTest {
+
+class IndividualCostsAmountCalculatorTest : KoinTest {
 
     private val useCasesTestModule = module {
-        single<IndividualPaymentAmount> { IndividualPaymentAmountImpl() }
+        single<IndividualCostsAmountCalculator> { IndividualCostsAmountCalculatorImpl() }
     }
 
-    private val sut: IndividualPaymentAmount by inject()
+    private val sut: IndividualCostsAmountCalculator by inject()
 
     @Before
     fun setUp() {
@@ -67,8 +68,8 @@ class IndividualPaymentAmountTest : KoinTest {
         val result = sut.execute(group)
 
         assertEquals(2, result.size)
-        assertEquals(100.0, result.first {it.participant == participant1}.amount, DELTA)
-        assertEquals(100.0, result.first {it.participant == participant2}.amount, DELTA)
+        assertEquals(100.0, result.first{it.participant == participant1}.amount, DELTA)
+        assertEquals(100.0, result.first{it.participant == participant2}.amount, DELTA)
     }
 
     @Test
@@ -86,9 +87,10 @@ class IndividualPaymentAmountTest : KoinTest {
                     paidBy = participant1
                 ),
                 FakeData.createFakeExpense(
-                    participants = listOf(participant2),
-                    amount = 80.0,
-                    paidBy = participant2
+                    participants = listOf(participant1, participant2),
+                    amount = 100.0,
+                    paidBy = participant2,
+                    splitBetween = listOf(participant2)
                 )
             )
         )
@@ -96,8 +98,8 @@ class IndividualPaymentAmountTest : KoinTest {
         val result = sut.execute(group)
 
         assertEquals(2, result.size)
-        assertEquals(100.0, result.first {it.participant == participant1}.amount, DELTA)
-        assertEquals(80.0, result.first {it.participant == participant2}.amount, DELTA)
+        assertEquals(50.0, result.first{it.participant == participant1}.amount, DELTA)
+        assertEquals(150.0, result.first{it.participant == participant2}.amount, DELTA)
     }
 
     @Test
@@ -110,12 +112,12 @@ class IndividualPaymentAmountTest : KoinTest {
             participants = listOf(participant1, participant2),
             transactions = listOf(
                 FakeData.createFakeExpense(
-                    participants = listOf(participant1),
+                    participants = listOf(participant1, participant2),
                     amount = 100.0,
                     paidBy = participant1
                 ),
                 FakeData.createFakeExpense(
-                    participants = listOf(participant2),
+                    participants = listOf(participant1, participant2),
                     amount = 100.0,
                     paidBy = participant2
                 ),
@@ -130,8 +132,8 @@ class IndividualPaymentAmountTest : KoinTest {
         val result = sut.execute(group)
 
         assertEquals(2, result.size)
-        assertEquals(120.0, result.first {it.participant == participant1}.amount, DELTA)
-        assertEquals(80.0, result.first {it.participant == participant2}.amount, DELTA)
+        assertEquals(100.0, result.first{it.participant == participant1}.amount, DELTA)
+        assertEquals(100.0, result.first{it.participant == participant2}.amount, DELTA)
     }
 
     @Test
@@ -164,8 +166,8 @@ class IndividualPaymentAmountTest : KoinTest {
         val result = sut.execute(group)
 
         assertEquals(2, result.size)
-        assertEquals(100.0, result.first {it.participant == participant1}.amount, DELTA)
-        assertEquals(80.0, result.first {it.participant == participant2}.amount, DELTA)
+        assertEquals(90.0, result.first{it.participant == participant1}.amount, DELTA)
+        assertEquals(90.0, result.first{it.participant == participant2}.amount, DELTA)
     }
 
     @Test
@@ -198,7 +200,7 @@ class IndividualPaymentAmountTest : KoinTest {
         val result = sut.execute(group)
 
         assertEquals(2, result.size)
-        assertEquals(100.0, result.first {it.participant == participant1}.amount, DELTA)
-        assertEquals(80.0, result.first {it.participant == participant2}.amount, DELTA)
+        assertEquals(100.0, result.first{it.participant == participant1}.amount, DELTA)
+        assertEquals(80.0, result.first{it.participant == participant2}.amount, DELTA)
     }
 }

@@ -5,11 +5,11 @@ import com.example.core.model.Participant
 import com.example.core.model.ParticipantAmount
 import com.example.core.model.Transaction
 
-interface IndividualCostsAmount {
+interface IndividualCostsAmountCalculator {
     fun execute(group: Group): List<ParticipantAmount>
 }
 
-internal class IndividualCostsAmountImpl : IndividualCostsAmount {
+internal class IndividualCostsAmountCalculatorImpl : IndividualCostsAmountCalculator {
     override fun execute(group: Group): List<ParticipantAmount> {
         return group.participants.map { participant ->
             ParticipantAmount(

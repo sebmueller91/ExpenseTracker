@@ -18,20 +18,20 @@ import org.koin.test.inject
 
 private val DELTA = 0.001
 
-class IndividualPaymentPercentageTest : KoinTest {
+class IndividualPaymentPercentageCalculatorTest : KoinTest {
     private val eventCostMock = mockk<EventCostsCalculator>()
-    private val individualPaymentAmountMock = mockk<IndividualPaymentAmount>()
+    private val individualPaymentAmountCalculatorMock = mockk<IndividualPaymentAmountCalculator>()
 
     private val useCasesTestModule = module {
-        single<IndividualPaymentPercentage> {
-            IndividualPaymentPercentageImpl(
+        single<IndividualPaymentPercentageCalculator> {
+            IndividualPaymentPercentageCalculatorImpl(
                 eventCostMock,
-                individualPaymentAmountMock
+                individualPaymentAmountCalculatorMock
             )
         }
     }
 
-    private val sut: IndividualPaymentPercentage by inject()
+    private val sut: IndividualPaymentPercentageCalculator by inject()
 
     @Before
     fun setUp() {
@@ -54,7 +54,7 @@ class IndividualPaymentPercentageTest : KoinTest {
             transactions = listOf(expense)
         )
         every { eventCostMock.execute(group.transactions) } returns 100.0
-        every { individualPaymentAmountMock.execute(group) } returns listOf(
+        every { individualPaymentAmountCalculatorMock.execute(group) } returns listOf(
             ParticipantAmount(
                 participant,
                 100.0
@@ -82,7 +82,7 @@ class IndividualPaymentPercentageTest : KoinTest {
             )
         )
         every { eventCostMock.execute(any()) } returns 240.0
-        every { individualPaymentAmountMock.execute(group) } returns listOf(
+        every { individualPaymentAmountCalculatorMock.execute(group) } returns listOf(
             ParticipantAmount(participant1, 120.0),
             ParticipantAmount(participant2, 120.0),
         )
@@ -116,7 +116,7 @@ class IndividualPaymentPercentageTest : KoinTest {
             )
         )
         every { eventCostMock.execute(any()) } returns 200.0
-        every { individualPaymentAmountMock.execute(group) } returns listOf(
+        every { individualPaymentAmountCalculatorMock.execute(group) } returns listOf(
             ParticipantAmount(participant1, 100.0),
             ParticipantAmount(participant2, 100.0)
         )
@@ -157,7 +157,7 @@ class IndividualPaymentPercentageTest : KoinTest {
             )
         )
         every { eventCostMock.execute(any()) } returns 200.0
-        every { individualPaymentAmountMock.execute(group) } returns listOf(
+        every { individualPaymentAmountCalculatorMock.execute(group) } returns listOf(
             ParticipantAmount(participant1, 120.0),
             ParticipantAmount(participant2, 80.0)
         )
@@ -196,7 +196,7 @@ class IndividualPaymentPercentageTest : KoinTest {
             )
         )
         every { eventCostMock.execute(any()) } returns 180.0
-        every { individualPaymentAmountMock.execute(group) } returns listOf(
+        every { individualPaymentAmountCalculatorMock.execute(group) } returns listOf(
             ParticipantAmount(participant1, 100.0),
             ParticipantAmount(participant2, 80.0)
         )
@@ -237,7 +237,7 @@ class IndividualPaymentPercentageTest : KoinTest {
             )
         )
         every { eventCostMock.execute(any()) } returns 180.0
-        every { individualPaymentAmountMock.execute(group) } returns listOf(
+        every { individualPaymentAmountCalculatorMock.execute(group) } returns listOf(
             ParticipantAmount(participant1, 100.0),
             ParticipantAmount(participant2, 80.0)
         )
@@ -273,7 +273,7 @@ class IndividualPaymentPercentageTest : KoinTest {
             )
         )
         every { eventCostMock.execute(any()) } returns 80.0
-        every { individualPaymentAmountMock.execute(group) } returns listOf(
+        every { individualPaymentAmountCalculatorMock.execute(group) } returns listOf(
             ParticipantAmount(participant1, 100.0),
             ParticipantAmount(participant2, -20.0)
         )
@@ -315,7 +315,7 @@ class IndividualPaymentPercentageTest : KoinTest {
             )
         )
         every { eventCostMock.execute(any()) } returns 280.0
-        every { individualPaymentAmountMock.execute(group) } returns listOf(
+        every { individualPaymentAmountCalculatorMock.execute(group) } returns listOf(
             ParticipantAmount(participant1, 100.0),
             ParticipantAmount(participant2, -20.0),
             ParticipantAmount(participant3, 200.0)

@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.core.model.Currency
 import com.example.core.model.Participant
 import com.example.core.model.Transaction
-import com.example.core.services.IndividualPaymentAmount
-import com.example.core.services.IndividualPaymentPercentage
+import com.example.core.services.IndividualPaymentAmountCalculator
+import com.example.core.services.IndividualPaymentPercentageCalculator
 import com.example.core.services.LocaleAwareFormatter
 import com.example.core.services.ResourceResolver
 import com.example.expensetracker.R
@@ -21,8 +21,8 @@ import java.util.UUID
 class GroupDetailViewModel(
     private val groupId: UUID,
     private val dataRepository: com.example.data.repository.DataRepository,
-    private val individualPaymentAmount: IndividualPaymentAmount,
-    private val individualPaymentPercentage: IndividualPaymentPercentage,
+    private val individualPaymentAmountCalculator: IndividualPaymentAmountCalculator,
+    private val individualPaymentPercentageCalculator: IndividualPaymentPercentageCalculator,
     private val resourceResolver: ResourceResolver,
     private val localeAwareFormatter: LocaleAwareFormatter
 ) : ViewModel() {
@@ -36,10 +36,8 @@ class GroupDetailViewModel(
                 formattedTransactions = group.transactions.map { transaction ->
                     transaction.format(group.currency)
                 },
-                individualShares = individualPaymentAmount.execute(group)
-                    .sortByValueDesc(),
-                percentageShares = individualPaymentPercentage.execute(group)
-                    .sortByValueDesc(),
+                individualShares = settleUpGroup.individualPaymentAmount,
+                percentageShares = settleUpGroup.individualPaymentPercentage,
                 settleUpTransactions = settleUpGroup.settleUpTransactions
                     .associateWith { it.formatAsSettleUpTransfer(group.currency) }
             )

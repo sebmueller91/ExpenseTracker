@@ -22,20 +22,20 @@ class SettleUpCalculatorIntegrationTests : KoinTest {
     private val fakePurpose = "asdasdjansdjasndjnbgfdsb"
 
     private val useCasesTestModule = module {
-        single<IndividualCostsAmount> { IndividualCostsAmountImpl() }
-        single<IndividualPaymentAmount> { IndividualPaymentAmountImpl() }
+        single<IndividualCostsAmountCalculator> { IndividualCostsAmountCalculatorImpl() }
+        single<IndividualPaymentAmountCalculator> { IndividualPaymentAmountCalculatorImpl() }
         single<SettleUpCalculator> {
             SettleUpCalculatorImpl(
-                individualCostsAmount = get(),
-                individualPaymentAmount = get(),
+                individualCostsAmountCalculator = get(),
+                individualPaymentAmountCalculator = get(),
                 context = contextMock
             )
         }
     }
 
     private val sut: SettleUpCalculator by inject()
-    private val individualCostsAmount: IndividualCostsAmount by inject()
-    private val individualPaymentAmount: IndividualPaymentAmount by inject()
+    private val individualCostsAmountCalculator: IndividualCostsAmountCalculator by inject()
+    private val individualPaymentAmountCalculator: IndividualPaymentAmountCalculator by inject()
 
     @Before
     fun setUp() {
@@ -339,8 +339,8 @@ class SettleUpCalculatorIntegrationTests : KoinTest {
         settleUpTransactions: List<Transaction.Transfer>
     ) {
         val settledUpGroup = group.copy(transactions = group.transactions + settleUpTransactions)
-        val payments = individualPaymentAmount.execute(settledUpGroup)
-        val costs = individualCostsAmount.execute(settledUpGroup)
+        val payments = individualPaymentAmountCalculator.execute(settledUpGroup)
+        val costs = individualCostsAmountCalculator.execute(settledUpGroup)
 
         assert(settledUpGroup.participants.toSet() == payments.map { it.participant }.toSet())
         assert(payments.map { it.participant }.toSet() == costs.map { it.participant }.toSet())

@@ -8,7 +8,7 @@ import io.realm.kotlin.types.RealmObject
 import java.util.Date
 import java.util.UUID
 
-internal class ExpenseObject : RealmObject{
+internal class ExpenseObject : RealmObject {
     var paidBy: ParticipantObject? = ParticipantObject()
     var amount: Double = 0.0
     var timestamp: Long = 0

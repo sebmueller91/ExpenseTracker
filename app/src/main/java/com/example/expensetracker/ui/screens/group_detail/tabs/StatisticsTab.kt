@@ -39,9 +39,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.core.model.Currency
-import com.example.core.model.Participant
-import com.example.expensetracker.ui.screens.group_detail.GroupDetailUiState
+import com.example.core.model.ParticipantAmount
+import com.example.core.model.ParticipantPercentage
 import com.example.core.util.UiUtils
+import com.example.expensetracker.ui.screens.group_detail.GroupDetailUiState
 import timber.log.Timber
 
 @Composable
@@ -75,7 +76,7 @@ fun StatisticsTab(
             Spacer(Modifier.height(20.dp))
         }
         item {
-            if (uiState.individualShares.any { it.value != 0.0 }) {
+            if (uiState.individualShares.any { it.amount != 0.0 }) {
                 PieChart(
                     percentageShares = uiState.percentageShares
                 )
@@ -94,7 +95,7 @@ fun StatisticsTab(
 
 @Composable
 private fun PieChart(
-    percentageShares: Map<Participant, Double>,
+    percentageShares: List<ParticipantPercentage>,
     modifier: Modifier = Modifier,
     outerRadius: Dp = 90.dp,
     chartBarWidth: Dp = 20.dp,
@@ -104,7 +105,7 @@ private fun PieChart(
     var lastValue = 0f
 
     val pieChartChunks =
-        percentageShares.values.map { value -> ((value / 100.0) * 360.0).toFloat() }
+        percentageShares.map { share -> ((share.percentage / 100.0) * 360.0).toFloat() }
 
     val animatedSize by animateFloatAsState(
         targetValue = if (animationFinished) outerRadius.value * 2f else 0f,
@@ -157,30 +158,31 @@ private fun PieChart(
 @Composable
 private fun BarChart(
     currency: Currency,
-    individualShares: Map<Participant, Double>,
-    percentageShares: Map<Participant, Double>,
+    individualShares: List<ParticipantAmount>,
+    percentageShares: List<ParticipantPercentage>,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
-        individualShares.entries.sortedByDescending { it.value }
-            .forEachIndexed { index, entry ->
-                val percentage = percentageShares[entry.key] ?: run {
-                    Timber.e("Could not retrieve percentage! This should not happen.")
-                    0.0
-                }
+        individualShares.forEachIndexed { index, share ->
+            val percentage =
+                percentageShares.firstOrNull { it.participant == share.participant }?.percentage
+                    ?: run {
+                        Timber.e("Could not retrieve percentage! This should not happen.")
+                        0.0
+                    }
 
-                BarChartItem(
-                    participantName = entry.key.name,
-                    amount = "${
-                        UiUtils.formatMoneyAmount(
-                            entry.value,
-                            currency,
-                            LocalContext.current
-                        )
-                    } (${UiUtils.formatPercentage(percentage)})",
-                    color = getPieChartColor(index)
-                )
-            }
+            BarChartItem(
+                participantName = share.participant.name,
+                amount = "${
+                    UiUtils.formatMoneyAmount(
+                        share.amount,
+                        currency,
+                        LocalContext.current
+                    )
+                } (${UiUtils.formatPercentage(percentage)})",
+                color = getPieChartColor(index)
+            )
+        }
     }
 }
 
