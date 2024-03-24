@@ -2,53 +2,56 @@ package com.example.expensetracker.ui.screens.group_detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.core.model.Currency
+import com.example.core.model.Participant
+import com.example.core.model.Transaction
+import com.example.core.services.IndividualPaymentAmountCalculator
+import com.example.core.services.IndividualPaymentPercentageCalculator
+import com.example.core.services.LocaleAwareFormatter
+import com.example.core.services.ResourceResolver
 import com.example.expensetracker.R
-import com.example.expensetracker.data.DatabaseRepository
-import com.example.expensetracker.model.Currency
-import com.example.expensetracker.model.Participant
-import com.example.expensetracker.model.Transaction
-import com.example.expensetracker.services.EventCosts
-import com.example.expensetracker.services.IndividualPaymentAmount
-import com.example.expensetracker.services.IndividualPaymentPercentage
-import com.example.expensetracker.services.LocaleAwareFormatter
-import com.example.expensetracker.services.ResourceResolver
-import com.example.expensetracker.services.SettleUp
 import com.example.expensetracker.ui.screens.group_detail.data.FormattedTransaction
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 class GroupDetailViewModel(
     private val groupId: UUID,
-    private val databaseRepository: DatabaseRepository,
-    private val eventCost: EventCosts,
-    private val individualPaymentAmount: IndividualPaymentAmount,
-    private val individualPaymentPercentage: IndividualPaymentPercentage,
-    private val settleUp: SettleUp,
+    private val dataRepository: com.example.data.repository.DataRepository,
+    private val individualPaymentAmountCalculator: IndividualPaymentAmountCalculator,
+    private val individualPaymentPercentageCalculator: IndividualPaymentPercentageCalculator,
     private val resourceResolver: ResourceResolver,
     private val localeAwareFormatter: LocaleAwareFormatter
 ) : ViewModel() {
-    val uiStateFlow: StateFlow<GroupDetailUiState> = databaseRepository.groups.map {
-        it.firstOrNull { it.id == groupId }
-    }.map { group ->
-        when (group) {
-            null -> GroupDetailUiState.Error
-            else -> GroupDetailUiState.Success(
+    val uiStateFlow: StateFlow<GroupDetailUiState> = dataRepository.groups.map { settleUpGroups ->
+        settleUpGroups.firstOrNull { it.group.id == groupId }?.let { settleUpGroup ->
+            val group = settleUpGroup.group
+
+            GroupDetailUiState.Success(
                 group = group,
-                eventCosts = eventCost.execute(group.transactions),
-                formattedTransactions = group.transactions.map { it.format(group.currency) },
-                individualShares = individualPaymentAmount.execute(group).sortByValueDesc(),
-                percentageShares = individualPaymentPercentage.execute(group).sortByValueDesc(),
-                settleUpTransactions = settleUp.execute(group)
+                eventCosts = settleUpGroup.eventCosts,
+                formattedTransactions = group.transactions.map { transaction ->
+                    transaction.format(group.currency)
+                },
+                individualShares = settleUpGroup.individualPaymentAmount,
+                percentageShares = settleUpGroup.individualPaymentPercentage,
+                settleUpTransactions = settleUpGroup.settleUpTransactions
                     .associateWith { it.formatAsSettleUpTransfer(group.currency) }
             )
-        }
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, GroupDetailUiState.Loading)
+        } ?: GroupDetailUiState.Error
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = GroupDetailUiState.Loading
+    )
 
     fun applySettleUpTransaction(transfer: Transaction.Transfer) {
-        databaseRepository.addTransaction(groupId = groupId, transaction = transfer)
+        viewModelScope.launch {
+            dataRepository.addTransactionToGroup(groupId = groupId, transaction = transfer)
+        }
     }
 
     private fun Transaction.Transfer.formatAsSettleUpTransfer(currency: Currency): String {

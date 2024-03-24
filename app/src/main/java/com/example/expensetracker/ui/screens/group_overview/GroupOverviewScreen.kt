@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -42,17 +43,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.core.model.Currency
+import com.example.core.model.Group
+import com.example.core.model.Participant
+import com.example.core.util.UiUtils
 import com.example.expensetracker.BuildConfig
 import com.example.expensetracker.R
-import com.example.expensetracker.model.Currency
-import com.example.expensetracker.model.Group
-import com.example.expensetracker.model.Participant
 import com.example.expensetracker.ui.components.ExpandCollapseButton
 import com.example.expensetracker.ui.components.RoundFloatingActionButton
 import com.example.expensetracker.ui.screens.destinations.AddGroupScreenDestination
 import com.example.expensetracker.ui.screens.destinations.GroupDetailScreenDestination
 import com.example.expensetracker.ui.theme.ExpenseTrackerTheme
-import com.example.expensetracker.ui.util.UiUtils
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -76,6 +77,7 @@ fun GroupOverviewScreen(
     GroupOverviewScreen(
         uiStateFlow = uiStateFlow,
         onAddGroup = { navigator.navigate(AddGroupScreenDestination) },
+        addFakeData = viewModel::addFakeData,
         onNavigateToDetailScreen = { uuid ->
             navigator.navigate(
                 GroupDetailScreenDestination(
@@ -89,6 +91,7 @@ fun GroupOverviewScreen(
 private fun GroupOverviewScreen(
     uiStateFlow: State<GroupOverviewUiState>,
     onAddGroup: () -> Unit,
+    addFakeData: () -> Unit,
     onNavigateToDetailScreen: (UUID) -> Unit
 ) {
     Scaffold(
@@ -127,6 +130,11 @@ private fun GroupOverviewScreen(
                         onNavigateToDetailScreen = onNavigateToDetailScreen,
                         modifier = Modifier.fillMaxWidth()
                     )
+                }
+                item {
+                    Button(onClick = addFakeData) {
+                        Text("Add fake data")
+                    }
                 }
             }
             Spacer(Modifier.weight(1f))
@@ -260,6 +268,7 @@ private fun GroupOverviewScreenPreview(darkMode: Boolean) {
         GroupOverviewScreen(
             uiStateFlow = uiState,
             onAddGroup = {},
+            addFakeData = {},
             onNavigateToDetailScreen = {}
         )
     }

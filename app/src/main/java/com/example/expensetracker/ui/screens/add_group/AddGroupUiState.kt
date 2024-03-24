@@ -1,6 +1,6 @@
 package com.example.expensetracker.ui.screens.add_group
 
-import com.example.expensetracker.model.Currency
+import com.example.core.model.Currency
 
 data class AddGroupUiState(
     val subScreen: AddGroupSubScreens = AddGroupSubScreens.GROUP_NAME_CURRENCY,

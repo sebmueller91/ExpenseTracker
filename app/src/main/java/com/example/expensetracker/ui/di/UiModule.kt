@@ -10,20 +10,18 @@ import java.util.UUID
 val uiModule = module {
     viewModel {
         GroupOverviewViewModel(
-            databaseRepository = get(),
+            dataRepository = get(),
             eventCost = get(),
             localeAwareFormatter = get()
         )
     }
-    viewModel { AddGroupViewModel(databaseRepository = get()) }
+    viewModel { AddGroupViewModel(dataRepository = get()) }
     viewModel { (groupId: UUID) ->
         GroupDetailViewModel(
             groupId = groupId,
-            databaseRepository = get(),
-            eventCost = get(),
-            individualPaymentAmount = get(),
-            individualPaymentPercentage = get(),
-            settleUp = get(),
+            dataRepository = get(),
+            individualPaymentAmountCalculator = get(),
+            individualPaymentPercentageCalculator = get(),
             resourceResolver = get(),
             localeAwareFormatter = get()
         )
