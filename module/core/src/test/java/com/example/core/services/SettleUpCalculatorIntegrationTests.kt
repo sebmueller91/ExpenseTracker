@@ -334,16 +334,20 @@ class SettleUpCalculatorIntegrationTests : KoinTest {
         assertParticipantsBalancesAreZero(group, result)
     }
 
-    private fun assertParticipantsBalancesAreZero(group: Group, settleUpTransactions: List<Transaction.Transfer>) {
+    private fun assertParticipantsBalancesAreZero(
+        group: Group,
+        settleUpTransactions: List<Transaction.Transfer>
+    ) {
         val settledUpGroup = group.copy(transactions = group.transactions + settleUpTransactions)
         val payments = individualPaymentAmount.execute(settledUpGroup)
         val costs = individualCostsAmount.execute(settledUpGroup)
 
-        assert(settledUpGroup.participants.toSet() == payments.keys)
-        assert(payments.keys == costs.keys)
+        assert(settledUpGroup.participants.toSet() == payments.map { it.participant }.toSet())
+        assert(payments.map { it.participant }.toSet() == costs.map { it.participant }.toSet())
 
         val balances =
-            payments.keys.associateWith { participant -> payments[participant]!! - costs[participant]!! }
+            payments.map { it.participant }
+                .associateWith { participant -> payments.first { it.participant == participant }.amount - costs.first { it.participant == participant }.amount }
                 .map { it.value }
 
         assert(balances.all { it.isEqualTo(0.0) })
