@@ -17,15 +17,15 @@ import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.inject
 
-class SettleUpIntegrationTests : KoinTest {
+class SettleUpCalculatorIntegrationTests : KoinTest {
     private val contextMock: Context = mockk<Context>(relaxed = true)
     private val fakePurpose = "asdasdjansdjasndjnbgfdsb"
 
     private val useCasesTestModule = module {
         single<IndividualCostsAmount> { IndividualCostsAmountImpl() }
         single<IndividualPaymentAmount> { IndividualPaymentAmountImpl() }
-        single<SettleUp> {
-            SettleUpImpl(
+        single<SettleUpCalculator> {
+            SettleUpCalculatorImpl(
                 individualCostsAmount = get(),
                 individualPaymentAmount = get(),
                 context = contextMock
@@ -33,7 +33,7 @@ class SettleUpIntegrationTests : KoinTest {
         }
     }
 
-    private val sut: SettleUp by inject()
+    private val sut: SettleUpCalculator by inject()
     private val individualCostsAmount: IndividualCostsAmount by inject()
     private val individualPaymentAmount: IndividualPaymentAmount by inject()
 

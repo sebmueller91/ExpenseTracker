@@ -9,6 +9,12 @@ interface IndividualPaymentAmount {
     fun execute(group: Group): List<ParticipantAmount>
 }
 
+internal class IndividualPaymentAmountImpl : IndividualPaymentAmount {
+    override fun execute(group: Group): Map<Participant, Double> {
+        return group.participants.associateWith { participant ->
+            calculateParticipantsPayment(
+                participant,
+                group.transactions
 class IndividualPaymentAmountImpl : IndividualPaymentAmount {
     override fun execute(group: Group): List<ParticipantAmount> {
         return group.participants.map { participant ->

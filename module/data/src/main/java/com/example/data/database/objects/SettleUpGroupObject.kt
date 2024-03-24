@@ -13,9 +13,11 @@ internal class SettleUpGroupObject : RealmObject {
     var _id: ObjectId = BsonObjectId()
     var group: GroupObject? = GroupObject()
     var settleUpTransactions: RealmList<TransferObject> = realmListOf()
+    var eventCosts: Double = 0.0
 }
 
 internal fun SettleUpGroupObject.toSettleUpGroup(): SettleUpGroup = SettleUpGroup(
     group = this@toSettleUpGroup.group?.toGroup()!!,
-    settleUpTransactions = this@toSettleUpGroup.settleUpTransactions.map { it.toTransfer() }
+    settleUpTransactions = this@toSettleUpGroup.settleUpTransactions.map { it.toTransfer() },
+    eventCosts = eventCosts
 )
