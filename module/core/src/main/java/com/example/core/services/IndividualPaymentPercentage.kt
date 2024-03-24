@@ -11,8 +11,8 @@ interface IndividualPaymentPercentage {
     fun execute(group: Group): List<ParticipantPercentage>
 }
 
-class IndividualPaymentPercentageImpl(
-    private val eventCost: EventCosts,
+internal class IndividualPaymentPercentageImpl(
+    private val eventCost: EventCostsCalculator,
     private val individualPaymentAmount: IndividualPaymentAmount
 ) : IndividualPaymentPercentage {
     override fun execute(group: Group): List<ParticipantPercentage> {

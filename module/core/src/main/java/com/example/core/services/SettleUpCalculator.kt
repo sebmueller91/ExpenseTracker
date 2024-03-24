@@ -15,15 +15,15 @@ import kotlin.math.min
 
 private const val EXPLORATION_DEPTH = 1
 
-interface SettleUp {
+interface SettleUpCalculator {
     fun execute(group: Group): List<Transaction.Transfer>
 }
 
-class SettleUpImpl(
+internal class SettleUpCalculatorImpl(
     private val individualPaymentAmount: IndividualPaymentAmount,
     private val individualCostsAmount: IndividualCostsAmount,
     private val context: Context
-) : SettleUp {
+) : SettleUpCalculator {
     override fun execute(group: Group): List<Transaction.Transfer> {
         val payments = individualPaymentAmount.execute(group)
         val costs = individualCostsAmount.execute(group)

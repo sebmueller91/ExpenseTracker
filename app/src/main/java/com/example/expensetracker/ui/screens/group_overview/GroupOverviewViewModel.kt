@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.model.Currency
 import com.example.core.model.Group
-import com.example.core.services.EventCosts
+import com.example.core.services.EventCostsCalculator
 import com.example.core.services.LocaleAwareFormatter
 import com.example.core.util.FakeData
 import com.example.data.repository.DataRepository
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 class GroupOverviewViewModel(
     private val dataRepository: DataRepository,
-    private val eventCost: EventCosts,
+    private val eventCost: EventCostsCalculator,
     private val localeAwareFormatter: LocaleAwareFormatter
 ) : ViewModel() {
     private var _uiState = MutableStateFlow(GroupOverviewUiState())
