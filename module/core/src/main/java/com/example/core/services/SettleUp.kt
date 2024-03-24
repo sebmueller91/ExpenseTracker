@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.core.R
 import com.example.core.model.Group
 import com.example.core.model.Participant
+import com.example.core.model.ParticipantAmount
 import com.example.core.model.Transaction
 import com.example.core.util.isBiggerThan
 import com.example.core.util.isEqualTo
@@ -27,7 +28,8 @@ class SettleUpImpl(
         val payments = individualPaymentAmount.execute(group)
         val costs = individualCostsAmount.execute(group)
 
-        if (payments.keys != costs.keys || payments.keys != group.participants.toSet()) {
+        if (payments.map { it.participant }.toSet() != costs.map { it.participant }
+                .toSet() || payments.map { it.participant }.toSet() != group.participants.toSet()) {
             Timber.e("Something is wrong with the participants in the group. Can not calculate settle up payments!")
             return emptyList()
         }
@@ -45,8 +47,8 @@ class SettleUpImpl(
     }
 
     private fun balanceUpParticipants(
-        debtors: List<ParticipantBalance>,
-        creditors: List<ParticipantBalance>,
+        debtors: List<ParticipantAmount>,
+        creditors: List<ParticipantAmount>,
         transactions: List<Transaction.Transfer>
     ): List<Transaction.Transfer> {
         if (debtors.isEmpty() && creditors.isEmpty()) {
@@ -57,9 +59,9 @@ class SettleUpImpl(
         }
 
         val sortedDebtors =
-            debtors.sortedWith(compareBy<ParticipantBalance> { it.balance }.thenBy { it.participant.id })
+            debtors.sortedWith(compareBy<ParticipantAmount> { it.amount }.thenBy { it.participant.id })
         val sortedCreditors =
-            creditors.sortedWith(compareBy<ParticipantBalance> { it.balance }.thenBy { it.participant.id })
+            creditors.sortedWith(compareBy<ParticipantAmount> { it.amount }.thenBy { it.participant.id })
 
         val transactionOptions = mutableListOf<List<Transaction.Transfer>>()
         sortedDebtors.take(EXPLORATION_DEPTH).forEachIndexed { debtorIndex, debtor ->
@@ -86,31 +88,35 @@ class SettleUpImpl(
     }
 
     private fun calculateBalances(
-        payments: Map<Participant, Double>,
-        costs: Map<Participant, Double>
+        payments: List<ParticipantAmount>,
+        costs: List<ParticipantAmount>,
     ) =
-        payments.keys.associateWith { participant -> payments[participant]!! - costs[participant]!! }
+        payments.map { payment ->
+            ParticipantAmount(participant = payment.participant,
+                amount = payments.first { it.participant == payment.participant }.amount - costs.first { it.participant == payment.participant }.amount
+            )
+        }
 
-    private fun Map<Participant, Double>.getCreditors() =
-        filter { it.value.isBiggerThan(0.0) }.toList()
+    private fun List<ParticipantAmount>.getCreditors() =
+        filter { it.amount.isBiggerThan(0.0) }.toList()
 
-    private fun Map<Participant, Double>.getDebtors() =
-        filter { it.value.isSmallerThan(0.0) }.toList()
+    private fun List<ParticipantAmount>.getDebtors() =
+        filter { it.amount.isSmallerThan(0.0) }.toList()
 
     private fun Map<Participant, Double>.toList() =
-        map { ParticipantBalance(participant = it.key, balance = it.value) }
+        map { ParticipantAmount(participant = it.key, amount = it.value) }
 
-    private fun MutableList<ParticipantBalance>.removeIfBalanceZero(index: Int) = this.apply {
-        if (this[index].balance.isEqualTo(0.0)) {
+    private fun MutableList<ParticipantAmount>.removeIfBalanceZero(index: Int) = this.apply {
+        if (this[index].amount.isEqualTo(0.0)) {
             removeAt(index)
         }
     }
 
     private fun MutableList<Transaction.Transfer>.addSettleUpTransaction(
-        debtor: ParticipantBalance,
-        creditor: ParticipantBalance
+        debtor: ParticipantAmount,
+        creditor: ParticipantAmount
     ): Transaction.Transfer {
-        val amount = min(-debtor.balance, creditor.balance)
+        val amount = min(-debtor.amount, creditor.amount)
         add(
             Transaction.Transfer(
                 fromParticipant = debtor.participant,
@@ -123,24 +129,19 @@ class SettleUpImpl(
         return last()
     }
 
-    private fun MutableList<ParticipantBalance>.applyPositiveTransaction(
+    private fun MutableList<ParticipantAmount>.applyPositiveTransaction(
         index: Int,
         transaction: Transaction
     ) {
-        this[index] = this[index].copy(balance = this[index].balance + transaction.amount)
+        this[index] = this[index].copy(amount = this[index].amount + transaction.amount)
         this.removeIfBalanceZero(index)
     }
 
-    private fun MutableList<ParticipantBalance>.applyNegativeTransaction(
+    private fun MutableList<ParticipantAmount>.applyNegativeTransaction(
         index: Int,
         transaction: Transaction
     ) {
-        this[index] = this[index].copy(balance = this[index].balance - transaction.amount)
+        this[index] = this[index].copy(amount = this[index].amount - transaction.amount)
         this.removeIfBalanceZero(index)
     }
 }
-
-private data class ParticipantBalance(
-    val participant: Participant,
-    val balance: Double
-)

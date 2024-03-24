@@ -2,6 +2,7 @@ package com.example.core.services
 
 import com.example.core.model.Currency
 import com.example.core.model.Group
+import com.example.core.model.ParticipantAmount
 import com.example.core.util.FakeData
 import io.mockk.every
 import io.mockk.mockk
@@ -14,7 +15,9 @@ import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.inject
+
 private val DELTA = 0.001
+
 class IndividualPaymentPercentageTest : KoinTest {
     private val eventCostMock = mockk<EventCosts>()
     private val individualPaymentAmountMock = mockk<IndividualPaymentAmount>()
@@ -51,13 +54,18 @@ class IndividualPaymentPercentageTest : KoinTest {
             transactions = listOf(expense)
         )
         every { eventCostMock.execute(group.transactions) } returns 100.0
-        every { individualPaymentAmountMock.execute(group) } returns mapOf(participant to 100.0)
+        every { individualPaymentAmountMock.execute(group) } returns listOf(
+            ParticipantAmount(
+                participant,
+                100.0
+            )
+        )
 
         val result = sut.execute(group)
 
-        assertEquals(1, result.entries.size)
-        assertEquals(participant, result.entries.first().key)
-        assertEquals(100.0, result.entries.first().value, DELTA)
+        assertEquals(1, result.size)
+        assertEquals(participant, result.first().participant)
+        assertEquals(100.0, result.first().percentage, DELTA)
     }
 
     @Test
@@ -74,16 +82,16 @@ class IndividualPaymentPercentageTest : KoinTest {
             )
         )
         every { eventCostMock.execute(any()) } returns 240.0
-        every { individualPaymentAmountMock.execute(group) } returns mapOf(
-            participant1 to 120.0,
-            participant2 to 120.0
+        every { individualPaymentAmountMock.execute(group) } returns listOf(
+            ParticipantAmount(participant1, 120.0),
+            ParticipantAmount(participant2, 120.0),
         )
 
         val result = sut.execute(group)
 
-        assertEquals(2, result.entries.size)
-        assertEquals(50.0, result[participant1]!!, DELTA)
-        assertEquals(50.0, result[participant2]!!, DELTA)
+        assertEquals(2, result.size)
+        assertEquals(50.0, result.first { it.participant == participant1}.percentage, DELTA)
+        assertEquals(50.0, result.first { it.participant == participant2 }.percentage, DELTA)
     }
 
     @Test
@@ -108,16 +116,16 @@ class IndividualPaymentPercentageTest : KoinTest {
             )
         )
         every { eventCostMock.execute(any()) } returns 200.0
-        every { individualPaymentAmountMock.execute(group) } returns mapOf(
-            participant1 to 100.0,
-            participant2 to 100.0
+        every { individualPaymentAmountMock.execute(group) } returns listOf(
+            ParticipantAmount(participant1, 100.0),
+            ParticipantAmount(participant2, 100.0)
         )
 
         val result = sut.execute(group)
 
-        assertEquals(2, result.entries.size)
-        assertEquals(50.0, result[participant1]!!, DELTA)
-        assertEquals(50.0, result[participant2]!!, DELTA)
+        assertEquals(2, result.size)
+        assertEquals(50.0, result.first { it.participant == participant1}.percentage, DELTA)
+        assertEquals(50.0, result.first { it.participant == participant2 }.percentage, DELTA)
     }
 
     @Test
@@ -149,16 +157,16 @@ class IndividualPaymentPercentageTest : KoinTest {
             )
         )
         every { eventCostMock.execute(any()) } returns 200.0
-        every { individualPaymentAmountMock.execute(group) } returns mapOf(
-            participant1 to 120.0,
-            participant2 to 80.0
+        every { individualPaymentAmountMock.execute(group) } returns listOf(
+            ParticipantAmount(participant1, 120.0),
+            ParticipantAmount(participant2, 80.0)
         )
 
         val result = sut.execute(group)
 
-        assertEquals(2, result.entries.size)
-        assertEquals(60.0, result[participant1]!!, DELTA)
-        assertEquals(40.0, result[participant2]!!, DELTA)
+        assertEquals(2, result.size)
+        assertEquals(60.0, result.first { it.participant == participant1}.percentage, DELTA)
+        assertEquals(40.0, result.first { it.participant == participant2 }.percentage, DELTA)
     }
 
     @Test
@@ -188,16 +196,16 @@ class IndividualPaymentPercentageTest : KoinTest {
             )
         )
         every { eventCostMock.execute(any()) } returns 180.0
-        every { individualPaymentAmountMock.execute(group) } returns mapOf(
-            participant1 to 100.0,
-            participant2 to 80.0
+        every { individualPaymentAmountMock.execute(group) } returns listOf(
+            ParticipantAmount(participant1, 100.0),
+            ParticipantAmount(participant2, 80.0)
         )
 
         val result = sut.execute(group)
 
-        assertEquals(2, result.entries.size)
-        assertEquals(100.0 / 1.8, result[participant1]!!, DELTA)
-        assertEquals(80.0 / 1.8, result[participant2]!!, DELTA)
+        assertEquals(2, result.size)
+        assertEquals(100.0 / 1.8, result.first { it.participant == participant1}.percentage, DELTA)
+        assertEquals(80.0 / 1.8, result.first { it.participant == participant2 }.percentage, DELTA)
     }
 
     @Test
@@ -229,16 +237,16 @@ class IndividualPaymentPercentageTest : KoinTest {
             )
         )
         every { eventCostMock.execute(any()) } returns 180.0
-        every { individualPaymentAmountMock.execute(group) } returns mapOf(
-            participant1 to 100.0,
-            participant2 to 80.0
+        every { individualPaymentAmountMock.execute(group) } returns listOf(
+            ParticipantAmount(participant1, 100.0),
+            ParticipantAmount(participant2, 80.0)
         )
 
         val result = sut.execute(group)
 
-        assertEquals(2, result.entries.size)
-        assertEquals(100.0 / 1.8, result[participant1]!!, DELTA)
-        assertEquals(80.0 / 1.8, result[participant2]!!, DELTA)
+        assertEquals(2, result.size)
+        assertEquals(100.0 / 1.8, result.first { it.participant == participant1}.percentage, DELTA)
+        assertEquals(80.0 / 1.8, result.first { it.participant == participant2 }.percentage, DELTA)
     }
 
     @Test
@@ -265,16 +273,16 @@ class IndividualPaymentPercentageTest : KoinTest {
             )
         )
         every { eventCostMock.execute(any()) } returns 80.0
-        every { individualPaymentAmountMock.execute(group) } returns mapOf(
-            participant1 to 100.0,
-            participant2 to -20.0
+        every { individualPaymentAmountMock.execute(group) } returns listOf(
+            ParticipantAmount(participant1, 100.0),
+            ParticipantAmount(participant2, -20.0)
         )
 
         val result = sut.execute(group)
 
-        assertEquals(2, result.entries.size)
-        assertEquals(100.0, result[participant1]!!, DELTA)
-        assertEquals(0.0, result[participant2]!!, DELTA)
+        assertEquals(2, result.size)
+        assertEquals(100.0, result.first { it.participant == participant1}.percentage, DELTA)
+        assertEquals(0.0, result.first { it.participant == participant2 }.percentage, DELTA)
     }
 
     @Test
@@ -307,17 +315,17 @@ class IndividualPaymentPercentageTest : KoinTest {
             )
         )
         every { eventCostMock.execute(any()) } returns 280.0
-        every { individualPaymentAmountMock.execute(group) } returns mapOf(
-            participant1 to 100.0,
-            participant2 to -20.0,
-            participant3 to 200.0
+        every { individualPaymentAmountMock.execute(group) } returns listOf(
+            ParticipantAmount(participant1, 100.0),
+            ParticipantAmount(participant2, -20.0),
+            ParticipantAmount(participant3, 200.0)
         )
 
         val result = sut.execute(group)
 
-        assertEquals(3, result.entries.size)
-        assertEquals(100.0/3.0, result[participant1]!!, DELTA)
-        assertEquals(0.0, result[participant2]!!, DELTA)
-        assertEquals(2.0*(100/3.0), result[participant3]!!, DELTA)
+        assertEquals(3, result.size)
+        assertEquals(100.0 / 3.0, result.first { it.participant == participant1 }.percentage, DELTA)
+        assertEquals(0.0, result.first { it.participant == participant2 }.percentage, DELTA)
+        assertEquals(2.0 * (100 / 3.0), result.first { it.participant == participant3 }.percentage, DELTA)
     }
 }

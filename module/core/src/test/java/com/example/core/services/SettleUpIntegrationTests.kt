@@ -4,12 +4,6 @@ import android.content.Context
 import com.example.core.model.Currency
 import com.example.core.model.Group
 import com.example.core.model.Transaction
-import com.example.core.services.IndividualCostsAmount
-import com.example.core.services.IndividualCostsAmountImpl
-import com.example.core.services.IndividualPaymentAmount
-import com.example.core.services.IndividualPaymentAmountImpl
-import com.example.core.services.SettleUp
-import com.example.core.services.SettleUpImpl
 import com.example.core.util.FakeData
 import com.example.core.util.isEqualTo
 import io.mockk.every
@@ -340,16 +334,20 @@ class SettleUpIntegrationTests : KoinTest {
         assertParticipantsBalancesAreZero(group, result)
     }
 
-    private fun assertParticipantsBalancesAreZero(group: Group, settleUpTransactions: List<Transaction.Transfer>) {
+    private fun assertParticipantsBalancesAreZero(
+        group: Group,
+        settleUpTransactions: List<Transaction.Transfer>
+    ) {
         val settledUpGroup = group.copy(transactions = group.transactions + settleUpTransactions)
         val payments = individualPaymentAmount.execute(settledUpGroup)
         val costs = individualCostsAmount.execute(settledUpGroup)
 
-        assert(settledUpGroup.participants.toSet() == payments.keys)
-        assert(payments.keys == costs.keys)
+        assert(settledUpGroup.participants.toSet() == payments.map { it.participant }.toSet())
+        assert(payments.map { it.participant }.toSet() == costs.map { it.participant }.toSet())
 
         val balances =
-            payments.keys.associateWith { participant -> payments[participant]!! - costs[participant]!! }
+            payments.map { it.participant }
+                .associateWith { participant -> payments.first { it.participant == participant }.amount - costs.first { it.participant == participant }.amount }
                 .map { it.value }
 
         assert(balances.all { it.isEqualTo(0.0) })
