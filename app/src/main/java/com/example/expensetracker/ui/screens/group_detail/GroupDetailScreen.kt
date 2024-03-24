@@ -33,7 +33,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.expensetracker.R
-import com.example.expensetracker.model.Transaction
+import com.example.core.model.Transaction
 import com.example.expensetracker.ui.components.NavigationIcon
 import com.example.expensetracker.ui.screens.destinations.GroupOverviewScreenDestination
 import com.example.expensetracker.ui.screens.group_detail.tabs.ExpensesTab

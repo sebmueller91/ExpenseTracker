@@ -1,6 +1,6 @@
 package com.example.expensetracker.ui.screens.group_overview
 
-import com.example.expensetracker.model.Group
+import com.example.core.model.Group
 
 data class GroupOverviewUiState(
     val groups: List<Group> = listOf(),
