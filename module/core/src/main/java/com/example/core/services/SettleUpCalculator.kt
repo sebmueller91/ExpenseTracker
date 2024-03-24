@@ -20,13 +20,13 @@ interface SettleUpCalculator {
 }
 
 internal class SettleUpCalculatorImpl(
-    private val individualPaymentAmount: IndividualPaymentAmount,
-    private val individualCostsAmount: IndividualCostsAmount,
+    private val individualPaymentAmountCalculator: IndividualPaymentAmountCalculator,
+    private val individualCostsAmountCalculator: IndividualCostsAmountCalculator,
     private val context: Context
 ) : SettleUpCalculator {
     override fun execute(group: Group): List<Transaction.Transfer> {
-        val payments = individualPaymentAmount.execute(group)
-        val costs = individualCostsAmount.execute(group)
+        val payments = individualPaymentAmountCalculator.execute(group)
+        val costs = individualCostsAmountCalculator.execute(group)
 
         if (payments.map { it.participant }.toSet() != costs.map { it.participant }
                 .toSet() || payments.map { it.participant }.toSet() != group.participants.toSet()) {

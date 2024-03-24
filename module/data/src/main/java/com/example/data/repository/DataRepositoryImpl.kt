@@ -4,12 +4,16 @@ import com.example.core.model.Group
 import com.example.core.model.SettleUpGroup
 import com.example.core.model.Transaction
 import com.example.core.services.EventCostsCalculator
+import com.example.core.services.IndividualPaymentAmountCalculator
+import com.example.core.services.IndividualPaymentPercentageCalculator
 import com.example.core.services.SettleUpCalculator
 import com.example.data.database.objects.SettleUpGroupObject
 import com.example.data.database.objects.toExpenseObject
 import com.example.data.database.objects.toGroup
 import com.example.data.database.objects.toGroupObject
 import com.example.data.database.objects.toIncomeObject
+import com.example.data.database.objects.toParicipantAmountObject
+import com.example.data.database.objects.toParicipantPercentageObject
 import com.example.data.database.objects.toSettleUpGroup
 import com.example.data.database.objects.toTransferObject
 import io.realm.kotlin.Realm
@@ -24,7 +28,9 @@ import java.util.UUID
 internal class DataRepositoryImpl(
     val realm: Realm,
     val settleUpCalculator: SettleUpCalculator,
-    val eventCostsCalculator: EventCostsCalculator
+    val eventCostsCalculator: EventCostsCalculator,
+    val individualPaymentAmountCalculator: IndividualPaymentAmountCalculator,
+    val individualPaymentPercentageCalculator: IndividualPaymentPercentageCalculator
 ) : DataRepository {
 
     override val groups: Flow<List<SettleUpGroup>> = realm
@@ -61,6 +67,7 @@ internal class DataRepositoryImpl(
 
             if (isSettleUpTransaction) {
                 newGroupObject.removeSettleUpTransaction(transaction.id.toString())
+                newGroupObject.recalculateIndividualValues()
             } else {
                 newGroupObject.recalculate()
             }
@@ -91,6 +98,19 @@ internal class DataRepositoryImpl(
             settleUpTransactions =
                 settleUpCalculator.execute(group).map { it.toTransferObject() }.toRealmList()
             eventCosts = eventCostsCalculator.execute(group.transactions)
+            individualPaymentAmount = individualPaymentAmountCalculator.execute(group)
+                .map { it.toParicipantAmountObject() }.toRealmList()
+            individualPaymentPercentage = individualPaymentPercentageCalculator.execute(group)
+                .map { it.toParicipantPercentageObject() }.toRealmList()
+        }
+    }
+
+    private fun SettleUpGroupObject.recalculateIndividualValues() {
+        group?.toGroup()?.let { group ->
+            individualPaymentAmount = individualPaymentAmountCalculator.execute(group)
+                .map { it.toParicipantAmountObject() }.toRealmList()
+            individualPaymentPercentage = individualPaymentPercentageCalculator.execute(group)
+                .map { it.toParicipantPercentageObject() }.toRealmList()
         }
     }
 }

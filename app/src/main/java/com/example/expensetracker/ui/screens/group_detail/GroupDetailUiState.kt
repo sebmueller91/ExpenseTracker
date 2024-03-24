@@ -1,7 +1,8 @@
 package com.example.expensetracker.ui.screens.group_detail
 
 import com.example.core.model.Group
-import com.example.core.model.Participant
+import com.example.core.model.ParticipantAmount
+import com.example.core.model.ParticipantPercentage
 import com.example.core.model.Transaction
 import com.example.expensetracker.ui.screens.group_detail.data.FormattedTransaction
 
@@ -10,11 +11,10 @@ sealed class GroupDetailUiState {
         val group: Group,
         val eventCosts: Double,
         val formattedTransactions: List<FormattedTransaction>,
-        val individualShares: Map<Participant, Double>,
-        val percentageShares: Map<Participant, Double>,
+        val individualShares: List<ParticipantAmount>,
+        val percentageShares: List<ParticipantPercentage>,
         val settleUpTransactions: Map<Transaction.Transfer, String>
-    ) :
-        GroupDetailUiState()
+    ) : GroupDetailUiState()
 
     data object Loading : GroupDetailUiState()
     data object Error : GroupDetailUiState()

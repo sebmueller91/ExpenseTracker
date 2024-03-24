@@ -20,8 +20,8 @@ val uiModule = module {
         GroupDetailViewModel(
             groupId = groupId,
             dataRepository = get(),
-            individualPaymentAmount = get(),
-            individualPaymentPercentage = get(),
+            individualPaymentAmountCalculator = get(),
+            individualPaymentPercentageCalculator = get(),
             resourceResolver = get(),
             localeAwareFormatter = get()
         )

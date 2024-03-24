@@ -7,14 +7,14 @@ import com.example.core.util.isEqualTo
 import com.example.core.util.isSmallerThan
 import timber.log.Timber
 
-interface IndividualPaymentPercentage {
+interface IndividualPaymentPercentageCalculator {
     fun execute(group: Group): List<ParticipantPercentage>
 }
 
-internal class IndividualPaymentPercentageImpl(
+internal class IndividualPaymentPercentageCalculatorImpl(
     private val eventCost: EventCostsCalculator,
-    private val individualPaymentAmount: IndividualPaymentAmount
-) : IndividualPaymentPercentage {
+    private val individualPaymentAmountCalculator: IndividualPaymentAmountCalculator
+) : IndividualPaymentPercentageCalculator {
     override fun execute(group: Group): List<ParticipantPercentage> {
         val eventCost =
             eventCost.execute(group.transactions).takeIf { !it.isEqualTo(0.0) }
@@ -23,7 +23,7 @@ internal class IndividualPaymentPercentageImpl(
                     listOf()
                 }
 
-        val individualShares = individualPaymentAmount.execute(group)
+        val individualShares = individualPaymentAmountCalculator.execute(group)
 
         return group.participants.map { participant ->
             val participantShare =
