@@ -5,10 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.core.model.Currency
 import com.example.core.model.Participant
 import com.example.core.model.Transaction
-import com.example.core.services.IndividualPaymentAmountCalculator
-import com.example.core.services.IndividualPaymentPercentageCalculator
 import com.example.core.services.LocaleAwareFormatter
 import com.example.core.services.ResourceResolver
+import com.example.data.repository.DataRepository
 import com.example.expensetracker.R
 import com.example.expensetracker.ui.screens.group_detail.data.FormattedTransaction
 import kotlinx.coroutines.flow.SharingStarted
@@ -20,9 +19,7 @@ import java.util.UUID
 
 class GroupDetailViewModel(
     private val groupId: UUID,
-    private val dataRepository: com.example.data.repository.DataRepository,
-    private val individualPaymentAmountCalculator: IndividualPaymentAmountCalculator,
-    private val individualPaymentPercentageCalculator: IndividualPaymentPercentageCalculator,
+    private val dataRepository: DataRepository,
     private val resourceResolver: ResourceResolver,
     private val localeAwareFormatter: LocaleAwareFormatter
 ) : ViewModel() {
@@ -33,9 +30,10 @@ class GroupDetailViewModel(
             GroupDetailUiState.Success(
                 group = group,
                 eventCosts = settleUpGroup.eventCosts,
-                formattedTransactions = group.transactions.map { transaction ->
-                    transaction.format(group.currency)
-                },
+                formattedTransactions = group.transactions.sortedByDescending { it.date }
+                    .map { transaction ->
+                        transaction.format(group.currency)
+                    },
                 individualShares = settleUpGroup.individualPaymentAmount,
                 percentageShares = settleUpGroup.individualPaymentPercentage,
                 settleUpTransactions = settleUpGroup.settleUpTransactions
