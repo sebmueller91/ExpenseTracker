@@ -30,9 +30,10 @@ class GroupDetailViewModel(
             GroupDetailUiState.Success(
                 group = group,
                 eventCosts = settleUpGroup.eventCosts,
-                formattedTransactions = group.transactions.map { transaction ->
-                    transaction.format(group.currency)
-                },
+                formattedTransactions = group.transactions.sortedByDescending { it.date }
+                    .map { transaction ->
+                        transaction.format(group.currency)
+                    },
                 individualShares = settleUpGroup.individualPaymentAmount,
                 percentageShares = settleUpGroup.individualPaymentPercentage,
                 settleUpTransactions = settleUpGroup.settleUpTransactions
