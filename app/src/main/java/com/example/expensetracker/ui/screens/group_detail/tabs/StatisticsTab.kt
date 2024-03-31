@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -42,6 +43,7 @@ import com.example.core.model.Currency
 import com.example.core.model.ParticipantAmount
 import com.example.core.model.ParticipantPercentage
 import com.example.core.util.UiUtils
+import com.example.expensetracker.R
 import com.example.expensetracker.ui.screens.group_detail.GroupDetailUiState
 import timber.log.Timber
 
@@ -57,13 +59,13 @@ fun StatisticsTab(
     ) {
         item {
             Text(
-                "Event costs: ${
-                    UiUtils.formatMoneyAmount(
-                        uiState.eventCosts,
+                stringResource(
+                    R.string.event_costs, UiUtils.formatMoneyAmount(
+                        uiState.groupCosts,
                         uiState.group.currency,
                         LocalContext.current
                     )
-                }",
+                ),
                 style = MaterialTheme.typography.headlineSmall
             )
             Divider(
@@ -72,7 +74,7 @@ fun StatisticsTab(
             )
         }
         item {
-            Text("Expense distribution", style = MaterialTheme.typography.headlineSmall)
+            Text(stringResource(R.string.expense_distribution), style = MaterialTheme.typography.headlineSmall)
             Spacer(Modifier.height(20.dp))
         }
         item {
