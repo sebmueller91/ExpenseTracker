@@ -1,7 +1,7 @@
 package com.example.core.services.di
 
-import com.example.core.services.EventCostsCalculator
-import com.example.core.services.EventCostsCalculatorImpl
+import com.example.core.services.GroupCostsCalculator
+import com.example.core.services.GroupCostsCalculatorImpl
 import com.example.core.services.IndividualCostsAmountCalculator
 import com.example.core.services.IndividualCostsAmountCalculatorImpl
 import com.example.core.services.IndividualPaymentAmountCalculator
@@ -17,12 +17,12 @@ import com.example.core.services.SettleUpCalculatorImpl
 import org.koin.dsl.module
 
 val servicesModule = module {
-    single<EventCostsCalculator> { EventCostsCalculatorImpl() }
+    single<GroupCostsCalculator> { GroupCostsCalculatorImpl() }
     factory<IndividualCostsAmountCalculator> { IndividualCostsAmountCalculatorImpl() }
     factory<IndividualPaymentAmountCalculator> { IndividualPaymentAmountCalculatorImpl() }
     factory<IndividualPaymentPercentageCalculator> {
         IndividualPaymentPercentageCalculatorImpl(
-            eventCost = get(),
+            groupCostCalculator = get(),
             individualPaymentAmountCalculator = get()
         )
     }

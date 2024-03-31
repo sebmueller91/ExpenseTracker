@@ -38,7 +38,7 @@ val dataModule = module {
         DataRepositoryImpl(
             realm = get(),
             settleUpCalculator = get(),
-            eventCostsCalculator = get(),
+            groupCostsCalculator = get(),
             individualPaymentAmountCalculator = get(),
             individualPaymentPercentageCalculator = get()
         )

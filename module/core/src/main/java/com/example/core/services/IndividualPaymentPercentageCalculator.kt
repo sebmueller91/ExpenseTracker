@@ -12,12 +12,12 @@ interface IndividualPaymentPercentageCalculator {
 }
 
 internal class IndividualPaymentPercentageCalculatorImpl(
-    private val eventCost: EventCostsCalculator,
+    private val groupCostCalculator: GroupCostsCalculator,
     private val individualPaymentAmountCalculator: IndividualPaymentAmountCalculator
 ) : IndividualPaymentPercentageCalculator {
     override fun execute(group: Group): List<ParticipantPercentage> {
-        val eventCost =
-            eventCost.execute(group.transactions).takeIf { !it.isEqualTo(0.0) }
+        val groupCosts =
+            groupCostCalculator.execute(group.transactions).takeIf { !it.isEqualTo(0.0) }
                 ?: return run {
                     Timber.d("No event costs, can not calculate percentage shares.")
                     listOf()
@@ -32,7 +32,7 @@ internal class IndividualPaymentPercentageCalculatorImpl(
                     listOf()
                 }
 
-            val result = (participantShare.amount / eventCost) * 100.0
+            val result = (participantShare.amount / groupCosts) * 100.0
             ParticipantPercentage(
                 participant,
 

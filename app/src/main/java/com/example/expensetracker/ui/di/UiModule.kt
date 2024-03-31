@@ -10,9 +10,7 @@ import java.util.UUID
 val uiModule = module {
     viewModel {
         GroupOverviewViewModel(
-            dataRepository = get(),
-            eventCost = get(),
-            localeAwareFormatter = get()
+            dataRepository = get()
         )
     }
     viewModel { AddGroupViewModel(dataRepository = get()) }
