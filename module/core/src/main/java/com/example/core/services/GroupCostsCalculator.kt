@@ -2,11 +2,11 @@ package com.example.core.services
 
 import com.example.core.model.Transaction
 
-interface EventCostsCalculator {
+interface GroupCostsCalculator {
     fun execute(transactions: List<Transaction>): Double
 }
 
-internal class EventCostsCalculatorImpl : EventCostsCalculator {
+internal class GroupCostsCalculatorImpl : GroupCostsCalculator {
     override fun execute(transactions: List<Transaction>): Double {
         var sum = 0.0
         transactions.forEach {transaction ->

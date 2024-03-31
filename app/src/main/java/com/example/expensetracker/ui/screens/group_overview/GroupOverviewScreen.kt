@@ -16,12 +16,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -46,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import com.example.core.model.Currency
 import com.example.core.model.Group
 import com.example.core.model.Participant
+import com.example.core.model.SettleUpGroup
 import com.example.core.util.UiUtils
 import com.example.expensetracker.BuildConfig
 import com.example.expensetracker.R
@@ -58,7 +60,6 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.koinViewModel
-import timber.log.Timber
 import java.util.UUID
 
 @RootNavGraph(start = true)
@@ -115,25 +116,34 @@ private fun GroupOverviewScreen(
                     .padding(top = 24.dp, bottom = 16.dp),
                 contentScale = ContentScale.Crop
             )
-            LazyColumn(
-                modifier = Modifier
-            ) {
-                itemsIndexed(items = uiStateFlow.value.groups) { index, group ->
-                    val eventCosts = uiStateFlow.value.eventCosts.getOrNull(index) ?: run {
-                        Timber.e("Could not retrieve event costs for group $group! Something is wrong here!")
-                        ""
-                    }
-
-                    GroupCard(
-                        group = group,
-                        eventCosts = eventCosts,
-                        onNavigateToDetailScreen = onNavigateToDetailScreen,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+            when (val uiSate = uiStateFlow.value) {
+                is GroupOverviewUiState.Loading -> {
+                    CircularProgressIndicator()
                 }
-                item {
-                    Button(onClick = addFakeData) {
-                        Text("Add fake data")
+
+                is GroupOverviewUiState.Success -> {
+                    LazyColumn(
+                        modifier = Modifier
+                    ) {
+                        items(items = uiSate.groups) { settleUpGroup ->
+                            val context = LocalContext.current
+
+                            GroupCard(
+                                group = settleUpGroup.group,
+                                groupCosts = UiUtils.formatMoneyAmount(
+                                    settleUpGroup.groupCosts,
+                                    settleUpGroup.group.currency,
+                                    context
+                                ),
+                                onNavigateToDetailScreen = onNavigateToDetailScreen,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                        item {
+                            Button(onClick = addFakeData) {
+                                Text("Add fake data")
+                            }
+                        }
                     }
                 }
             }
@@ -146,7 +156,7 @@ private fun GroupOverviewScreen(
 @Composable
 private fun GroupCard(
     group: Group,
-    eventCosts: String,
+    groupCosts: String,
     onNavigateToDetailScreen: (UUID) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -176,7 +186,7 @@ private fun GroupCard(
                 Text(group.name, style = MaterialTheme.typography.headlineSmall)
                 Spacer(Modifier.weight(1f))
                 Text(
-                    eventCosts,
+                    groupCosts,
                     style = MaterialTheme.typography.bodyMedium
                 )
                 ExpandCollapseButton(expanded = expanded, onClick = { expanded = !expanded })
@@ -241,24 +251,35 @@ private fun VersionCopyrightLabel(modifier: Modifier = Modifier) {
 private fun GroupOverviewScreenPreview(darkMode: Boolean) {
     val uiState = remember {
         mutableStateOf(
-            GroupOverviewUiState(
+            GroupOverviewUiState.Success(
                 groups = listOf(
-                    Group(
-                        name = "Rock im Park",
-                        participants = listOf(
-                            Participant("Participant 1"),
-                            Participant("Participant 2")
-                        ),
-                        currency = Currency.EURO,
-                        transactions = listOf()
-                    ), Group(
-                        name = "Summer Breeze",
-                        participants = listOf(
-                            Participant("Participant 3"),
-                            Participant("Participant 4")
-                        ),
-                        currency = Currency.EURO,
-                        transactions = listOf()
+                    SettleUpGroup(
+                        group = Group(
+                            name = "Rock im Park",
+                            participants = listOf(
+                                Participant("Participant 1"),
+                                Participant("Participant 2")
+                            ),
+                            currency = Currency.EURO,
+                            transactions = listOf()
+                        ), individualPaymentAmount = listOf(),
+                        individualPaymentPercentage = listOf(),
+                        groupCosts = 123.23,
+                        settleUpTransactions = listOf()
+                    ),
+                    SettleUpGroup(
+                        group = Group(
+                            name = "Summer Breeze",
+                            participants = listOf(
+                                Participant("Participant 3"),
+                                Participant("Participant 4")
+                            ),
+                            currency = Currency.EURO,
+                            transactions = listOf()
+                        ), individualPaymentAmount = listOf(),
+                        individualPaymentPercentage = listOf(),
+                        groupCosts = 123.23,
+                        settleUpTransactions = listOf()
                     )
                 )
             )

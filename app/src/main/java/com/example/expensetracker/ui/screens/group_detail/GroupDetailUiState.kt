@@ -9,7 +9,7 @@ import com.example.expensetracker.ui.screens.group_detail.data.FormattedTransact
 sealed class GroupDetailUiState {
     data class Success(
         val group: Group,
-        val eventCosts: Double,
+        val groupCosts: Double,
         val formattedTransactions: List<FormattedTransaction>,
         val individualShares: List<ParticipantAmount>,
         val percentageShares: List<ParticipantPercentage>,

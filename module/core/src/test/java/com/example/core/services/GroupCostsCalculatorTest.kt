@@ -13,12 +13,12 @@ import org.koin.test.inject
 
 private val DELTA = 0.001
 
-class EventCostsCalculatorTest: KoinTest {
+class GroupCostsCalculatorTest: KoinTest {
     private val useCasesTestModule = module {
-        single<EventCostsCalculator> { EventCostsCalculatorImpl() }
+        single<GroupCostsCalculator> { GroupCostsCalculatorImpl() }
     }
 
-    private val sut: EventCostsCalculator by inject()
+    private val sut: GroupCostsCalculator by inject()
 
     @Before
     fun setUp() {
