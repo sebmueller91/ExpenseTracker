@@ -3,7 +3,6 @@ package com.example.expensetracker.ui.screens.group_detail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.model.Currency
-import com.example.core.model.Participant
 import com.example.core.model.Transaction
 import com.example.core.services.LocaleAwareFormatter
 import com.example.core.services.ResourceResolver
@@ -29,7 +28,7 @@ class GroupDetailViewModel(
 
             GroupDetailUiState.Success(
                 group = group,
-                eventCosts = settleUpGroup.eventCosts,
+                groupCosts = settleUpGroup.groupCosts,
                 formattedTransactions = group.transactions.sortedByDescending { it.date }
                     .map { transaction ->
                         transaction.format(group.currency)
@@ -117,7 +116,4 @@ class GroupDetailViewModel(
             splitBetween = splitBetween
         )
     }
-
-    private fun Map<Participant, Double>.sortByValueDesc(): Map<Participant, Double> =
-        toList().sortedByDescending { it.second }.toMap()
 }

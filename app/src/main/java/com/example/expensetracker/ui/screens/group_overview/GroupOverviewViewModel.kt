@@ -4,8 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.model.Currency
 import com.example.core.model.Group
-import com.example.core.services.EventCostsCalculator
-import com.example.core.services.LocaleAwareFormatter
 import com.example.core.util.FakeData
 import com.example.data.repository.DataRepository
 import kotlinx.coroutines.flow.SharingStarted
@@ -15,12 +13,10 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class GroupOverviewViewModel(
-    private val dataRepository: DataRepository,
-    private val eventCost: EventCostsCalculator,
-    private val localeAwareFormatter: LocaleAwareFormatter
+    private val dataRepository: DataRepository
 ) : ViewModel() {
     val uiStateFlow: StateFlow<GroupOverviewUiState> = dataRepository.groups.map { settleUpGroups ->
-        GroupOverviewUiState.Success(settleUpGroups.map {Pair(it.group, it.eventCosts)})
+        GroupOverviewUiState.Success(settleUpGroups)
 
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), GroupOverviewUiState.Loading)
 
@@ -104,9 +100,5 @@ class GroupOverviewViewModel(
                 )
             )
         }
-    }
-
-    private fun Group.formattedEventCosts(): String {
-        return localeAwareFormatter.formatMoneyAmount(eventCost.execute(transactions), currency)
     }
 }

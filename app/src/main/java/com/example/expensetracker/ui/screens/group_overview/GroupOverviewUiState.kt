@@ -1,10 +1,10 @@
 package com.example.expensetracker.ui.screens.group_overview
 
-import com.example.core.model.Group
+import com.example.core.model.SettleUpGroup
 
 sealed class GroupOverviewUiState {
     data class Success(
-        val groups: List<Pair<Group, Double>> = listOf(),
+        val groups: List<SettleUpGroup> = listOf(),
     ) : GroupOverviewUiState()
 
     data object Loading: GroupOverviewUiState()
