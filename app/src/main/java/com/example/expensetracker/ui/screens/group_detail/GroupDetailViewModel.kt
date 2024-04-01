@@ -8,6 +8,7 @@ import com.example.core.services.LocaleAwareFormatter
 import com.example.core.services.ResourceResolver
 import com.example.data.repository.DataRepository
 import com.example.expensetracker.R
+import com.example.expensetracker.ui.screens.group_detail.data.FormattedSettleUpTransaction
 import com.example.expensetracker.ui.screens.group_detail.data.FormattedTransaction
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -35,8 +36,12 @@ class GroupDetailViewModel(
                     },
                 individualShares = settleUpGroup.individualPaymentAmount,
                 percentageShares = settleUpGroup.individualPaymentPercentage,
-                settleUpTransactions = settleUpGroup.settleUpTransactions
-                    .associateWith { it.formatAsSettleUpTransfer(group.currency) }
+                settleUpTransactions = settleUpGroup.settleUpTransactions.map {
+                    FormattedSettleUpTransaction(
+                        transaction = it,
+                        formattedText = it.formatAsSettleUpTransfer(group.currency)
+                    )
+                }
             )
         } ?: GroupDetailUiState.Error
     }.stateIn(
