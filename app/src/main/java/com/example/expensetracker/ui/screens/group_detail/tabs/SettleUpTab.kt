@@ -1,5 +1,8 @@
 package com.example.expensetracker.ui.screens.group_detail.tabs
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
@@ -25,6 +29,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,6 +44,8 @@ import com.example.expensetracker.ui.components.AnimatedFloatingActionButton
 import com.example.expensetracker.ui.components.RoundFloatingActionButton
 import com.example.expensetracker.ui.components.ScreenWithAnimatedOverlay
 import com.example.expensetracker.ui.screens.group_detail.GroupDetailUiState
+import com.example.expensetracker.ui.screens.group_detail.data.FormattedSettleUpTransaction
+import kotlinx.coroutines.delay
 
 @Composable
 fun SettleUpTab(
@@ -88,27 +95,34 @@ private fun SettleUpTransactions(
     applySettleUpTransaction: (Transaction.Transfer) -> Unit
 ) {
     LazyColumn(modifier = modifier) {
-        uiState.settleUpTransactions.entries.forEach { entry ->
-            item {
-                SettleUpTransactionCard(
-                    entry = entry,
-                    modifier = Modifier.fillMaxWidth(),
-                    applySettleUpTransaction = applySettleUpTransaction
-                )
-            }
+        items(items = uiState.settleUpTransactions) { transaction ->
+            SettleUpTransactionCard(
+                transaction = transaction,
+                modifier = Modifier.fillMaxWidth(),
+                applySettleUpTransaction = applySettleUpTransaction
+            )
         }
     }
 }
 
 @Composable
 private fun SettleUpTransactionCard(
-    entry: Map.Entry<Transaction.Transfer, String>,
+    transaction: FormattedSettleUpTransaction,
     modifier: Modifier = Modifier,
     applySettleUpTransaction: (Transaction.Transfer) -> Unit
 ) {
+    val animationDuration = 1000
+    var isVisible by remember { mutableStateOf(true) }
+
     Card(
         modifier = modifier
-            .height(70.dp)
+            .animateContentSize(
+                animationSpec = tween(
+                    durationMillis = animationDuration,
+                    easing = LinearOutSlowInEasing
+                )
+            )
+            .height(if (isVisible) 70.dp else 0.dp)
             .padding(vertical = 6.dp, horizontal = 8.dp),
         shape = RoundedCornerShape(16.dp),
     ) {
@@ -119,7 +133,7 @@ private fun SettleUpTransactionCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = entry.value,
+                text = transaction.formattedText,
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier
                     .weight(1f)
@@ -128,7 +142,7 @@ private fun SettleUpTransactionCard(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Button(onClick = {
-                applySettleUpTransaction(entry.key)
+                isVisible = false
             }) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -145,6 +159,13 @@ private fun SettleUpTransactionCard(
                     )
                 }
             }
+        }
+    }
+
+    LaunchedEffect(key1 = isVisible) {
+        if (!isVisible) {
+            delay(animationDuration.toLong())
+            applySettleUpTransaction(transaction.transaction)
         }
     }
 }
